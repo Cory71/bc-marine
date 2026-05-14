@@ -1,0 +1,24 @@
+# Private project files
+planning.md
+2026-05-09-bc-marine-weather-design.md
+.claude
+
+# Dependencies
+node_modules
+
+# Expo
+.expo
+dist
+web-build
+
+# Environment variables (API keys)
+.env
+.env.local
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs
+npm-debug.log
+yarn-error.log

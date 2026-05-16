@@ -38,6 +38,12 @@ export function getSunMoon(lat, lon) {
   };
 }
 
+// Converts a wind/swell direction in degrees to an 8-point compass label
+export function degreesToCardinal(deg) {
+  const dirs = ['N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW'];
+  return dirs[Math.round(deg / 45) % 8];
+}
+
 // Returns the nearest station to a given GPS coordinate
 export function findNearestStation(lat, lon, stations) {
   let nearest = null;

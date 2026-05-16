@@ -50,27 +50,27 @@
 
 ### Task 1.1 — Initialize Expo Project
 
-- [ ] Initialize Expo project with blank template
-- [ ] Confirm default app loads in Expo Go on your phone
-- [ ] Install all project dependencies (React Navigation, Axios, AsyncStorage, react-native-svg, suncalc)
-- [ ] Commit
+- [x] Initialize Expo project with blank template
+- [x] Confirm default app loads in Expo Go on your phone
+- [x] Install all project dependencies (React Navigation, Axios, AsyncStorage, react-native-svg, suncalc)
+- [x] Commit
 
 ### Task 1.2 — Theme Constants
 
-- [ ] Create `src/utils/constants.js` with COLORS, BC_REGIONS (all 5 regions + EC sub-areas + stations), BC_STATIONS flat list, and API base URLs
-- [ ] Commit
+- [x] Create `src/utils/constants.js` with COLORS, BC_REGIONS (all 5 regions + EC sub-areas + stations), BC_STATIONS flat list, and API base URLs
+- [x] Commit
 
 ### Task 1.3 — Unit Utilities
 
-- [ ] Create `src/utils/units.js` with `metresToFeet()`, `formatTime()`, `timeSince()`, and `getSunMoon()`
-- [ ] Commit
+- [x] Create `src/utils/units.js` with `metresToFeet()`, `formatTime()`, `timeSince()`, and `getSunMoon()`
+- [x] Commit
 
 ### Task 1.4 — Navigation & Stub Screens
 
-- [ ] Create stub screen files for: DashboardScreen, TideDetailScreen, WeatherDetailScreen, CurrentsDetailScreen, LocationsScreen
-- [ ] Set up `App.js` with 2-tab bottom navigation (Home · Locations) and stack navigator for drill-down screens
-- [ ] Confirm 2 tabs appear and navigation works on your phone
-- [ ] Commit
+- [x] Create stub screen files for: DashboardScreen, TideDetailScreen, WeatherDetailScreen, CurrentsDetailScreen, LocationsScreen
+- [x] Set up `App.js` with 2-tab bottom navigation (Home · Locations) and stack navigator for drill-down screens
+- [x] Confirm 2 tabs appear and navigation works on your phone
+- [x] Commit
 
 ---
 
@@ -81,35 +81,35 @@
 
 ### Task 2.1 — Cache Module
 
-- [ ] Create `src/services/cache.js` with get, set, and isFresh functions (30-minute expiry)
-- [ ] Commit
+- [x] Create `src/services/cache.js` with get, set, and isFresh functions (30-minute expiry)
+- [x] Commit
 
 ### Task 2.2 — DFO Tide Service
 
-- [ ] Create `src/services/dfoService.js` with `fetchTides()`, `fetchTideEvents()`, and `fetchWeeklyTides()`
-- [ ] Verify DFO station IDs against the live IWLS API for the stations in `constants.js`
-- [ ] Confirm tide data returns in metres and converts to feet correctly
-- [ ] Commit
+- [x] Create `src/services/dfoService.js` with `fetchTides()`, `fetchTideEvents()`, and `fetchWeeklyTides()`
+- [x] Verify DFO station IDs against the live IWLS API for the stations in `constants.js`
+- [x] Confirm tide data returns in metres and converts to feet correctly
+- [x] Commit
 
 ### Task 2.3 — Stormglass Weather Service
 
-- [ ] Sign up at stormglass.io and get a free API key (50 calls/day)
-- [ ] Create `src/services/stormglassService.js` with `fetchWeather()` returning wind, waves, swell, currents, visibility, water temp
-- [ ] Confirm data returns with correct units (kts, ft, km, °C)
-- [ ] Commit
+- [x] Sign up at stormglass.io and get a free API key (50 calls/day)
+- [x] Create `src/services/stormglassService.js` with `fetchWeather()` returning wind, waves, swell, currents, visibility, water temp
+- [x] Confirm data returns with correct units (kts, ft, km, °C)
+- [x] Commit
 
 ### Task 2.4 — Environment Canada Marine Alerts Service
 
-- [ ] Create `src/services/ecService.js` with `fetchMarineForecast()` returning warnings array and forecast text
-- [ ] Confirm EC RSS/XML parses correctly using fast-xml-parser
-- [ ] Commit
+- [x] Create `src/services/ecService.js` with `fetchMarineForecast()` returning warnings array and forecast text
+- [x] Confirm EC RSS/XML parses correctly using fast-xml-parser
+- [x] Commit
 
 ### Task 2.5 — AppContext
 
-- [ ] Create `src/context/AppContext.js` with all shared state: activeStation, savedStations, tides, tideEvents, weeklyTides, weather, marineForecast, loading, error, lastUpdated, refresh
-- [ ] Wrap `App.js` with the AppContext provider
-- [ ] Confirm data loads for default station on app open
-- [ ] Commit
+- [x] Create `src/context/AppContext.js` with all shared state: activeStation, savedStations, tides, tideEvents, weeklyTides, weather, marineForecast, loading, error, lastUpdated, refresh
+- [x] Wrap `App.js` with the AppContext provider
+- [x] Confirm data loads for default station on app open
+- [x] Commit
 
 ---
 

@@ -144,9 +144,7 @@ export const BC_STATIONS = BC_REGIONS.flatMap(r =>
 // API base URLs
 export const API = {
   DFO_BASE: 'https://api.iwls-sine.azure.cloud.dfo-mpo.gc.ca/api/v1',
-  STORMGLASS_BASE: 'https://api.stormglass.io/v2',
   EC_MARINE_BASE: 'https://weather.gc.ca/rss/marine',
+  OPEN_METEO_MARINE: 'https://marine-api.open-meteo.com/v1/marine',
+  OPEN_METEO_WEATHER: 'https://api.open-meteo.com/v1/forecast',
 };
-
-// Add your Stormglass API key here after signing up at stormglass.io
-export const STORMGLASS_API_KEY = 'YOUR_STORMGLASS_API_KEY';

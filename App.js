@@ -3,6 +3,7 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createStackNavigator } from '@react-navigation/stack';
 import { Text } from 'react-native';
 import { COLORS } from './src/utils/constants';
+import { AppProvider } from './src/context/AppContext';
 
 import DashboardScreen from './src/screens/DashboardScreen';
 import TideDetailScreen from './src/screens/TideDetailScreen';
@@ -27,6 +28,7 @@ function HomeStack() {
 
 export default function App() {
   return (
+    <AppProvider>
     <NavigationContainer>
       <Tab.Navigator
         screenOptions={{
@@ -48,5 +50,6 @@ export default function App() {
         />
       </Tab.Navigator>
     </NavigationContainer>
+    </AppProvider>
   );
 }

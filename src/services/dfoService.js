@@ -23,21 +23,27 @@ export async function fetchTides(stationId) {
   return data;
 }
 
-// Fetch just the high/low events for today at a DFO station
+// Fetch high/low tide events for the next 48 hours so NEXT LOW is always visible
 export async function fetchTideEvents(stationId) {
   const cacheKey = `tideEvents_${stationId}`;
   const cached = getCache(cacheKey);
   if (cached) return cached;
 
   const today = new Date().toISOString().split('T')[0];
-  const url = `${API.DFO_BASE}/stations/${stationId}/data?time-series-code=wlp-hilo&from=${today}T00:00:00Z&to=${today}T23:59:59Z`;
+  const tomorrow = new Date(Date.now() + 86400000).toISOString().split('T')[0];
+  const url = `${API.DFO_BASE}/stations/${stationId}/data?time-series-code=wlp-hilo&from=${today}T00:00:00Z&to=${tomorrow}T23:59:59Z`;
 
   const response = await axios.get(url);
-  const data = response.data.map(item => ({
+  const events = response.data;
+  // Tide events always alternate HIGH/LOW. Determine which comes first by comparing
+  // the first two values — whichever is larger is the high tide.
+  const firstIsHigh = events.length >= 2
+    ? events[0].value > events[1].value
+    : (events[0]?.value ?? 0) > 0;
+  const data = events.map((item, i) => ({
     time: new Date(item.eventDate),
     heightFt: parseFloat(metresToFeet(item.value)),
-    // DFO wlp-hilo alternates between high and low — higher value = HIGH
-    type: item.value >= 0 ? 'HIGH' : 'LOW',
+    type: firstIsHigh === (i % 2 === 0) ? 'HIGH' : 'LOW',
   }));
 
   setCache(cacheKey, data);

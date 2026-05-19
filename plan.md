@@ -120,20 +120,20 @@
 
 ### Task 3.1 — Shared Card Component
 
-- [ ] Create `src/components/CardWrapper.js` — reusable styled card container used by all dashboard cards
-- [ ] Commit
+- [x] Create `src/components/CardWrapper.js` — reusable styled card container used by all dashboard cards
+- [x] Commit
 
 ### Task 3.2 — Warning Banner Component
 
-- [ ] Create `src/components/WarningBanner.js` — orange EC alert strip, hidden when no active warnings
-- [ ] Commit
+- [x] Create `src/components/WarningBanner.js` — orange EC alert strip, hidden when no active warnings
+- [x] Commit
 
 ### Task 3.3 — Full Dashboard Screen
 
-- [ ] Replace `DashboardScreen.js` stub with full implementation showing: location header (with sunrise/sunset/moon phase), warning banner, EC forecast card, Wind & Weather card, Tides card, Tidal Currents card
-- [ ] Confirm pull-to-refresh works
-- [ ] Confirm each card is tappable and navigates to the correct detail screen
-- [ ] Commit
+- [x] Replace `DashboardScreen.js` stub with full implementation showing: location header (with sunrise/sunset/moon phase), warning banner, EC forecast card, Wind & Weather card, Tides card, Tidal Currents card
+- [x] Confirm pull-to-refresh works
+- [x] Confirm each card is tappable and navigates to the correct detail screen
+- [x] Commit
 
 ---
 

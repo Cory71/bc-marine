@@ -4,12 +4,14 @@ import { BC_STATIONS } from '../utils/constants';
 import { fetchTides, fetchTideEvents, fetchWeeklyTides } from '../services/dfoService';
 import { fetchWeather } from '../services/weatherService';
 import { fetchMarineForecast } from '../services/ecService';
+import { clearCache } from '../services/cache';
 
 const AppContext = createContext(null);
 
 export function AppProvider({ children }) {
-  const [activeStation, setActiveStation] = useState(BC_STATIONS[0]); // Default: first BC station
-  const [savedStations, setSavedStations] = useState([BC_STATIONS[0]]);
+  const defaultStation = BC_STATIONS.find(s => s.name === 'Victoria') ?? BC_STATIONS[0];
+  const [activeStation, setActiveStation] = useState(defaultStation);
+  const [savedStations, setSavedStations] = useState([defaultStation]);
   const [tides, setTides] = useState([]);
   const [tideEvents, setTideEvents] = useState([]);
   const [weeklyTides, setWeeklyTides] = useState([]);
@@ -32,23 +34,39 @@ export function AppProvider({ children }) {
   }, [activeStation]);
 
   async function loadData(forceRefresh = false) {
+    if (forceRefresh) {
+      clearCache(`tides_${activeStation.id}`);
+      clearCache(`tideEvents_${activeStation.id}`);
+      clearCache(`weekly_${activeStation.id}`);
+      clearCache(`weather_${activeStation.lat}_${activeStation.lon}`);
+      clearCache(`ec_${activeStation.region}`);
+    }
     setLoading(true);
     setError(null);
     try {
-      const [tidesData, eventsData, weeklyData, weatherData, forecastData] = await Promise.all([
+      const [tidesResult, eventsResult, weeklyResult, weatherResult, forecastResult] = await Promise.allSettled([
         fetchTides(activeStation.id),
         fetchTideEvents(activeStation.id),
         fetchWeeklyTides(activeStation.id),
         fetchWeather(activeStation.lat, activeStation.lon),
         fetchMarineForecast(activeStation.region),
       ]);
-      setTides(tidesData);
-      setTideEvents(eventsData);
-      setWeeklyTides(weeklyData);
-      setWeather(weatherData);
-      setMarineForecast(forecastData);
+
+      // Log any failures to the console so we can see which API is broken
+      const labels = ['tides', 'tideEvents', 'weeklyTides', 'weather', 'marineForecast'];
+      [tidesResult, eventsResult, weeklyResult, weatherResult, forecastResult].forEach((r, i) => {
+        if (r.status === 'rejected') console.warn(`[loadData] ${labels[i]} failed:`, r.reason);
+      });
+
+      if (tidesResult.status === 'fulfilled') setTides(tidesResult.value);
+      if (eventsResult.status === 'fulfilled') setTideEvents(eventsResult.value);
+      if (weeklyResult.status === 'fulfilled') setWeeklyTides(weeklyResult.value);
+      if (weatherResult.status === 'fulfilled') setWeather(weatherResult.value);
+      if (forecastResult.status === 'fulfilled') setMarineForecast(forecastResult.value);
+
       setLastUpdated(new Date());
     } catch (e) {
+      console.error('[loadData] unexpected error:', e);
       setError('Could not load data. Check your connection and try again.');
     } finally {
       setLoading(false);

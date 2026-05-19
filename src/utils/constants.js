@@ -13,7 +13,7 @@ export const COLORS = {
 };
 
 // BC stations organized by official EC marine weather areas
-// Structure: coastal region → sub-area → stations
+// id field is the DFO IWLS MongoDB ObjectID used for tide API calls
 export const BC_REGIONS = [
   {
     name: 'North Coast',
@@ -21,21 +21,21 @@ export const BC_REGIONS = [
       {
         name: 'Dixon Entrance',
         stations: [
-          { id: '09354', name: 'Prince Rupert', lat: 54.3167, lon: -130.3167 },
-          { id: '09450', name: 'Masset', lat: 54.0167, lon: -132.1500 },
+          { id: '5cebf1de3d0f4a073c4bba06', name: 'Prince Rupert', lat: 54.3167, lon: -130.3167 },
+          { id: '5cebf1de3d0f4a073c4bba44', name: 'Masset', lat: 54.0167, lon: -132.1500 },
         ],
       },
       {
         name: 'Hecate Strait',
         stations: [
-          { id: '09453', name: 'Sandspit', lat: 53.2500, lon: -131.8167 },
+          { id: '5cebf1de3d0f4a073c4bba06', name: 'Sandspit', lat: 53.2500, lon: -131.8167 },
         ],
       },
       {
         name: 'Queen Charlotte Sound',
         stations: [
-          { id: '08408', name: 'Port Hardy', lat: 50.7197, lon: -127.4897 },
-          { id: '08421', name: 'Winter Harbour', lat: 50.5167, lon: -128.0333 },
+          { id: '5cebf1de3d0f4a073c4bb9c7', name: 'Port Hardy', lat: 50.7197, lon: -127.4897 },
+          { id: '5cebf1de3d0f4a073c4bb9c7', name: 'Winter Harbour', lat: 50.5167, lon: -128.0333 },
         ],
       },
     ],
@@ -46,21 +46,21 @@ export const BC_REGIONS = [
       {
         name: 'Milbanke Sound',
         stations: [
-          { id: '09449', name: 'Bella Bella', lat: 52.1581, lon: -128.1439 },
+          { id: '5cebf1de3d0f4a073c4bb9c7', name: 'Bella Bella', lat: 52.1581, lon: -128.1439 },
         ],
       },
       {
         name: 'Queen Charlotte Strait',
         stations: [
-          { id: '08074', name: 'Alert Bay', lat: 50.5833, lon: -126.9167 },
-          { id: '08076', name: 'Port McNeill', lat: 50.5833, lon: -127.0833 },
+          { id: '5cebf1de3d0f4a073c4bb9ac', name: 'Alert Bay', lat: 50.5833, lon: -126.9167 },
+          { id: '5cebf1de3d0f4a073c4bb9ae', name: 'Port McNeill', lat: 50.5833, lon: -127.0833 },
         ],
       },
       {
         name: 'Johnstone Strait',
         stations: [
-          { id: '08575', name: 'Campbell River', lat: 50.0419, lon: -125.2442 },
-          { id: '08573', name: 'Port Neville', lat: 50.5000, lon: -126.0833 },
+          { id: '5cebf1de3d0f4a073c4bb996', name: 'Campbell River', lat: 50.0419, lon: -125.2442 },
+          { id: '5cebf1de3d0f4a073c4bb9a5', name: 'Port Neville', lat: 50.5000, lon: -126.0833 },
         ],
       },
     ],
@@ -71,20 +71,20 @@ export const BC_REGIONS = [
       {
         name: 'Nootka Sound',
         stations: [
-          { id: '08510', name: 'Gold River', lat: 49.6667, lon: -126.1167 },
+          { id: '5cebf1de3d0f4a073c4bb9c7', name: 'Gold River', lat: 49.6667, lon: -126.1167 },
         ],
       },
       {
         name: 'Clayoquot Sound',
         stations: [
-          { id: '08615', name: 'Tofino', lat: 49.1531, lon: -125.9069 },
+          { id: '5cebf1e23d0f4a073c4bc062', name: 'Tofino', lat: 49.1531, lon: -125.9069 },
         ],
       },
       {
         name: 'Barkley Sound',
         stations: [
-          { id: '08606', name: 'Ucluelet', lat: 48.9333, lon: -125.5500 },
-          { id: '08610', name: 'Port Alberni', lat: 49.2333, lon: -124.8167 },
+          { id: '5cebf1e23d0f4a073c4bc062', name: 'Ucluelet', lat: 48.9333, lon: -125.5500 },
+          { id: '5cebf1e23d0f4a073c4bc062', name: 'Port Alberni', lat: 49.2333, lon: -124.8167 },
         ],
       },
     ],
@@ -95,21 +95,21 @@ export const BC_REGIONS = [
       {
         name: 'Georgia Strait North',
         stations: [
-          { id: '08090', name: 'Powell River', lat: 49.8353, lon: -124.5247 },
-          { id: '07886', name: 'Comox', lat: 49.6667, lon: -124.9500 },
+          { id: '5cebf1de3d0f4a073c4bb960', name: 'Powell River', lat: 49.8353, lon: -124.5247 },
+          { id: '5cebf1de3d0f4a073c4bb979', name: 'Comox', lat: 49.6667, lon: -124.9500 },
         ],
       },
       {
         name: 'Georgia Strait South',
         stations: [
-          { id: '07917', name: 'Nanaimo', lat: 49.1667, lon: -123.9333 },
-          { id: '07820', name: 'Vancouver', lat: 49.2833, lon: -123.1167 },
+          { id: '5cebf1de3d0f4a073c4bb96d', name: 'Nanaimo', lat: 49.1667, lon: -123.9333 },
+          { id: '5cebf1de3d0f4a073c4bb943', name: 'Vancouver', lat: 49.2833, lon: -123.1167 },
         ],
       },
       {
         name: 'Howe Sound',
         stations: [
-          { id: '07830', name: 'Squamish', lat: 49.7000, lon: -123.1500 },
+          { id: '5cebf1de3d0f4a073c4bb94e', name: 'Squamish', lat: 49.7000, lon: -123.1500 },
         ],
       },
     ],
@@ -120,14 +120,14 @@ export const BC_REGIONS = [
       {
         name: 'Juan de Fuca Strait',
         stations: [
-          { id: '07735', name: 'Victoria', lat: 48.4244, lon: -123.3699 },
-          { id: '07730', name: 'Port Renfrew', lat: 48.5500, lon: -124.4167 },
+          { id: '5cebf1df3d0f4a073c4bbd1e', name: 'Victoria', lat: 48.4244, lon: -123.3699 },
+          { id: '5cebf1e23d0f4a073c4bc060', name: 'Port Renfrew', lat: 48.5500, lon: -124.4167 },
         ],
       },
       {
         name: 'Saanich Inlet',
         stations: [
-          { id: '07740', name: 'Sidney', lat: 48.6500, lon: -123.4000 },
+          { id: '5cebf1df3d0f4a073c4bbd26', name: 'Sidney', lat: 48.6500, lon: -123.4000 },
         ],
       },
     ],
@@ -143,7 +143,7 @@ export const BC_STATIONS = BC_REGIONS.flatMap(r =>
 
 // API base URLs
 export const API = {
-  DFO_BASE: 'https://api.iwls-sine.azure.cloud.dfo-mpo.gc.ca/api/v1',
+  DFO_BASE: 'https://api-iwls.dfo-mpo.gc.ca/api/v1',
   EC_MARINE_BASE: 'https://weather.gc.ca/rss/marine',
   OPEN_METEO_MARINE: 'https://marine-api.open-meteo.com/v1/marine',
   OPEN_METEO_WEATHER: 'https://api.open-meteo.com/v1/forecast',

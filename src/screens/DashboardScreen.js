@@ -10,7 +10,9 @@ export default function DashboardScreen({ navigation }) {
 
   const now = new Date();
   const sunMoon = getSunMoon(activeStation.lat, activeStation.lon);
-  const currentWeather = weather.find(h => new Date(h.time) >= now) ?? weather[0];
+  const currentWeather = weather.reduce((closest, h) =>
+    Math.abs(new Date(h.time) - now) < Math.abs(new Date(closest.time) - now) ? h : closest
+  , weather[0] ?? {});
   const nextHigh = tideEvents.find(e => e.type === 'HIGH' && new Date(e.time) > now);
   const nextLow = tideEvents.find(e => e.type === 'LOW' && new Date(e.time) > now);
   // Use the closest hourly reading for current tide height
@@ -68,7 +70,9 @@ export default function DashboardScreen({ navigation }) {
         <View style={styles.row}>
           <View style={styles.statBox}>
             <Text style={styles.statLabel}>Wind</Text>
-            <Text style={styles.statValue}>{currentWeather?.windSpeedKts?.toFixed(0) ?? '--'} kts</Text>
+            <Text style={styles.statValue}>
+              {currentWeather?.windDirectionDeg != null ? degreesToCardinal(currentWeather.windDirectionDeg) + ' ' : ''}{currentWeather?.windSpeedKts?.toFixed(0) ?? '--'} kts
+            </Text>
           </View>
           <View style={styles.statBox}>
             <Text style={styles.statLabel}>Waves</Text>

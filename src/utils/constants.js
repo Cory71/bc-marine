@@ -141,6 +141,35 @@ export const BC_STATIONS = BC_REGIONS.flatMap(r =>
   )
 );
 
+// Additional BC coastal communities for search — use nearest DFO station for tide data
+export const BC_COMMUNITIES = [
+  // Sunshine Coast
+  { id: '5cebf1de3d0f4a073c4bb94e', name: 'Gibsons', lat: 49.3972, lon: -123.5069, region: 'Georgia Strait North', coast: 'Strait of Georgia' },
+  { id: '5cebf1de3d0f4a073c4bb94e', name: 'Sechelt', lat: 49.4739, lon: -123.7572, region: 'Georgia Strait North', coast: 'Strait of Georgia' },
+  { id: '5cebf1de3d0f4a073c4bb960', name: 'Pender Harbour', lat: 49.6267, lon: -124.0261, region: 'Georgia Strait North', coast: 'Strait of Georgia' },
+  { id: '5cebf1de3d0f4a073c4bb960', name: 'Halfmoon Bay', lat: 49.5106, lon: -123.9081, region: 'Georgia Strait North', coast: 'Strait of Georgia' },
+  // East Vancouver Island
+  { id: '5cebf1de3d0f4a073c4bb979', name: 'Courtenay', lat: 49.6858, lon: -124.9897, region: 'Georgia Strait North', coast: 'Strait of Georgia' },
+  { id: '5cebf1de3d0f4a073c4bb96d', name: 'Parksville', lat: 49.3161, lon: -124.3122, region: 'Georgia Strait South', coast: 'Strait of Georgia' },
+  { id: '5cebf1de3d0f4a073c4bb96d', name: 'Ladysmith', lat: 49.0006, lon: -123.8197, region: 'Georgia Strait South', coast: 'Strait of Georgia' },
+  { id: '5cebf1de3d0f4a073c4bb96d', name: 'Chemainus', lat: 48.9267, lon: -123.7097, region: 'Georgia Strait South', coast: 'Strait of Georgia' },
+  // South Vancouver Island
+  { id: '5cebf1df3d0f4a073c4bbd1e', name: 'Sooke', lat: 48.3769, lon: -123.7264, region: 'Juan de Fuca Strait', coast: 'Juan de Fuca & South Coast' },
+  { id: '5cebf1df3d0f4a073c4bbd26', name: 'Ganges', lat: 48.8594, lon: -123.5028, region: 'Saanich Inlet', coast: 'Juan de Fuca & South Coast' },
+  // West Coast Vancouver Island
+  { id: '5cebf1e23d0f4a073c4bc062', name: 'Bamfield', lat: 48.8356, lon: -125.1350, region: 'Barkley Sound', coast: 'West Coast Vancouver Island' },
+  { id: '5cebf1de3d0f4a073c4bb9c7', name: 'Tahsis', lat: 49.9167, lon: -126.6667, region: 'Nootka Sound', coast: 'West Coast Vancouver Island' },
+  // Central Coast
+  { id: '5cebf1de3d0f4a073c4bb9c7', name: 'Bella Coola', lat: 52.3667, lon: -126.7667, region: 'Milbanke Sound', coast: 'Central Coast' },
+  { id: '5cebf1de3d0f4a073c4bb9c7', name: 'Ocean Falls', lat: 52.3500, lon: -127.6833, region: 'Milbanke Sound', coast: 'Central Coast' },
+  { id: '5cebf1de3d0f4a073c4bb9c7', name: 'Klemtu', lat: 52.5833, lon: -128.5167, region: 'Milbanke Sound', coast: 'Central Coast' },
+  { id: '5cebf1de3d0f4a073c4bb91e', name: 'Hartley Bay', lat: 53.4242, lon: -129.2519, region: 'Milbanke Sound', coast: 'Central Coast' },
+  { id: '5cebf1de3d0f4a073c4bb925', name: 'Kitimat', lat: 53.9890, lon: -128.6960, region: 'Milbanke Sound', coast: 'Central Coast' },
+  // Metro Vancouver area
+  { id: '5cebf1de3d0f4a073c4bb943', name: 'White Rock', lat: 49.0253, lon: -122.8028, region: 'Georgia Strait South', coast: 'Strait of Georgia' },
+  { id: '5cebf1de3d0f4a073c4bb943', name: 'Tsawwassen', lat: 49.0133, lon: -123.1317, region: 'Georgia Strait South', coast: 'Strait of Georgia' },
+];
+
 // API base URLs
 export const API = {
   DFO_BASE: 'https://api-iwls.dfo-mpo.gc.ca/api/v1',

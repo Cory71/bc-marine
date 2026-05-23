@@ -144,20 +144,20 @@
 
 ### Task 4.1 — TideCurve SVG Component
 
-- [ ] Create `src/components/TideCurve.js` — SVG sine wave tide chart with current position marker and high/low labels
-- [ ] Commit
+- [x] Create `src/components/TideCurve.js` — SVG sine wave tide chart with current position marker and high/low labels
+- [x] Commit
 
 ### Task 4.2 — Tide Detail Screen
 
-- [ ] Replace `TideDetailScreen.js` stub with full implementation showing: current height (ft), next event countdown, SVG tide curve, today's tide table, 7-day max tide bar chart
-- [ ] Confirm all values display in feet
-- [ ] Commit
+- [x] Replace `TideDetailScreen.js` stub with full implementation showing: current height (ft), next event countdown, SVG tide curve, today's tide table, 7-day max tide bar chart
+- [x] Confirm all values display in feet
+- [x] Commit
 
 ### Task 4.3 — Wind & Weather Detail Screen
 
-- [ ] Replace `WeatherDetailScreen.js` stub with full implementation showing: compass rose, wind/gusts/waves/swell/visibility/water temp, hourly breakdown table, wave height trend chart
-- [ ] Confirm wind in kts, waves in ft, visibility in km, temp in °C
-- [ ] Commit
+- [x] Replace `WeatherDetailScreen.js` stub with full implementation showing: compass rose, wind/gusts/waves/swell/visibility/water temp, hourly breakdown table, wave height trend chart
+- [x] Confirm wind in kts, waves in ft, visibility in km, temp in °C
+- [x] Commit
 
 ---
 
@@ -168,28 +168,28 @@
 
 ### Task 5.1 — LocationCard Component
 
-- [ ] Create `src/components/LocationCard.js` — saved location card showing Alert / Wind / Waves / Tide summary with active station indicator
-- [ ] Commit
+- [x] Create `src/components/LocationCard.js` — saved location card showing Alert / Wind / Waves / Tide summary with active station indicator
+- [x] Commit
 
 ### Task 5.2 — Locations Screen
 
-- [ ] Replace `LocationsScreen.js` stub with full implementation: search bar, saved favourites with LocationCards, accordion region browser (all 5 regions → EC sub-areas → station name rows)
-- [ ] Confirm tapping a station sets it as active and opens the Dashboard with full conditions
-- [ ] Confirm accordion expand/collapse works for all regions
-- [ ] Commit
+- [x] Replace `LocationsScreen.js` stub with full implementation: search bar, saved favourites with LocationCards, accordion region browser (all 5 regions → EC sub-areas → station name rows)
+- [x] Confirm tapping a station sets it as active and opens the Dashboard with full conditions
+- [x] Confirm accordion expand/collapse works for all regions
+- [x] Commit
 
 ### Task 5.3 — Currents Detail Screen
 
-- [ ] Replace `CurrentsDetailScreen.js` stub with full implementation showing: current speed (kts), direction, flooding/ebbing phase, hourly breakdown table
-- [ ] Commit
+- [x] Replace `CurrentsDetailScreen.js` stub with full implementation showing: current speed (kts), direction, flooding/ebbing phase, hourly breakdown table
+- [x] Commit
 
 ### Task 5.4 — GPS: Use My Location
 
-- [ ] Add `expo-location` to the install command (already included in Task 1.1)
-- [ ] Add `findNearestStation()` utility to `src/utils/units.js`
-- [ ] Add "Use My Location" button to `LocationsScreen.js` that requests GPS permission, gets current coordinates, finds the nearest BC station, and opens the Dashboard for it
-- [ ] Confirm permission prompt appears on first tap and nearest station loads correctly
-- [ ] Commit
+- [x] Add `expo-location` to the install command (already included in Task 1.1)
+- [x] Add `findNearestStation()` utility to `src/utils/units.js`
+- [x] Add "Use My Location" button to `LocationsScreen.js` that requests GPS permission, gets current coordinates, finds the nearest BC station, and opens the Dashboard for it
+- [x] Confirm permission prompt appears on first tap and nearest station loads correctly
+- [x] Commit
 
 ---
 

@@ -12,6 +12,7 @@ function degreesToCompass(deg) {
 
 export default function WeatherDetailScreen({ navigation }) {
   const { activeStation, weather } = useApp();
+
   const now = new Date();
   const current = weather.reduce((closest, h) =>
     Math.abs(new Date(h.time) - now) < Math.abs(new Date(closest.time) - now) ? h : closest

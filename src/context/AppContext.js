@@ -24,7 +24,16 @@ export function AppProvider({ children }) {
   // Load saved stations from device storage on app start
   useEffect(() => {
     AsyncStorage.getItem('savedStations').then(json => {
-      if (json) setSavedStations(JSON.parse(json));
+      if (!json) return;
+      const saved = JSON.parse(json);
+      // Enrich any stations that are missing region/coast (saved before fix)
+      const enriched = saved.map(s => {
+        if (s.region) return s;
+        const match = BC_STATIONS.find(b => b.name === s.name);
+        return match ? { ...s, region: match.region, coast: match.coast } : s;
+      });
+      setSavedStations(enriched);
+      AsyncStorage.setItem('savedStations', JSON.stringify(enriched));
     });
   }, []);
 
@@ -35,21 +44,27 @@ export function AppProvider({ children }) {
 
   async function loadData(forceRefresh = false) {
     if (forceRefresh) {
+      const regionKey = activeStation.region
+        ?? BC_STATIONS.find(s => s.id === activeStation.id)?.region;
       clearCache(`tides_${activeStation.id}`);
       clearCache(`tideEvents_${activeStation.id}`);
       clearCache(`weekly_${activeStation.id}`);
       clearCache(`weather_${activeStation.lat}_${activeStation.lon}`);
-      clearCache(`ec_${activeStation.region}`);
+      clearCache(`ec_${regionKey}`);
     }
     setLoading(true);
     setError(null);
     try {
+      // Region may be missing on stations loaded from AsyncStorage — look it up if so
+      const region = activeStation.region
+        ?? BC_STATIONS.find(s => s.id === activeStation.id)?.region;
+
       const [tidesResult, eventsResult, weeklyResult, weatherResult, forecastResult] = await Promise.allSettled([
         fetchTides(activeStation.id),
         fetchTideEvents(activeStation.id),
         fetchWeeklyTides(activeStation.id),
         fetchWeather(activeStation.lat, activeStation.lon),
-        fetchMarineForecast(activeStation.region),
+        fetchMarineForecast(region),
       ]);
 
       // Log any failures to the console so we can see which API is broken
@@ -74,8 +89,10 @@ export function AppProvider({ children }) {
   }
 
   function saveStation(station) {
-    const updated = savedStations.find(s => s.id === station.id)
-      ? savedStations
+    const exists = savedStations.some(s => s.id === station.id);
+    // Always update the saved data so region/coast are kept current
+    const updated = exists
+      ? savedStations.map(s => s.id === station.id ? station : s)
       : [...savedStations, station];
     setSavedStations(updated);
     AsyncStorage.setItem('savedStations', JSON.stringify(updated));

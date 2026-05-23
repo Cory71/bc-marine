@@ -19,6 +19,11 @@ export default function DashboardScreen({ navigation }) {
   const currentTide = tides.reduce((closest, h) =>
     Math.abs(new Date(h.time) - now) < Math.abs(new Date(closest.time) - now) ? h : closest
   , tides[0] ?? { heightFt: null });
+  // Current phase: compare speed to previous hour; show -- when no data
+  const currentIdx = weather.findIndex(h => h.time === currentWeather.time);
+  const prevSpeed = weather[currentIdx - 1]?.currentSpeedKts ?? null;
+  const currentSpeed = currentWeather?.currentSpeedKts ?? null;
+  const currentPhase = currentSpeed != null ? (currentSpeed >= (prevSpeed ?? 0) ? 'Flooding' : 'Ebbing') : null;
 
   if (loading) {
     return (
@@ -118,7 +123,9 @@ export default function DashboardScreen({ navigation }) {
           </View>
           <View style={styles.statBox}>
             <Text style={styles.statLabel}>Phase</Text>
-            <Text style={[styles.statValue, { color: COLORS.safe }]}>Flooding</Text>
+            <Text style={[styles.statValue, { color: currentPhase === 'Flooding' ? COLORS.safe : currentPhase === 'Ebbing' ? COLORS.warning : COLORS.textMuted }]}>
+              {currentPhase ?? '--'}
+            </Text>
           </View>
         </View>
       </CardWrapper>

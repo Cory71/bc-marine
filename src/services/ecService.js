@@ -22,6 +22,14 @@ const EC_FEEDS = {
   'Saanich Inlet': 'https://weather.gc.ca/rss/marine/07000_e.xml',
 };
 
+// Sub-area filter for regions that share a single EC feed with other sub-areas.
+// EC's Strait of Georgia feed (14300) bundles both north and south entries in
+// one XML file, so we match the entry title to pick the right one.
+const EC_SUBAREA = {
+  'Georgia Strait North': 'north of nanaimo',
+  'Georgia Strait South': 'south of nanaimo',
+};
+
 // Fetch marine forecast and active warnings for a BC region name
 export async function fetchMarineForecast(regionName) {
   const cacheKey = `ec_${regionName}`;
@@ -38,7 +46,14 @@ export async function fetchMarineForecast(regionName) {
   const atomRaw = parsed?.feed?.entry;
   const rssRaw = parsed?.rss?.channel?.item;
   const raw = atomRaw ?? rssRaw ?? [];
-  const entries = Array.isArray(raw) ? raw : [raw];
+  const allEntries = Array.isArray(raw) ? raw : [raw];
+
+  // When the region shares a feed with other sub-areas, keep only entries
+  // whose title mentions this region's sub-area
+  const subArea = EC_SUBAREA[regionName];
+  const entries = subArea
+    ? allEntries.filter(e => String(e.title ?? '').toLowerCase().includes(subArea))
+    : allEntries;
 
   // summary is used in Atom, description in RSS 2.0 — strip HTML tags and decode entities
   const getText = e => {

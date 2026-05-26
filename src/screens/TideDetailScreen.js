@@ -10,6 +10,24 @@ export default function TideDetailScreen({ navigation }) {
   const chartWidth = screenWidth - 56; // account for card padding and margins
 
   const now = new Date();
+
+  // Graceful fallback when DFO returned no tide data for this station
+  if (!tides || tides.length === 0) {
+    return (
+      <ScrollView style={styles.container}>
+        <TouchableOpacity style={styles.back} onPress={() => navigation.goBack()}>
+          <Text style={styles.backText}>‹ Dashboard</Text>
+        </TouchableOpacity>
+        <Text style={styles.title}>Tide Chart</Text>
+        <Text style={styles.subtitle}>📍 {activeStation.name}, BC · DFO</Text>
+        <View style={styles.emptyCard}>
+          <Text style={styles.emptyText}>No tide data available for this station.</Text>
+          <Text style={styles.emptySub}>Pull down on the Dashboard to refresh.</Text>
+        </View>
+      </ScrollView>
+    );
+  }
+
   const currentTide = tides.reduce((closest, h) =>
     Math.abs(new Date(h.time) - now) < Math.abs(new Date(closest.time) - now) ? h : closest
   , tides[0] ?? { heightFt: null });
@@ -105,4 +123,7 @@ const styles = StyleSheet.create({
   eventType: { fontSize: 11, fontWeight: 'bold', width: 60 },
   eventHeight: { color: COLORS.textPrimary, fontSize: 13, fontWeight: 'bold' },
   eventTime: { color: COLORS.textSecondary, fontSize: 12 },
+  emptyCard: { marginHorizontal: 16, marginTop: 12, padding: 16, backgroundColor: 'rgba(126,206,244,0.06)', borderWidth: 1, borderColor: 'rgba(126,206,244,0.15)', borderRadius: 10, alignItems: 'center' },
+  emptyText: { color: COLORS.textSecondary, fontSize: 13, textAlign: 'center' },
+  emptySub: { color: COLORS.textMuted, fontSize: 11, marginTop: 6, textAlign: 'center' },
 });

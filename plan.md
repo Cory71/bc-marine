@@ -1,12 +1,10 @@
 # BC Marine Weather & Tides — Project Plan
 
-**Goal:** Build a React Native mobile app showing BC coastal marine weather, tides, and alerts using DFO, Stormglass, and Environment Canada data sources.
+**Goal:** Build a React Native mobile app showing BC coastal marine weather, tides, and alerts using DFO, Open-Meteo, and Environment Canada data sources.
 
 **Tech Stack:** Expo, React Native, React Navigation, Axios, AsyncStorage, react-native-svg
 
 **Timeline:** ~May 9 to May 26, 2026
-
-**Design spec:** `2026-05-09-bc-marine-weather-design.md`
 
 ---
 
@@ -16,6 +14,7 @@
 /
 ├── App.js                          # Root — navigation setup
 ├── app.json                        # Expo config
+├── README.md                       # Project overview, setup, and data sources
 ├── plan.md                         # This file
 ├── src/
 │   ├── context/
@@ -23,7 +22,7 @@
 │   ├── services/
 │   │   ├── cache.js                # In-memory cache with 30-min expiry
 │   │   ├── dfoService.js           # DFO IWLS API — tide heights & times
-│   │   ├── stormglassService.js    # Stormglass API — wind, waves, currents
+│   │   ├── weatherService.js       # Open-Meteo API — wind, waves, swell, currents, visibility
 │   │   └── ecService.js            # Environment Canada — warnings, forecast text
 │   ├── utils/
 │   │   ├── units.js                # metresToFeet(), formatTime(), timeSince(), getSunMoon(), findNearestStation()
@@ -45,7 +44,7 @@
 
 ## Phase 1 — Project Setup & Navigation Skeleton
 
-**Week 1, Days 1–2 · Est. 3–4 hours**
+**Est. 3–4 hours**
 *Goal: Working app on your phone with all screens stubbed out and navigation functional.*
 
 ### Task 1.1 — Initialize Expo Project
@@ -76,7 +75,7 @@
 
 ## Phase 2 — AppContext & Data Services
 
-**Week 1, Days 3–5 · Est. 4–5 hours**
+**Est. 4–5 hours**
 *Goal: All three data sources fetching real data and flowing into global app state.*
 
 ### Task 2.1 — Cache Module
@@ -91,11 +90,11 @@
 - [x] Confirm tide data returns in metres and converts to feet correctly
 - [x] Commit
 
-### Task 2.3 — Stormglass Weather Service
+### Task 2.3 — Open-Meteo Weather Service
 
-- [x] Sign up at stormglass.io and get a free API key (50 calls/day)
-- [x] Create `src/services/stormglassService.js` with `fetchWeather()` returning wind, waves, swell, currents, visibility, water temp
-- [x] Confirm data returns with correct units (kts, ft, km, °C)
+- [x] No sign-up or API key needed — Open-Meteo is free and unlimited
+- [x] Create `src/services/weatherService.js` with `fetchWeather()` returning wind, waves, swell, currents, and visibility
+- [x] Confirm data returns with correct units (kts, ft, km)
 - [x] Commit
 
 ### Task 2.4 — Environment Canada Marine Alerts Service
@@ -115,7 +114,7 @@
 
 ## Phase 3 — Dashboard Screen
 
-**Week 2, Days 1–2 · Est. 3–4 hours**
+**Est. 3–4 hours**
 *Goal: Full Dashboard showing all live data cards for the active location.*
 
 ### Task 3.1 — Shared Card Component
@@ -139,7 +138,7 @@
 
 ## Phase 4 — Tide Detail & Weather Detail Screens
 
-**Week 2, Days 3–5 · Est. 4–5 hours**
+**Est. 4–5 hours**
 *Goal: Full drill-down detail screens for tides and weather.*
 
 ### Task 4.1 — TideCurve SVG Component
@@ -163,7 +162,7 @@
 
 ## Phase 5 — Locations & Currents Screens
 
-**Week 3, Days 1–3 · Est. 4–5 hours**
+**Est. 4–5 hours**
 *Goal: Fully functional Locations browser and Currents detail screen.*
 
 ### Task 5.1 — LocationCard Component
@@ -195,36 +194,36 @@
 
 ## Phase 6 — Polish & Submission
 
-**Week 3, Days 4–5 · Est. 2–3 hours**
+**Est. 2–3 hours**
 *Goal: Clean up edge cases, secure API key, write README, submit.*
 
 ### Task 6.1 — Error States & Loading Indicators
 
-- [ ] Confirm loading spinner shows on Dashboard while data fetches
-- [ ] Add no-data guard to each detail screen (graceful fallback message)
-- [ ] Test with network off to confirm error states display correctly
+- [x] Confirm loading spinner shows on Dashboard while data fetches
+- [x] Add no-data guard to each detail screen (graceful fallback message)
+- [x] Test with network off to confirm error states display correctly
 - [ ] Commit
 
 ### Task 6.2 — .gitignore & API Key Safety
 
-- [ ] Create `.gitignore` excluding `node_modules/`, `.env`, build folders
-- [ ] Move Stormglass API key to a `.env` file and load via `expo-constants` or `process.env`
-- [ ] Confirm `.env` is not tracked by git
+- [x] Create `.gitignore` excluding `node_modules/`, `.env`, build folders
+- [x] No API keys required — app uses Open-Meteo (free, no key), DFO IWLS, and Environment Canada Atom feeds
+- [x] Confirm `.env` is not tracked by git
 - [ ] Commit
 
 ### Task 6.3 — README
 
-- [ ] Write `README.md` with: project description, setup instructions, API key setup, how to run, features list, data sources, screenshots
+- [x] Write `README.md` with: project description, setup instructions, how to run, features list, data sources
 - [ ] Commit
 
 ### Task 6.4 — Final Testing Checklist
 
-- [ ] Tides load and display in feet for multiple stations
-- [ ] Wind and waves display in kts and ft
-- [ ] EC warnings appear when active, banner hides when none
-- [ ] Accordion regions all expand and show correct stations
-- [ ] Tapping a station loads full Dashboard conditions
-- [ ] Saved favourites persist after closing and reopening the app
-- [ ] Pull-to-refresh fetches new data
-- [ ] App works with no network (shows error state, not crash)
+- [x] Tides load and display in feet for multiple stations
+- [x] Wind and waves display in kts and ft
+- [x] EC warnings appear when active, banner hides when none
+- [x] Accordion regions all expand and show correct stations
+- [x] Tapping a station loads full Dashboard conditions
+- [x] Saved favourites persist after closing and reopening the app
+- [x] Pull-to-refresh fetches new data
+- [x] App works with no network (shows error state, not crash)
 - [ ] Commit and push to GitHub

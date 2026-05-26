@@ -13,6 +13,27 @@ export default function CurrentsDetailScreen({ navigation }) {
   const { activeStation, weather } = useApp();
 
   const now = new Date();
+
+  // Open-Meteo lacks current data in BC fjords and sheltered inlets
+  const hasCurrentsData = weather && weather.some(h => h.currentSpeedKts != null);
+
+  // Graceful fallback when no current data is available for this region
+  if (!hasCurrentsData) {
+    return (
+      <ScrollView style={styles.container}>
+        <TouchableOpacity style={styles.back} onPress={() => navigation.goBack()}>
+          <Text style={styles.backText}>‹ Dashboard</Text>
+        </TouchableOpacity>
+        <Text style={styles.title}>Tidal Currents</Text>
+        <Text style={styles.subtitle}>📍 {activeStation.name}, BC · Open-Meteo</Text>
+        <View style={styles.emptyCard}>
+          <Text style={styles.emptyText}>No tidal current data available for this station.</Text>
+          <Text style={styles.emptySub}>Open-Meteo does not cover fjords, inlets, and many sheltered BC waters.</Text>
+        </View>
+      </ScrollView>
+    );
+  }
+
   const current = weather.reduce((closest, h) =>
     Math.abs(new Date(h.time) - now) < Math.abs(new Date(closest.time) - now) ? h : closest
   , weather[0] ?? {});
@@ -91,4 +112,7 @@ const styles = StyleSheet.create({
   tableRow: { flexDirection: 'row', paddingVertical: 5, borderBottomWidth: 1, borderBottomColor: 'rgba(126,206,244,0.08)' },
   currentRow: { backgroundColor: 'rgba(77,204,136,0.05)', borderRadius: 4 },
   colText: { flex: 1, color: COLORS.textSecondary, fontSize: 10 },
+  emptyCard: { marginHorizontal: 16, marginTop: 12, padding: 16, backgroundColor: 'rgba(126,206,244,0.06)', borderWidth: 1, borderColor: 'rgba(126,206,244,0.15)', borderRadius: 10, alignItems: 'center' },
+  emptyText: { color: COLORS.textSecondary, fontSize: 13, textAlign: 'center' },
+  emptySub: { color: COLORS.textMuted, fontSize: 11, marginTop: 6, textAlign: 'center' },
 });

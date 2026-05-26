@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "mobile-marine-weather-tides-mobile-app",
-    "slug": "mobile-marine-weather-tides-mobile-app",
+    "name": "BC Marine",
+    "slug": "bc-marine",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",

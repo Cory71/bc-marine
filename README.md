@@ -4,6 +4,12 @@ A React Native mobile app for BC coastal mariners. Shows live tide heights, wind
 
 Built with Expo for iOS and Android.
 
+## Try it out
+
+Scan with your phone's camera ([Expo Go](https://expo.dev/client) required):
+
+![BC Marine QR code](bc-marine-qr.png)
+
 ## Features
 
 - **Dashboard** — at-a-glance view of wind, waves, visibility, tides, and tidal currents for the active station

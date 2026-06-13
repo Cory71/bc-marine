@@ -24,6 +24,18 @@
     },
     "web": {
       "favicon": "./assets/favicon.png"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "13bca074-7926-49a6-9c99-80dd527911a1"
+      }
+    },
+    "owner": "cory71",
+    "runtimeVersion": {
+      "policy": "sdkVersion"
+    },
+    "updates": {
+      "url": "https://u.expo.dev/13bca074-7926-49a6-9c99-80dd527911a1"
     }
   }
 }

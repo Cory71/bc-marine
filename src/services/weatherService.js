@@ -9,9 +9,13 @@ export async function fetchWeather(lat, lon) {
   const cached = getCache(cacheKey);
   if (cached) return cached;
 
-  // Fetch marine data (waves, swell, currents) and wind data in parallel
-  const [marineRes, weatherRes] = await Promise.all([
+  // Fail fast if Open-Meteo is slow or unreachable, so the Dashboard doesn't hang
+  const TIMEOUT_MS = 15000;
+
+  // Use allSettled so one failed endpoint doesn't wipe out the other's data
+  const [marineResult, weatherResult] = await Promise.allSettled([
     axios.get(API.OPEN_METEO_MARINE, {
+      timeout: TIMEOUT_MS,
       params: {
         latitude: lat,
         longitude: lon,
@@ -20,6 +24,7 @@ export async function fetchWeather(lat, lon) {
       },
     }),
     axios.get(API.OPEN_METEO_WEATHER, {
+      timeout: TIMEOUT_MS,
       params: {
         latitude: lat,
         longitude: lon,
@@ -30,22 +35,38 @@ export async function fetchWeather(lat, lon) {
     }),
   ]);
 
-  const marine = marineRes.data.hourly;
-  const weather = weatherRes.data.hourly;
+  // Log endpoint failures so we can see them in the Metro console
+  if (marineResult.status === 'rejected') {
+    console.warn('[fetchWeather] marine endpoint failed:', marineResult.reason?.message);
+  }
+  if (weatherResult.status === 'rejected') {
+    console.warn('[fetchWeather] weather endpoint failed:', weatherResult.reason?.message);
+  }
 
-  // Zip the two hourly arrays together by index
-  const data = marine.time.map((time, i) => ({
+  // If both endpoints failed, throw so AppContext keeps the previous state
+  if (marineResult.status === 'rejected' && weatherResult.status === 'rejected') {
+    throw new Error('Both Open-Meteo endpoints failed');
+  }
+
+  const marine = marineResult.status === 'fulfilled' ? marineResult.value.data.hourly : null;
+  const weather = weatherResult.status === 'fulfilled' ? weatherResult.value.data.hourly : null;
+
+  // Use whichever hourly time array is available (they line up when both are present)
+  const timeArray = marine?.time ?? weather?.time;
+
+  // Zip the two hourly arrays together by index — missing fields become null so the UI shows dashes
+  const data = timeArray.map((time, i) => ({
     time: new Date(time),
-    windSpeedKts: weather.windspeed_10m[i] ?? null,
-    windDirectionDeg: weather.winddirection_10m[i] ?? null,
-    waveHeightFt: marine.wave_height[i] != null ? parseFloat(metresToFeet(marine.wave_height[i])) : null,
-    wavePeriodS: marine.wave_period[i] ?? null,
-    swellHeightFt: marine.swell_wave_height[i] != null ? parseFloat(metresToFeet(marine.swell_wave_height[i])) : null,
-    swellDirectionDeg: marine.swell_wave_direction[i] ?? null,
-    visibilityKm: weather.visibility[i] != null ? parseFloat((weather.visibility[i] / 1000).toFixed(1)) : null,
+    windSpeedKts: weather?.windspeed_10m?.[i] ?? null,
+    windDirectionDeg: weather?.winddirection_10m?.[i] ?? null,
+    waveHeightFt: marine?.wave_height?.[i] != null ? parseFloat(metresToFeet(marine.wave_height[i])) : null,
+    wavePeriodS: marine?.wave_period?.[i] ?? null,
+    swellHeightFt: marine?.swell_wave_height?.[i] != null ? parseFloat(metresToFeet(marine.swell_wave_height[i])) : null,
+    swellDirectionDeg: marine?.swell_wave_direction?.[i] ?? null,
+    visibilityKm: weather?.visibility?.[i] != null ? parseFloat((weather.visibility[i] / 1000).toFixed(1)) : null,
     // ocean_current_velocity is in km/h — convert to knots
-    currentSpeedKts: marine.ocean_current_velocity[i] != null ? parseFloat((marine.ocean_current_velocity[i] * 0.539957).toFixed(2)) : null,
-    currentDirectionDeg: marine.ocean_current_direction[i] ?? null,
+    currentSpeedKts: marine?.ocean_current_velocity?.[i] != null ? parseFloat((marine.ocean_current_velocity[i] * 0.539957).toFixed(2)) : null,
+    currentDirectionDeg: marine?.ocean_current_direction?.[i] ?? null,
   }));
 
   setCache(cacheKey, data);

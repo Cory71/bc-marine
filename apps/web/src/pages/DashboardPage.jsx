@@ -12,127 +12,136 @@ import Card from '../components/Card.jsx';
 import Stat from '../components/Stat.jsx';
 import TideCurve from '../components/TideCurve.jsx';
 import Skeleton from '../components/Skeleton.jsx';
-import PanelError from '../components/PanelError.jsx';
+import SourceContent from '../components/SourceContent.jsx';
 
 const NO_VALUE = '--';
 
-// At-a-glance conditions for the active station
+// At-a-glance conditions for the active station. Each card fills in as soon as
+// its own data source arrives, instead of waiting for the slowest one.
 export default function DashboardPage() {
   const { loading, lastUpdated } = useApp();
-  // Skeletons only before the first load; a refresh keeps the old numbers on screen
-  if (loading && !lastUpdated) return <DashboardSkeleton />;
+  // Fade the old numbers slightly while a refresh is running
+  const isRefreshing = loading && Boolean(lastUpdated);
 
   return (
-    <div className={`dashboard ${loading ? 'is-refreshing' : ''}`} aria-busy={loading}>
+    <div className={`dashboard ${isRefreshing ? 'is-refreshing' : ''}`} aria-busy={loading}>
       <div className="card-grid">
-        <WindCard />
-        <WavesCard />
-        <VisibilityCard />
-        <TideNowCard />
-        <CurrentsCard />
+        <Card title="Wind" to="/weather">
+          <SourceContent source="weather" errorMessage="Weather unavailable">
+            <WindReading />
+          </SourceContent>
+        </Card>
+        <Card title="Waves" to="/weather">
+          <SourceContent source="weather" errorMessage="Weather unavailable">
+            <WavesReading />
+          </SourceContent>
+        </Card>
+        <Card title="Visibility">
+          <SourceContent source="weather" errorMessage="Weather unavailable">
+            <VisibilityReading />
+          </SourceContent>
+        </Card>
+        <Card title="Tide" to="/tides">
+          <SourceContent source="tides" errorMessage="Tides unavailable">
+            <TideNowReading />
+          </SourceContent>
+        </Card>
+        <Card title="Currents" to="/currents">
+          <SourceContent source="weather" errorMessage="Currents unavailable">
+            <CurrentsReading />
+          </SourceContent>
+        </Card>
         <SunMoonCard />
       </div>
-      <TideChartCard />
-      <ForecastCard />
+
+      <Card title="Today's tide" to="/tides" className="card--wide">
+        <SourceContent
+          source="tides"
+          errorMessage="Tides unavailable"
+          placeholder={<Skeleton height={240} />}
+        >
+          <TodaysTideCurve />
+        </SourceContent>
+      </Card>
+
+      <Card title="Marine forecast" className="card--wide">
+        <SourceContent
+          source="marineForecast"
+          errorMessage="Forecast unavailable"
+          placeholder={<ForecastPlaceholder />}
+        >
+          <ForecastText />
+        </SourceContent>
+      </Card>
     </div>
   );
 }
 
-// True when a source failed and there's no earlier data to fall back on
-function useIsUnavailable(key, data) {
-  const { failures } = useApp();
-  return failures.includes(key) && (!data || data.length === 0);
-}
-
-function useCurrentWeather() {
+// The hourly weather reading closest to now
+function useWeatherNow() {
   const { weather } = useApp();
-  return { weather, now: findClosestReading(weather), unavailable: useIsUnavailable('weather', weather) };
+  return findClosestReading(weather);
 }
 
-function WindCard() {
-  const { now, unavailable } = useCurrentWeather();
+function WindReading() {
+  const now = useWeatherNow();
   const direction = now?.windDirectionDeg != null ? degreesToCardinal(now.windDirectionDeg) : '';
   const speed = now?.windSpeedKts != null ? Math.round(now.windSpeedKts) : NO_VALUE;
-  return (
-    <Card title="Wind" to="/weather">
-      {unavailable ? <PanelError message="Weather unavailable" /> : <Stat label="Now" value={`${direction} ${speed} kts`.trim()} />}
-    </Card>
-  );
+  return <Stat label="Now" value={`${direction} ${speed} kts`.trim()} />;
 }
 
-function WavesCard() {
-  const { now, unavailable } = useCurrentWeather();
+function WavesReading() {
+  const now = useWeatherNow();
   const swell = now?.swellHeightFt != null ? `Swell ${now.swellHeightFt} ft` : undefined;
-  return (
-    <Card title="Waves" to="/weather">
-      {unavailable ? (
-        <PanelError message="Weather unavailable" />
-      ) : (
-        <Stat label="Height" value={`${now?.waveHeightFt ?? NO_VALUE} ft`} detail={swell} />
-      )}
-    </Card>
-  );
+  return <Stat label="Height" value={`${now?.waveHeightFt ?? NO_VALUE} ft`} detail={swell} />;
 }
 
-function VisibilityCard() {
-  const { now, unavailable } = useCurrentWeather();
+function VisibilityReading() {
+  const now = useWeatherNow();
   const visibility = now?.visibilityKm != null ? Math.round(now.visibilityKm) : NO_VALUE;
-  return (
-    <Card title="Visibility">
-      {unavailable ? <PanelError message="Weather unavailable" /> : <Stat label="Now" value={`${visibility} km`} />}
-    </Card>
-  );
+  return <Stat label="Now" value={`${visibility} km`} />;
 }
 
-function TideNowCard() {
+function TideNowReading() {
   const { tides, tideEvents } = useApp();
-  const unavailable = useIsUnavailable('tides', tides);
   const current = findClosestReading(tides);
   const nextHigh = getNextTideEvent(tideEvents, 'HIGH');
   const nextLow = getNextTideEvent(tideEvents, 'LOW');
 
   return (
-    <Card title="Tide" to="/tides">
-      {unavailable ? (
-        <PanelError message="Tides unavailable" />
-      ) : (
-        <>
-          <Stat label="Now" value={current ? `${current.heightFt} ft` : NO_VALUE} />
-          <p className="card__note numeric">
-            High {nextHigh ? formatTime(nextHigh.time) : NO_VALUE} · Low{' '}
-            {nextLow ? formatTime(nextLow.time) : NO_VALUE}
-          </p>
-        </>
-      )}
-    </Card>
+    <>
+      <Stat label="Now" value={current ? `${current.heightFt} ft` : NO_VALUE} />
+      <p className="card__note numeric">
+        High {nextHigh ? formatTime(nextHigh.time) : NO_VALUE} · Low{' '}
+        {nextLow ? formatTime(nextLow.time) : NO_VALUE}
+      </p>
+    </>
   );
 }
 
-function CurrentsCard() {
-  const { weather, now, unavailable } = useCurrentWeather();
+function CurrentsReading() {
+  const { weather } = useApp();
+  const now = useWeatherNow();
+  if (!hasCurrentData(weather))
+    return <p className="card__note">No current data for this station.</p>;
+
   const phase = getCurrentPhase(weather);
-  const phaseTone = { Flooding: 'safe', Ebbing: 'warning' }[phase];
-
-  let content;
-  if (unavailable) content = <PanelError message="Currents unavailable" />;
-  else if (!hasCurrentData(weather)) content = <p className="card__note">No current data for this station.</p>;
-  else {
-    const direction = now?.currentDirectionDeg != null ? degreesToCardinal(now.currentDirectionDeg) : NO_VALUE;
-    content = (
-      <>
-        <Stat label="Speed" value={`${now?.currentSpeedKts?.toFixed(1) ?? NO_VALUE} kts`} detail={direction} />
-        <p className={`card__note stat__value--${phaseTone ?? 'muted'}`}>{phase ?? NO_VALUE}</p>
-      </>
-    );
-  }
-
+  const phaseTone = { Flooding: 'safe', Ebbing: 'warning' }[phase] ?? 'muted';
+  const direction =
+    now?.currentDirectionDeg != null ? degreesToCardinal(now.currentDirectionDeg) : NO_VALUE;
   return (
-    <Card title="Currents" to="/currents">
-      {content}
-    </Card>
+    <>
+      <Stat
+        label="Speed"
+        value={`${now?.currentSpeedKts?.toFixed(1) ?? NO_VALUE} kts`}
+        detail={direction}
+      />
+      <p className={`card__note stat__value--${phaseTone}`}>{phase ?? NO_VALUE}</p>
+    </>
   );
 }
 
+// Calculated on the device from the station's position, so it never waits for an API
 function SunMoonCard() {
   const { activeStation } = useApp();
   const { sunrise, sunset, moonPhase } = getSunMoon(activeStation.lat, activeStation.lon);
@@ -147,30 +156,18 @@ function SunMoonCard() {
   );
 }
 
-function TideChartCard() {
+function TodaysTideCurve() {
   const { tides, tideEvents } = useApp();
-  const unavailable = useIsUnavailable('tides', tides);
-  return (
-    <Card title="Today's tide" to="/tides" className="card--wide">
-      {unavailable ? <PanelError message="Tides unavailable" /> : <TideCurve tides={tides} events={tideEvents} />}
-    </Card>
-  );
+  return <TideCurve tides={tides} events={tideEvents} />;
 }
 
-function ForecastCard() {
+function ForecastText() {
   const { marineForecast, activeStation } = useApp();
-  const unavailable = useIsUnavailable('marineForecast', marineForecast.forecast);
   return (
-    <Card title="Marine forecast" className="card--wide">
-      {unavailable ? (
-        <PanelError message="Forecast unavailable" />
-      ) : (
-        <>
-          <p className="forecast-text">{tidyForecastText(marineForecast.forecast) || NO_VALUE}</p>
-          <p className="card__source">Source: Environment Canada · {activeStation.region}</p>
-        </>
-      )}
-    </Card>
+    <>
+      <p className="forecast-text">{tidyForecastText(marineForecast.forecast) || NO_VALUE}</p>
+      <p className="card__source">Source: Environment Canada · {activeStation.region}</p>
+    </>
   );
 }
 
@@ -179,27 +176,13 @@ function tidyForecastText(text) {
   return text.replace(/\s*\n(?!Issued)\s*/g, ' ');
 }
 
-// Placeholder layout with the same shape as the real dashboard
-function DashboardSkeleton() {
+function ForecastPlaceholder() {
   return (
-    <div className="dashboard" aria-busy="true">
-      <p className="visually-hidden">Loading marine data…</p>
-      <div className="card-grid">
-        {Array.from({ length: 6 }, (_, i) => (
-          <div key={i} className="card">
-            <Skeleton width="40%" height={12} />
-            <Skeleton width="70%" height={28} />
-          </div>
-        ))}
-      </div>
-      <div className="card card--wide">
-        <Skeleton height={240} />
-      </div>
-      <div className="card card--wide">
-        <Skeleton height={14} />
-        <Skeleton height={14} width="85%" />
-        <Skeleton height={14} width="60%" />
-      </div>
-    </div>
+    <>
+      <span className="visually-hidden">Loading forecast…</span>
+      <Skeleton height={14} />
+      <Skeleton height={14} width="85%" />
+      <Skeleton height={14} width="60%" />
+    </>
   );
 }

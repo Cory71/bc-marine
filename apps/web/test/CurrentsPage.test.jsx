@@ -9,7 +9,11 @@ vi.mock('../src/context/AppContext.jsx', () => ({ useApp: vi.fn() }));
 
 afterEach(cleanup);
 
-const GOLD_RIVER = { name: 'Gold River', region: 'Nootka Sound', coast: 'West Coast Vancouver Island' };
+const GOLD_RIVER = {
+  name: 'Gold River',
+  region: 'Nootka Sound',
+  coast: 'West Coast Vancouver Island',
+};
 
 // Hourly readings starting now, with the given current speeds
 function hoursWithSpeeds(speeds) {
@@ -21,7 +25,13 @@ function hoursWithSpeeds(speeds) {
 }
 
 function renderPage(weather) {
-  useApp.mockReturnValue({ activeStation: GOLD_RIVER, weather, failures: [], loading: false, lastUpdated: new Date() });
+  useApp.mockReturnValue({
+    activeStation: GOLD_RIVER,
+    weather,
+    getSourceStatus: () => 'ready',
+    loading: false,
+    lastUpdated: new Date(),
+  });
   render(
     <MemoryRouter initialEntries={['/currents?station=gold-river']}>
       <CurrentsPage />

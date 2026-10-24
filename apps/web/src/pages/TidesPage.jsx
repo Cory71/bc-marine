@@ -6,31 +6,31 @@ import {
   formatTime,
 } from '@bc-marine/shared';
 import { useApp } from '../context/AppContext.jsx';
-import DetailPage, { EmptyState } from '../components/DetailPage.jsx';
+import DetailPage, { EmptyState, DetailPlaceholder } from '../components/DetailPage.jsx';
 import Card from '../components/Card.jsx';
 import Stat from '../components/Stat.jsx';
 import TideCurve from '../components/TideCurve.jsx';
 import WeeklyTideBars from '../components/WeeklyTideBars.jsx';
-import PanelError from '../components/PanelError.jsx';
+import Skeleton from '../components/Skeleton.jsx';
+import SourceContent from '../components/SourceContent.jsx';
 
 export default function TidesPage() {
   return (
     <DetailPage title="Tides" source="Fisheries and Oceans Canada">
-      <TidesContent />
+      <SourceContent
+        source="tides"
+        errorMessage="Tides unavailable. Try refreshing."
+        placeholder={<DetailPlaceholder />}
+      >
+        <TidesContent />
+      </SourceContent>
     </DetailPage>
   );
 }
 
 function TidesContent() {
-  const { tides, tideEvents, weeklyTides, failures } = useApp();
-
-  if (tides.length === 0) {
-    return failures.includes('tides') ? (
-      <PanelError message="Tides unavailable. Try refreshing." />
-    ) : (
-      <EmptyState message="No tide data available for this station." />
-    );
-  }
+  const { tides, tideEvents } = useApp();
+  if (tides.length === 0) return <EmptyState message="No tide data available for this station." />;
 
   const current = findClosestReading(tides);
   const trend = getTideTrend(tides);
@@ -56,15 +56,23 @@ function TidesContent() {
           <TideEventsTable events={tideEvents} />
         </Card>
         <Card title="Highest tide, next 7 days">
-          {weeklyTides.length > 0 ? (
-            <WeeklyTideBars days={weeklyTides} />
-          ) : (
-            <p className="card__note">Weekly tides unavailable.</p>
-          )}
+          {/* The 7-day chart needs 7 requests, so it loads on its own without holding up the page */}
+          <SourceContent
+            source="weeklyTides"
+            errorMessage="Weekly tides unavailable."
+            placeholder={<Skeleton height={200} />}
+          >
+            <WeeklyTides />
+          </SourceContent>
         </Card>
       </div>
     </>
   );
+}
+
+function WeeklyTides() {
+  const { weeklyTides } = useApp();
+  return <WeeklyTideBars days={weeklyTides} />;
 }
 
 // Events from an hour ago onward, so a tide that just turned is still listed (like mobile)
@@ -84,7 +92,10 @@ function TideEventsTable({ events }) {
       <tbody>
         {recentAndUpcoming.map(event => (
           <tr key={event.time.toString()}>
-            <th scope="row" className={event.type === 'HIGH' ? 'tide-type--high' : 'tide-type--low'}>
+            <th
+              scope="row"
+              className={event.type === 'HIGH' ? 'tide-type--high' : 'tide-type--low'}
+            >
               {event.type === 'HIGH' ? '↑ High' : '↓ Low'}
             </th>
             <td>{event.heightFt} ft</td>

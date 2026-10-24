@@ -35,9 +35,20 @@ The repo is an npm-workspaces monorepo. Both apps depend on `@bc-marine/shared`,
 
 The rule is that shared code never imports React, React Native, Expo or browser globals. That keeps it usable by the mobile app, the web app and the Node-based proxy, and testable in plain Node. A fix to an API call or a unit conversion reaches both apps at once.
 
-### Partial failure
+### Partial failure and progressive loading
 
-`loadStationData` uses `Promise.allSettled`, so one slow or broken API doesn't take down the others. It returns each data set or `null`, plus a list of the sources that failed. Both apps keep the previous data on screen for a failed source, and the web app shows an inline error only on the affected panel. For example, if Environment Canada is down, only the forecast panel says "Forecast unavailable".
+`loadStationData` uses `Promise.allSettled`, so one slow or broken API doesn't take down the others. It returns each data set or `null`, plus a list of the sources that failed. Both apps keep the previous data on screen for a failed source.
+
+It also takes an optional `onData(key, value)` callback that fires as each source arrives. The web app uses it so every panel follows its own source: a placeholder while loading, the data as soon as it lands, or an inline error if that source failed. The dashboard fills in card by card instead of waiting for the slowest API (the 7-day tide outlook is seven requests), and switching stations never shows the previous station's numbers. For example, if Environment Canada is down, only the forecast panel says "Forecast unavailable".
+
+### Adding a data layer
+
+Data sources are listed in one table, `DATA_SOURCES` in `loadStationData.js`. To add a layer (for example, water temperature or buoy observations):
+
+1. Write a fetch function in `packages/shared/src/services/` using `getJson` or `getText` from `http.js` (timeouts and HTTP errors are handled there), and cache it with `getCache`/`setCache`.
+2. Add `{ key, load }` to `DATA_SOURCES`. Both apps now receive it from `loadStationData`.
+3. On the web, add the key and its empty value to `EMPTY_DATA` in `AppContext.jsx`, then wrap the panel in `<SourceContent source="yourKey">` to get the loading, ready and error states for free.
+4. Add a forced-refresh cache key in `clearStationCache` and a test alongside the other service tests.
 
 ## The Environment Canada proxy
 
@@ -83,7 +94,7 @@ The app is a static site plus one tiny function. On Vercel, the static files are
 
 Expo can export the mobile app to the web through `react-native-web`, but that wasn't the right fit:
 
-- **Bundle size.** `react-native-web` and the React Navigation stack add a lot of JavaScript for a page that only needs React and a router. The Vite build is about 125 KB gzipped in total, and Lighthouse scores it 98–100 for performance on desktop.
+- **Bundle size.** `react-native-web` and the React Navigation stack add a lot of JavaScript for a page that only needs React and a router. The first download is about 86 KB of gzipped JavaScript (React, React Router, the app and the shared data layer); the XML parser and the detail pages load on demand. Lighthouse scores it 98–100 for performance on desktop.
 - **Desktop layout.** The mobile screens are designed for a narrow, tab-driven phone UI. The web app is built around a persistent station sidebar, a card grid and wide charts, and collapses to a drawer below 1024px. Building it as a normal React DOM app made that layout, semantic HTML (real `<table>`s, links and buttons) and accessibility much easier.
 - **Shareable URLs.** React Router keeps the active station in the URL (`/tides?station=tofino`), so links can be shared and survive a refresh.
 
@@ -91,7 +102,7 @@ The two apps still share all data logic, so the cost of separate UIs is limited 
 
 ## Testing strategy
 
-- **Shared package (Vitest, Node):** unit conversions and compass labels; BC-time helpers, including daylight-saving edge cases, run under `TZ=America/Toronto`; DFO and Open-Meteo request URLs, with axios mocked; EC parsing of Atom, RSS 2.0 and the Georgia Strait north/south shared feed; cache expiry with fake timers; and `loadStationData` partial failure and forced refresh.
+- **Shared package (Vitest, Node):** unit conversions and compass labels; BC-time helpers, including daylight-saving edge cases, run under `TZ=America/Toronto`; the `fetch` wrapper (query parameters, timeouts, HTTP errors); DFO and Open-Meteo request URLs, with `fetch` stubbed; EC parsing of Atom, RSS 2.0 and the Georgia Strait north/south shared feed; cache expiry with fake timers; and `loadStationData` partial failure, forced refresh and progressive `onData` delivery.
 - **Web (Vitest + Testing Library, jsdom):** the proxy allowlist and error mapping; `localStorage` fallbacks (blocked storage, bad JSON, quota errors); the data context (unknown `?station=` falls back to Victoria and rewrites the URL, and a failed source keeps the other data); the tide chart's accessible label; and the currents page's no-data state.
 - **CI (GitHub Actions):** lint, tests, the web production build, and an Android bundle export of the mobile app on every push and pull request, so a shared-package change that breaks either app is caught before merge.
 - **Manual checks:** each UI change was checked in a real browser at 1440px and 375px widths (layout, no horizontal scroll, keyboard focus, drawer behaviour), with Lighthouse for performance and accessibility, and the mobile app was checked on a phone in Expo Go.

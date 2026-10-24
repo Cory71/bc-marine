@@ -1,30 +1,35 @@
-import { findClosestReading, getUpcomingHours, degreesToCompass, formatTime } from '@bc-marine/shared';
+import {
+  findClosestReading,
+  getUpcomingHours,
+  degreesToCompass,
+  formatTime,
+} from '@bc-marine/shared';
 import { useApp } from '../context/AppContext.jsx';
-import DetailPage, { EmptyState } from '../components/DetailPage.jsx';
+import DetailPage, { EmptyState, DetailPlaceholder } from '../components/DetailPage.jsx';
 import Card from '../components/Card.jsx';
 import Stat from '../components/Stat.jsx';
-import PanelError from '../components/PanelError.jsx';
+import SourceContent from '../components/SourceContent.jsx';
 
 const NO_VALUE = '--';
 
 export default function WeatherPage() {
   return (
     <DetailPage title="Wind & weather" source="Open-Meteo">
-      <WeatherContent />
+      <SourceContent
+        source="weather"
+        errorMessage="Weather unavailable. Try refreshing."
+        placeholder={<DetailPlaceholder />}
+      >
+        <WeatherContent />
+      </SourceContent>
     </DetailPage>
   );
 }
 
 function WeatherContent() {
-  const { weather, failures } = useApp();
-
-  if (weather.length === 0) {
-    return failures.includes('weather') ? (
-      <PanelError message="Weather unavailable. Try refreshing." />
-    ) : (
-      <EmptyState message="No weather data available for this station." />
-    );
-  }
+  const { weather } = useApp();
+  if (weather.length === 0)
+    return <EmptyState message="No weather data available for this station." />;
 
   const now = findClosestReading(weather);
   return (

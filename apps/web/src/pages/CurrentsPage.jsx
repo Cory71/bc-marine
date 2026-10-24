@@ -7,27 +7,29 @@ import {
   formatTime,
 } from '@bc-marine/shared';
 import { useApp } from '../context/AppContext.jsx';
-import DetailPage, { EmptyState } from '../components/DetailPage.jsx';
+import DetailPage, { EmptyState, DetailPlaceholder } from '../components/DetailPage.jsx';
 import Card from '../components/Card.jsx';
 import Stat from '../components/Stat.jsx';
-import PanelError from '../components/PanelError.jsx';
+import SourceContent from '../components/SourceContent.jsx';
 
 const PHASE_TONES = { Flooding: 'safe', Ebbing: 'warning' };
 
 export default function CurrentsPage() {
   return (
     <DetailPage title="Tidal currents" source="Open-Meteo">
-      <CurrentsContent />
+      <SourceContent
+        source="weather"
+        errorMessage="Current data unavailable. Try refreshing."
+        placeholder={<DetailPlaceholder />}
+      >
+        <CurrentsContent />
+      </SourceContent>
     </DetailPage>
   );
 }
 
 function CurrentsContent() {
-  const { weather, failures } = useApp();
-
-  if (failures.includes('weather') && weather.length === 0) {
-    return <PanelError message="Current data unavailable. Try refreshing." />;
-  }
+  const { weather } = useApp();
   // Open-Meteo has no current data for fjords, inlets and many sheltered waters
   if (!hasCurrentData(weather)) {
     return (

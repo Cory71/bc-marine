@@ -1,5 +1,4 @@
 import { test, expect, vi, beforeEach, afterEach } from 'vitest';
-import axios from 'axios';
 import {
   isValidEcFeedCode,
   buildDirectEcFeedUrl,
@@ -8,8 +7,6 @@ import {
   fetchMarineForecast,
   clearCache,
 } from '../src/index.js';
-
-vi.mock('axios');
 
 // Small EC-style Atom feed: one warning and one forecast entry
 const ATOM_FIXTURE = `<?xml version="1.0" encoding="UTF-8"?>
@@ -38,11 +35,11 @@ const GEORGIA_FIXTURE = `<?xml version="1.0" encoding="UTF-8"?>
   <entry><title>Marine Forecast - Strait of Georgia - south of Nanaimo</title><summary>South text.</summary></entry>
 </feed>`;
 
-beforeEach(() => {
-  vi.mocked(axios.get).mockReset();
-  clearCache('ec_Howe Sound');
+beforeEach(() => clearCache('ec_Howe Sound'));
+afterEach(() => {
+  configureEcFeedUrl(buildDirectEcFeedUrl);
+  vi.unstubAllGlobals();
 });
-afterEach(() => configureEcFeedUrl(buildDirectEcFeedUrl));
 
 test('isValidEcFeedCode accepts known codes only', () => {
   expect(isValidEcFeedCode('06400')).toBe(true);
@@ -53,28 +50,37 @@ test('isValidEcFeedCode accepts known codes only', () => {
 test('buildDirectEcFeedUrl points at weather.gc.ca', () =>
   expect(buildDirectEcFeedUrl('06400')).toBe('https://weather.gc.ca/rss/marine/06400_e.xml'));
 
-test('parseMarineFeed reads Atom warnings and forecast', () => {
-  const { warnings, forecast } = parseMarineFeed(ATOM_FIXTURE, 'Howe Sound');
-  expect(warnings).toEqual([{ title: 'Gale warning in effect - Howe Sound', summary: 'Gale warning in effect.' }]);
+test('parseMarineFeed reads Atom warnings and forecast', async () => {
+  const { warnings, forecast } = await parseMarineFeed(ATOM_FIXTURE, 'Howe Sound');
+  expect(warnings).toEqual([
+    { title: 'Gale warning in effect - Howe Sound', summary: 'Gale warning in effect.' },
+  ]);
   expect(forecast).toBe('Wind light.\nBecoming southeast 15 knots.');
 });
 
-test('parseMarineFeed reads RSS 2.0 items', () => {
-  const { warnings, forecast } = parseMarineFeed(RSS_FIXTURE, 'Howe Sound');
+test('parseMarineFeed reads RSS 2.0 items', async () => {
+  const { warnings, forecast } = await parseMarineFeed(RSS_FIXTURE, 'Howe Sound');
   expect(warnings.map(w => w.title)).toEqual(['Strong wind warning in effect']);
   expect(forecast).toBe('Seas 1 metre.');
 });
 
-test('parseMarineFeed keeps only the Georgia Strait south entries', () =>
-  expect(parseMarineFeed(GEORGIA_FIXTURE, 'Georgia Strait South').forecast).toBe('South text.'));
+test('parseMarineFeed keeps only the Georgia Strait south entries', async () =>
+  expect((await parseMarineFeed(GEORGIA_FIXTURE, 'Georgia Strait South')).forecast).toBe(
+    'South text.'
+  ));
 
 test('fetchMarineForecast uses the configured URL builder', async () => {
   configureEcFeedUrl(code => `/api/ec-feed?code=${code}`);
-  axios.get.mockResolvedValue({ data: ATOM_FIXTURE });
-  await fetchMarineForecast('Howe Sound');
-  expect(axios.get).toHaveBeenCalledWith('/api/ec-feed?code=06400');
+  const fetchMock = vi.fn(() => Promise.resolve(new Response(ATOM_FIXTURE)));
+  vi.stubGlobal('fetch', fetchMock);
+  const { forecast } = await fetchMarineForecast('Howe Sound');
+  expect(fetchMock.mock.calls[0][0]).toBe('/api/ec-feed?code=06400');
+  expect(forecast).toContain('southeast 15 knots');
 });
 
 test('unknown region returns the existing fallback', async () => {
-  expect(await fetchMarineForecast('Nowhere')).toEqual({ warnings: [], forecast: 'No forecast available for this region.' });
+  expect(await fetchMarineForecast('Nowhere')).toEqual({
+    warnings: [],
+    forecast: 'No forecast available for this region.',
+  });
 });

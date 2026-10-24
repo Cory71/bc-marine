@@ -72,8 +72,11 @@
   color: var(--color-text-secondary);
 }
 
+/* The input itself has no outline, so the whole search box shows the focus ring */
 .search:focus-within {
   border-color: var(--color-accent);
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
 }
 
 .search input {

@@ -11,13 +11,20 @@ const NAV_ITEMS = [
   { label: 'Currents', path: '/currents' },
 ];
 
-export default function Header({ onOpenDrawer }) {
+export default function Header({ onOpenDrawer, menuButtonRef, drawerOpen }) {
   const { activeStation, marineForecast, lastUpdated, loading, refresh } = useApp();
 
   return (
     <header className="header">
       <div className="header__top">
-        <button type="button" className="button header__menu" onClick={onOpenDrawer}>
+        <button
+          ref={menuButtonRef}
+          type="button"
+          className="button header__menu"
+          onClick={onOpenDrawer}
+          aria-controls="station-sidebar"
+          aria-expanded={drawerOpen}
+        >
           <Icon name="menu" />
           Change station
         </button>

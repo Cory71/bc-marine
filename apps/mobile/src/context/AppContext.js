@@ -1,14 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import {
-  BC_STATIONS,
-  fetchTides,
-  fetchTideEvents,
-  fetchWeeklyTides,
-  fetchWeather,
-  fetchMarineForecast,
-  clearCache,
-} from '@bc-marine/shared';
+import { BC_STATIONS, loadStationData } from '@bc-marine/shared';
 
 const AppContext = createContext(null);
 
@@ -47,41 +39,20 @@ export function AppProvider({ children }) {
   }, [activeStation]);
 
   async function loadData(forceRefresh = false) {
-    if (forceRefresh) {
-      const regionKey = activeStation.region
-        ?? BC_STATIONS.find(s => s.id === activeStation.id)?.region;
-      clearCache(`tides_${activeStation.id}`);
-      clearCache(`tideEvents_${activeStation.id}`);
-      clearCache(`weekly_${activeStation.id}`);
-      clearCache(`weather_${activeStation.lat}_${activeStation.lon}`);
-      clearCache(`ec_${regionKey}`);
-    }
     setLoading(true);
     setError(null);
     try {
-      // Region may be missing on stations loaded from AsyncStorage — look it up if so
-      const region = activeStation.region
-        ?? BC_STATIONS.find(s => s.id === activeStation.id)?.region;
-
-      const [tidesResult, eventsResult, weeklyResult, weatherResult, forecastResult] = await Promise.allSettled([
-        fetchTides(activeStation.id),
-        fetchTideEvents(activeStation.id),
-        fetchWeeklyTides(activeStation.id),
-        fetchWeather(activeStation.lat, activeStation.lon),
-        fetchMarineForecast(region),
-      ]);
+      const result = await loadStationData(activeStation, { forceRefresh });
 
       // Log any failures to the console so we can see which API is broken
-      const labels = ['tides', 'tideEvents', 'weeklyTides', 'weather', 'marineForecast'];
-      [tidesResult, eventsResult, weeklyResult, weatherResult, forecastResult].forEach((r, i) => {
-        if (r.status === 'rejected') console.warn(`[loadData] ${labels[i]} failed:`, r.reason);
-      });
+      result.failures.forEach(label => console.warn(`[loadData] ${label} failed`));
 
-      if (tidesResult.status === 'fulfilled') setTides(tidesResult.value);
-      if (eventsResult.status === 'fulfilled') setTideEvents(eventsResult.value);
-      if (weeklyResult.status === 'fulfilled') setWeeklyTides(weeklyResult.value);
-      if (weatherResult.status === 'fulfilled') setWeather(weatherResult.value);
-      if (forecastResult.status === 'fulfilled') setMarineForecast(forecastResult.value);
+      // A null key means that fetch failed — keep the previous data on screen
+      if (result.tides) setTides(result.tides);
+      if (result.tideEvents) setTideEvents(result.tideEvents);
+      if (result.weeklyTides) setWeeklyTides(result.weeklyTides);
+      if (result.weather) setWeather(result.weather);
+      if (result.marineForecast) setMarineForecast(result.marineForecast);
 
       setLastUpdated(new Date());
     } catch (e) {

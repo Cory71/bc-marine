@@ -18,7 +18,11 @@ Live tides, wind, waves, currents and Environment Canada marine forecasts for th
 
 ### Mobile app (Expo)
 
-<!-- TODO: mobile screenshots -->
+<p>
+  <img src="docs/screenshots/mobile-dashboard.png" alt="Mobile app dashboard for Victoria with a gale warning, marine forecast, wind, tides and tidal currents" width="240" />
+  <img src="docs/screenshots/mobile-tides.png" alt="Mobile app tide chart with current height, today's curve, upcoming highs and lows and 7-day maximums" width="240" />
+  <img src="docs/screenshots/mobile-weather.png" alt="Mobile app wind and weather view with current conditions and an hourly breakdown" width="240" />
+</p>
 
 ## Features
 

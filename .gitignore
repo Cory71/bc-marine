@@ -24,3 +24,6 @@ Thumbs.db
 # Logs
 npm-debug.log
 yarn-error.log
+
+# Playwright MCP screenshots and logs
+.playwright-mcp

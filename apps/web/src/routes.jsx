@@ -1,20 +1,7 @@
-import { Routes, Route, Outlet } from 'react-router';
-import { useApp } from './context/AppContext.jsx';
+import { Routes, Route } from 'react-router';
+import AppShell from './layout/AppShell.jsx';
 
-// Temporary shell and pages — Tasks 10–12 replace these with the real layout and views
-function AppShellStub() {
-  const { activeStation, loading } = useApp();
-  return (
-    <main className="placeholder">
-      <h1>BC Marine</h1>
-      <p>
-        {activeStation.name} {loading ? '· loading…' : ''}
-      </p>
-      <Outlet />
-    </main>
-  );
-}
-
+// Temporary page placeholder — Tasks 11–12 replace these with the real views
 function PagePlaceholder({ title }) {
   return <h2>{title}</h2>;
 }
@@ -22,7 +9,7 @@ function PagePlaceholder({ title }) {
 export default function AppRoutes() {
   return (
     <Routes>
-      <Route element={<AppShellStub />}>
+      <Route element={<AppShell />}>
         <Route index element={<PagePlaceholder title="Dashboard" />} />
         <Route path="tides" element={<PagePlaceholder title="Tides" />} />
         <Route path="weather" element={<PagePlaceholder title="Weather" />} />

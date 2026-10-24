@@ -25,6 +25,17 @@ export default function DashboardPage() {
 
   return (
     <div className={`dashboard ${isRefreshing ? 'is-refreshing' : ''}`} aria-busy={loading}>
+      {/* Forecast first: it's what mariners check before anything else (same as mobile) */}
+      <Card title="Marine forecast" className="card--wide">
+        <SourceContent
+          source="marineForecast"
+          errorMessage="Forecast unavailable"
+          placeholder={<ForecastPlaceholder />}
+        >
+          <ForecastText />
+        </SourceContent>
+      </Card>
+
       <div className="card-grid">
         <Card title="Wind" to="/weather">
           <SourceContent source="weather" errorMessage="Weather unavailable">
@@ -61,16 +72,6 @@ export default function DashboardPage() {
           placeholder={<Skeleton height={240} />}
         >
           <TodaysTideCurve />
-        </SourceContent>
-      </Card>
-
-      <Card title="Marine forecast" className="card--wide">
-        <SourceContent
-          source="marineForecast"
-          errorMessage="Forecast unavailable"
-          placeholder={<ForecastPlaceholder />}
-        >
-          <ForecastText />
         </SourceContent>
       </Card>
     </div>

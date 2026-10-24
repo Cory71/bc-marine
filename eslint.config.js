@@ -32,7 +32,13 @@ export default [
 
   // Server code and config files run in Node
   {
-    files: ['apps/web/api/**/*.js', 'apps/web/server/**/*.js', '*.config.js', '**/*.config.js'],
+    files: [
+      'apps/web/api/**/*.js',
+      'apps/web/server/**/*.js',
+      'apps/web/test/**/*.js',
+      '*.config.js',
+      '**/*.config.js',
+    ],
     languageOptions: { globals: globals.node },
   },
 ];

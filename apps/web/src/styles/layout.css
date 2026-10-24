@@ -1,0 +1,338 @@
+/* ---------- App frame ---------- */
+.app-shell {
+  min-height: 100vh;
+}
+
+.app-shell__content {
+  min-width: 0; /* lets long content shrink instead of causing sideways scroll */
+}
+
+.main {
+  padding: 16px;
+  outline: none;
+}
+
+/* ---------- Sidebar (station picker) ---------- */
+.sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 16px;
+  background: var(--color-nav-bar);
+  border-right: 1px solid var(--color-card-border);
+  overflow-y: auto;
+}
+
+.sidebar__top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.sidebar__brand {
+  color: var(--color-accent);
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  font-size: 0.875rem;
+}
+
+.sidebar__section {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.sidebar__label {
+  color: var(--color-text-secondary);
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.sidebar__empty {
+  color: var(--color-text-secondary);
+  font-size: 0.875rem;
+}
+
+.sidebar__error {
+  color: var(--color-warning);
+  font-size: 0.8125rem;
+}
+
+.search {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 12px;
+  border: 1px solid var(--color-card-border);
+  border-radius: 8px;
+  background: var(--color-card-bg);
+  color: var(--color-text-secondary);
+}
+
+/* The input itself has no outline, so the whole search box shows the focus ring */
+.search:focus-within {
+  border-color: var(--color-accent);
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+.search input {
+  flex: 1;
+  min-width: 0;
+  padding: 10px 0;
+  border: none;
+  background: transparent;
+  outline: none;
+}
+
+.search input::placeholder {
+  color: var(--color-text-secondary);
+  opacity: 0.8;
+}
+
+.station-list__row {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.station-button {
+  display: flex;
+  flex: 1;
+  justify-content: space-between;
+  gap: 8px;
+  width: 100%;
+  padding: 7px 10px;
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  text-align: left;
+  cursor: pointer;
+}
+
+.station-button:hover {
+  background: var(--color-card-bg);
+}
+
+.station-button[aria-current='true'] {
+  background: rgba(126, 206, 244, 0.16);
+  color: var(--color-accent);
+  font-weight: 600;
+}
+
+.station-button__region {
+  color: var(--color-text-secondary);
+  font-size: 0.8125rem;
+}
+
+.coast__toggle {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  width: 100%;
+  padding: 8px 6px;
+  border: none;
+  background: transparent;
+  font-weight: 600;
+  text-align: left;
+  cursor: pointer;
+}
+
+.coast__toggle svg {
+  transition: transform 0.15s;
+}
+
+.coast__toggle[aria-expanded='true'] svg {
+  transform: rotate(90deg);
+}
+
+.area {
+  padding-left: 20px;
+  margin-bottom: 6px;
+}
+
+.area__name {
+  padding: 4px 10px;
+  color: var(--color-text-secondary);
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+/* ---------- Header ---------- */
+.header {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 16px 16px 0;
+  border-bottom: 1px solid var(--color-card-border);
+}
+
+.header__top {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+}
+
+.header__station {
+  flex: 1 1 200px;
+  min-width: 0;
+}
+
+.header__name {
+  font-size: 1.75rem;
+  line-height: 1.2;
+}
+
+.header__region {
+  color: var(--color-text-secondary);
+  font-size: 0.875rem;
+}
+
+.header__status {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.header__updated {
+  color: var(--color-text-secondary);
+  font-size: 0.8125rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.main-nav {
+  display: flex;
+  gap: 4px;
+  overflow-x: auto; /* very narrow screens can still swipe the tabs */
+  scrollbar-width: none;
+}
+
+.main-nav__link {
+  padding: 10px 14px;
+  border-bottom: 2px solid transparent;
+  color: var(--color-text-secondary);
+  font-weight: 600;
+  font-size: 0.9375rem;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.main-nav__link:hover {
+  color: var(--color-text-primary);
+}
+
+.main-nav__link.active {
+  color: var(--color-accent);
+  border-bottom-color: var(--color-accent);
+}
+
+/* ---------- Warning banner ---------- */
+.warning-banner {
+  display: flex;
+  gap: 10px;
+  padding: 10px 12px;
+  border: 1px solid rgba(255, 159, 67, 0.5);
+  border-radius: 8px;
+  background: rgba(255, 159, 67, 0.12);
+  color: var(--color-warning);
+}
+
+.warning-banner svg {
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.warning-banner__title {
+  font-size: 0.8125rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.warning-banner__more {
+  font-weight: 400;
+  text-transform: none;
+}
+
+.warning-banner__body {
+  color: #f0c690;
+  font-size: 0.875rem;
+}
+
+/* ---------- Small screens: sidebar becomes a slide-in drawer ---------- */
+@media (max-width: 1023px) {
+  .sidebar {
+    position: fixed;
+    inset: 0 auto 0 0;
+    z-index: 20;
+    width: min(320px, 88vw);
+    transform: translateX(-100%);
+    visibility: hidden; /* also removes it from the tab order while closed */
+    transition: transform 0.2s ease, visibility 0.2s;
+  }
+
+  .sidebar--open {
+    transform: translateX(0);
+    visibility: visible;
+    /* Become visible at once when opening, so the search box can take focus */
+    transition: transform 0.2s ease, visibility 0s;
+  }
+
+  .drawer-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 10;
+    background: rgba(0, 0, 0, 0.55);
+  }
+
+  .header__name {
+    font-size: 1.375rem;
+  }
+
+  .main-nav {
+    gap: 0;
+  }
+
+  .main-nav__link {
+    padding: 10px 10px;
+  }
+}
+
+/* ---------- Large screens: fixed sidebar beside the content ---------- */
+@media (min-width: 1024px) {
+  .app-shell {
+    display: grid;
+    grid-template-columns: 300px 1fr;
+  }
+
+  .sidebar {
+    position: sticky;
+    top: 0;
+    height: 100vh;
+  }
+
+  .sidebar__close,
+  .header__menu,
+  .drawer-backdrop {
+    display: none;
+  }
+
+  .header {
+    padding: 24px 32px 0;
+  }
+
+  .main {
+    padding: 24px 32px 48px;
+  }
+}
+
+/* Respect users who turn off animations */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    transition: none !important;
+  }
+}

@@ -1,0 +1,19 @@
+{
+  "name": "@bc-marine/shared",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "main": "./src/index.js",
+  "exports": "./src/index.js",
+  "scripts": {
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "axios": "^1.20.0",
+    "fast-xml-parser": "^5.8.0",
+    "suncalc": "^1.9.0"
+  },
+  "devDependencies": {
+    "vitest": "^5"
+  }
+}

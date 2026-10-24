@@ -1,0 +1,14 @@
+/* App colours — same values as the mobile app's theme.js, except text-muted,
+   which is lightened from #4a7090 (3.5:1) to pass WCAG AA contrast (6.3:1) */
+:root {
+  --color-background: #0a1628;
+  --color-nav-bar: #060f1e;
+  --color-accent: #7ecef4;
+  --color-card-border: rgba(126, 206, 244, 0.2);
+  --color-card-bg: rgba(126, 206, 244, 0.08);
+  --color-text-primary: #ffffff;
+  --color-text-secondary: #9cc8e8;
+  --color-text-muted: #7b9bba;
+  --color-warning: #ff9f43;
+  --color-safe: #4dcc88;
+}

@@ -1,0 +1,350 @@
+/* ---------- Cards ---------- */
+.dashboard {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* Fade old numbers slightly while a refresh is running */
+.dashboard.is-refreshing {
+  opacity: 0.6;
+  transition: opacity 0.2s;
+}
+
+/* 1 column on phones, 2 on tablets, 3 on desktop (6 cards = two full rows) */
+.card-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 16px;
+}
+
+@media (min-width: 600px) {
+  .card-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 1024px) {
+  .card-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.stat-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 24px;
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 16px 18px;
+  border: 1px solid var(--color-card-border);
+  border-radius: 12px;
+  background: var(--color-card-bg);
+  color: inherit;
+  text-decoration: none;
+}
+
+.card--link {
+  transition: border-color 0.15s, background 0.15s, transform 0.15s;
+}
+
+.card--link:hover {
+  border-color: rgba(126, 206, 244, 0.5);
+  background: rgba(126, 206, 244, 0.12);
+  transform: translateY(-1px);
+}
+
+.card__title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  color: var(--color-text-secondary);
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.card__note {
+  color: var(--color-text-secondary);
+  font-size: 0.875rem;
+}
+
+.card__source {
+  color: var(--color-text-secondary);
+  font-size: 0.75rem;
+  opacity: 0.85;
+}
+
+/* ---------- Readings ---------- */
+.stat__label {
+  color: var(--color-text-secondary);
+  font-size: 0.8125rem;
+}
+
+.stat__value {
+  font-size: 1.625rem;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.stat__value--safe {
+  color: var(--color-safe);
+  font-weight: 600;
+}
+
+.stat__value--warning {
+  color: var(--color-warning);
+  font-weight: 600;
+}
+
+.stat__value--muted {
+  color: var(--color-text-secondary);
+}
+
+.stat__detail {
+  color: var(--color-text-secondary);
+  font-size: 0.875rem;
+}
+
+/* ---------- Forecast ---------- */
+.forecast-text {
+  max-width: 75ch;
+  color: var(--color-text-secondary);
+  white-space: pre-line; /* keep EC's line breaks */
+}
+
+/* ---------- Tide curve ---------- */
+.tide-curve {
+  width: 100%;
+  overflow: hidden;
+}
+
+.tide-curve svg {
+  display: block;
+}
+
+.tide-curve__axis {
+  fill: var(--color-text-secondary);
+  font-size: 12px;
+}
+
+.tide-curve__label {
+  font-size: 12px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.tide-curve__high {
+  fill: var(--color-warning);
+}
+
+.tide-curve__low {
+  fill: var(--color-accent);
+}
+
+.tide-curve__now {
+  fill: var(--color-safe);
+  stroke: var(--color-safe);
+}
+
+.tide-curve__now line {
+  stroke-opacity: 0.5;
+}
+
+.tide-curve__now text {
+  stroke: none;
+}
+
+/* ---------- Loading and errors ---------- */
+.skeleton {
+  display: block;
+  border-radius: 6px;
+  background: linear-gradient(90deg, rgba(126, 206, 244, 0.06), rgba(126, 206, 244, 0.14), rgba(126, 206, 244, 0.06));
+  background-size: 200% 100%;
+  animation: shimmer 1.4s ease-in-out infinite;
+}
+
+@keyframes shimmer {
+  from {
+    background-position: 100% 0;
+  }
+  to {
+    background-position: -100% 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .skeleton {
+    animation: none;
+  }
+}
+
+.panel-error {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--color-warning);
+  font-size: 0.875rem;
+}
+
+/* ---------- Detail views ---------- */
+.detail {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.detail.is-refreshing {
+  opacity: 0.6;
+  transition: opacity 0.2s;
+}
+
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  align-self: flex-start;
+  color: var(--color-accent);
+  font-size: 0.875rem;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.back-link svg {
+  transform: rotate(180deg);
+}
+
+.back-link:hover {
+  text-decoration: underline;
+}
+
+.detail__title {
+  font-size: 1.375rem;
+}
+
+.detail__source {
+  color: var(--color-text-secondary);
+  font-size: 0.875rem;
+}
+
+/* Side by side on wide screens, stacked on narrow ones */
+.detail__columns {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 340px), 1fr));
+  gap: 16px;
+}
+
+.stat-row--spread {
+  gap: 16px 48px;
+}
+
+.empty-state__message {
+  font-weight: 600;
+}
+
+/* ---------- Tables ---------- */
+.table-scroll {
+  overflow-x: auto; /* wide tables swipe inside the card on phones */
+}
+
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-variant-numeric: tabular-nums;
+  font-size: 0.9375rem;
+}
+
+.data-table th,
+.data-table td {
+  padding: 9px 12px 9px 0;
+  border-bottom: 1px solid var(--color-card-border);
+  text-align: left;
+  white-space: nowrap;
+}
+
+.data-table thead th {
+  color: var(--color-text-secondary);
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.data-table tbody th {
+  font-weight: 600;
+}
+
+.data-table tbody tr:last-child > * {
+  border-bottom: none;
+}
+
+.data-table__now th {
+  color: var(--color-safe);
+}
+
+.data-table__now td {
+  font-weight: 700;
+}
+
+.tide-type--high {
+  color: var(--color-warning);
+}
+
+.tide-type--low {
+  color: var(--color-accent);
+}
+
+/* ---------- Weekly tide bars ---------- */
+.weekly-bars {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 8px;
+  height: 200px;
+}
+
+.weekly-bars__day {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+}
+
+.weekly-bars__value {
+  color: var(--color-text-secondary);
+  font-size: 0.75rem;
+  white-space: nowrap;
+}
+
+.weekly-bars__track {
+  display: flex;
+  flex: 1;
+  align-items: flex-end;
+  width: 100%;
+  max-width: 36px;
+}
+
+.weekly-bars__bar {
+  width: 100%;
+  border-radius: 4px 4px 0 0;
+  background: rgba(126, 206, 244, 0.35);
+}
+
+.weekly-bars__label {
+  color: var(--color-text-secondary);
+  font-size: 0.8125rem;
+}
+
+.weekly-bars__day--today .weekly-bars__bar {
+  background: var(--color-accent);
+}
+
+.weekly-bars__day--today .weekly-bars__label {
+  color: var(--color-accent);
+  font-weight: 700;
+}

@@ -10,7 +10,16 @@
   },
   "scripts": {
     "test": "npm run test --workspace @bc-marine/shared",
-    "lint": "echo \"No lint yet\"",
-    "build:web": "echo \"No web app yet\""
-  }
+    "lint": "eslint .",
+    "build:web": "echo \"No web app yet\"",
+    "format": "prettier --write packages apps/web"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "eslint": "^10.13.0",
+    "eslint-plugin-react-hooks": "^7.1.1",
+    "globals": "^17.13.0",
+    "prettier": "^3.9.10"
+  },
+  "type": "module"
 }

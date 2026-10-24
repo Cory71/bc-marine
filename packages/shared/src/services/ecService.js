@@ -1,34 +1,17 @@
 import axios from 'axios';
 import { XMLParser } from 'fast-xml-parser';
 import { setCache, getCache } from './cache.js';
+import { EC_FEED_CODES, EC_SUBAREA, buildDirectEcFeedUrl } from './ecFeeds.js';
 
 const parser = new XMLParser();
 
-// BC marine region Atom feed URLs from Environment Canada (verified URLs)
-const EC_FEEDS = {
-  'Dixon Entrance': 'https://weather.gc.ca/rss/marine/03300_e.xml',
-  'Hecate Strait': 'https://weather.gc.ca/rss/marine/06200_e.xml',
-  'Queen Charlotte Sound': 'https://weather.gc.ca/rss/marine/12300_e.xml',
-  'Milbanke Sound': 'https://weather.gc.ca/rss/marine/02300_e.xml',
-  'Queen Charlotte Strait': 'https://weather.gc.ca/rss/marine/12400_e.xml',
-  'Johnstone Strait': 'https://weather.gc.ca/rss/marine/06800_e.xml',
-  'Georgia Strait North': 'https://weather.gc.ca/rss/marine/14300_e.xml',
-  'Georgia Strait South': 'https://weather.gc.ca/rss/marine/14300_e.xml',
-  'Howe Sound': 'https://weather.gc.ca/rss/marine/06400_e.xml',
-  'Nootka Sound': 'https://weather.gc.ca/rss/marine/15300_e.xml',
-  'Clayoquot Sound': 'https://weather.gc.ca/rss/marine/16200_e.xml',
-  'Barkley Sound': 'https://weather.gc.ca/rss/marine/16200_e.xml',
-  'Juan de Fuca Strait': 'https://weather.gc.ca/rss/marine/07000_e.xml',
-  'Saanich Inlet': 'https://weather.gc.ca/rss/marine/07000_e.xml',
-};
+// Builds the feed URL from a code — the web app swaps this for its proxy
+let currentBuildUrl = buildDirectEcFeedUrl;
 
-// Sub-area filter for regions that share a single EC feed with other sub-areas.
-// EC's Strait of Georgia feed (14300) bundles both north and south entries in
-// one XML file, so we match the entry title to pick the right one.
-const EC_SUBAREA = {
-  'Georgia Strait North': 'north of nanaimo',
-  'Georgia Strait South': 'south of nanaimo',
-};
+// Choose how feed URLs are built (call once at app start-up)
+export function configureEcFeedUrl(buildUrl) {
+  currentBuildUrl = buildUrl;
+}
 
 // Fetch marine forecast and active warnings for a BC region name
 export async function fetchMarineForecast(regionName) {
@@ -36,11 +19,18 @@ export async function fetchMarineForecast(regionName) {
   const cached = getCache(cacheKey);
   if (cached) return cached;
 
-  const feedUrl = EC_FEEDS[regionName];
-  if (!feedUrl) return { warnings: [], forecast: 'No forecast available for this region.' };
+  const code = EC_FEED_CODES[regionName];
+  if (!code) return { warnings: [], forecast: 'No forecast available for this region.' };
 
-  const response = await axios.get(feedUrl);
-  const parsed = parser.parse(response.data);
+  const response = await axios.get(currentBuildUrl(code));
+  const data = parseMarineFeed(response.data, regionName);
+  setCache(cacheKey, data);
+  return data;
+}
+
+// Turn an EC feed's XML into { warnings, forecast } for one region
+export function parseMarineFeed(xml, regionName) {
+  const parsed = parser.parse(xml);
 
   // EC feeds can be Atom (feed.entry) or RSS 2.0 (rss.channel.item)
   const atomRaw = parsed?.feed?.entry;
@@ -55,28 +45,26 @@ export async function fetchMarineForecast(regionName) {
     ? allEntries.filter(e => String(e.title ?? '').toLowerCase().includes(subArea))
     : allEntries;
 
-  // summary is used in Atom, description in RSS 2.0 — strip HTML tags and decode entities
-  const getText = e => {
-    const raw = e.summary ?? e.description ?? '';
-    return String(raw)
-      .replace(/&#60;/g, '<').replace(/&#62;/g, '>').replace(/&amp;/g, '&')
-      .replace(/<br\s*\/?>/gi, '\n')
-      .replace(/<[^>]+>/g, '')
-      .trim();
-  };
-
   const warnings = entries
     .filter(e => {
       const t = String(e.title ?? '').toLowerCase();
       return t.includes('warning') || t.includes('watch');
     })
-    .map(e => ({ title: e.title, summary: getText(e) }));
+    .map(e => ({ title: e.title, summary: getEntryText(e) }));
 
   // Use first entry that mentions forecast, or fall back to the first entry
   const forecastEntry = entries.find(e => String(e.title ?? '').toLowerCase().includes('forecast')) ?? entries[0];
-  const forecast = forecastEntry ? getText(forecastEntry) : 'No forecast available.';
+  const forecast = forecastEntry ? getEntryText(forecastEntry) : 'No forecast available.';
 
-  const data = { warnings, forecast };
-  setCache(cacheKey, data);
-  return data;
+  return { warnings, forecast };
+}
+
+// summary is used in Atom, description in RSS 2.0 — strip HTML tags and decode entities
+function getEntryText(entry) {
+  const raw = entry.summary ?? entry.description ?? '';
+  return String(raw)
+    .replace(/&#60;/g, '<').replace(/&#62;/g, '>').replace(/&amp;/g, '&')
+    .replace(/<br\s*\/?>/gi, '\n')
+    .replace(/<[^>]+>/g, '')
+    .trim();
 }

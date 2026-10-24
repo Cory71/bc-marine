@@ -5,4 +5,5 @@ export * from './bcTime.js';
 export * from './services/cache.js';
 export * from './services/dfoService.js';
 export * from './services/weatherService.js';
+export * from './services/ecFeeds.js';
 export * from './services/ecService.js';

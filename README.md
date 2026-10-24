@@ -94,7 +94,6 @@ Tests cover unit conversions, BC-time and daylight-saving edge cases, EC feed pa
 
 ## Known Limitations
 
-- **Shared tide station IDs:** several stations in the station list use another station's DFO ID (for example, Sandspit uses Prince Rupert's), so they show that station's tides. The web app identifies stations by name to keep saving and links correct.
 - **Tidal currents:** Open-Meteo has no current data for fjords, inlets and many sheltered waters, so stations like Gold River show a "no data" message.
 - **BC's permanent UTC−7:** BC stops changing its clocks on November 1, 2026. Devices with older time zone data may show times one hour off after that date. See [docs/architecture.md](docs/architecture.md#bc-time).
 

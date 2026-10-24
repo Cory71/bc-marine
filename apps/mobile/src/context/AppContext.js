@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { BC_STATIONS, loadStationData } from '@bc-marine/shared';
+import { ALL_LOCATIONS, BC_STATIONS, loadStationData } from '@bc-marine/shared';
 
 const AppContext = createContext(null);
 
@@ -22,12 +22,9 @@ export function AppProvider({ children }) {
     AsyncStorage.getItem('savedStations').then(json => {
       if (!json) return;
       const saved = JSON.parse(json);
-      // Enrich any stations that are missing region/coast (saved before fix)
-      const enriched = saved.map(s => {
-        if (s.region) return s;
-        const match = BC_STATIONS.find(b => b.name === s.name);
-        return match ? { ...s, region: match.region, coast: match.coast } : s;
-      });
+      // Refresh saved stations from the current list by name, so older saves pick up
+      // corrected DFO ids and any missing region/coast
+      const enriched = saved.map(s => ALL_LOCATIONS.find(location => location.name === s.name) ?? s);
       setSavedStations(enriched);
       AsyncStorage.setItem('savedStations', JSON.stringify(enriched));
     });
@@ -63,11 +60,12 @@ export function AppProvider({ children }) {
     }
   }
 
+  // Match saved stations by name — a few nearby places share one DFO tide station id
   function saveStation(station) {
-    const exists = savedStations.some(s => s.id === station.id);
+    const exists = savedStations.some(s => s.name === station.name);
     // Always update the saved data so region/coast are kept current
     const updated = exists
-      ? savedStations.map(s => s.id === station.id ? station : s)
+      ? savedStations.map(s => s.name === station.name ? station : s)
       : [...savedStations, station];
     setSavedStations(updated);
     AsyncStorage.setItem('savedStations', JSON.stringify(updated));

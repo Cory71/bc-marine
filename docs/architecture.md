@@ -98,7 +98,7 @@ The two apps still share all data logic, so the cost of separate UIs is limited 
 
 ## Known limitations
 
-- **Shared DFO station IDs.** Several entries in the station list reuse another station's DFO ID (for example, Sandspit uses Prince Rupert's, and Port Hardy, Winter Harbour, Bella Bella and Gold River share one), so they show that station's tides. The web app identifies stations by a slug of their name, not their ID, so URLs, favourites and list keys stay correct. Fixing the IDs themselves needs a careful pass against DFO's station catalogue.
+- **Station identity.** Every location now uses its own nearby DFO tide station (verified against DFO's station catalogue; all within 6 km), but a few communities still share one, such as Courtenay using Comox's station. So both apps identify stations by **name**: the web app uses a slug of the name for URLs, favourites and list keys, and the mobile app matches saved stations by name and refreshes them from the current list on launch, so older saves pick up corrected IDs.
 - **Tidal current coverage.** Open-Meteo's ocean model doesn't cover fjords, inlets and many sheltered BC waters. Those stations show a clear "no data" message instead of zeros.
 - **Device time zone data.** See [BC's move to permanent UTC−7](#bcs-move-to-permanent-utc7).
 - **In-memory cache only.** The 30-minute cache lives in memory, so reloading the page refetches. The CDN cache in front of the EC proxy softens this for the slowest source.

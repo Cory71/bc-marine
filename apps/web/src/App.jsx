@@ -1,9 +1,14 @@
-// Placeholder page until the real layout lands
+import { BrowserRouter } from 'react-router';
+import { AppProvider } from './context/AppContext.jsx';
+import AppRoutes from './routes.jsx';
+
+// Router first, because the app context reads the station from the URL
 export default function App() {
   return (
-    <main className="placeholder">
-      <h1>BC Marine</h1>
-      <p>Live tides, wind, waves and marine forecasts for the BC coast.</p>
-    </main>
+    <BrowserRouter>
+      <AppProvider>
+        <AppRoutes />
+      </AppProvider>
+    </BrowserRouter>
   );
 }

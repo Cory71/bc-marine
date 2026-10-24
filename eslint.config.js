@@ -15,9 +15,9 @@ export default [
     languageOptions: { globals: { ...globals.node, ...globals.browser } },
   },
 
-  // Web app UI code runs in the browser
+  // Web app UI code (and its component tests) runs in the browser
   {
-    files: ['apps/web/src/**/*.{js,jsx}'],
+    files: ['apps/web/src/**/*.{js,jsx}', 'apps/web/test/**/*.jsx'],
     languageOptions: {
       globals: globals.browser,
       parserOptions: { ecmaFeatures: { jsx: true } },

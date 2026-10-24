@@ -1,0 +1,35 @@
+import { test, expect, afterEach } from 'vitest';
+import { render, screen, cleanup } from '@testing-library/react';
+import TideCurve from '../src/components/TideCurve.jsx';
+
+afterEach(cleanup);
+
+const NOW = new Date('2026-10-24T17:20:00Z');
+
+// Six hourly readings from 14:00 to 19:00 UTC
+const SIX_HOURLY_POINTS = [2, 3, 5, 6, 5, 3].map((heightFt, i) => ({
+  time: new Date(Date.UTC(2026, 9, 24, 14 + i)),
+  heightFt,
+}));
+
+const EVENTS = [
+  { time: new Date('2026-10-24T17:30:00Z'), heightFt: 6.2, type: 'HIGH' },
+  { time: new Date('2026-10-24T23:45:00Z'), heightFt: 1.1, type: 'LOW' },
+];
+
+test('TideCurve renders an accessible svg and a Now marker', () => {
+  render(<TideCurve tides={SIX_HOURLY_POINTS} now={NOW} width={600} />);
+  expect(screen.getByRole('img', { name: /tide/i })).toBeTruthy();
+  expect(screen.getByText('Now')).toBeTruthy();
+});
+
+test('TideCurve label summarises the next high and low', () => {
+  render(<TideCurve tides={SIX_HOURLY_POINTS} events={EVENTS} now={NOW} width={600} />);
+  const label = screen.getByRole('img').getAttribute('aria-label');
+  expect(label).toBe('Tide curve for today. Next high 6.2 ft at 10:30 AM, next low 1.1 ft at 4:45 PM.');
+});
+
+test('TideCurve renders nothing with fewer than 2 points', () => {
+  const { container } = render(<TideCurve tides={[]} />);
+  expect(container.firstChild).toBeNull();
+});

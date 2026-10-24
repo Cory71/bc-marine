@@ -2,6 +2,7 @@ import { test, expect } from 'vitest';
 import {
   metresToFeet,
   degreesToCardinal,
+  degreesToCompass,
   findNearestStation,
   formatTime,
   timeSince,
@@ -29,3 +30,10 @@ test('formatTime shows BC time to a Toronto viewer', () =>
 
 test('timeSince adds PT', () =>
   expect(timeSince(new Date('2026-10-24T16:15:00Z'))).toBe('Updated 9:15 AM PT'));
+
+test('degreesToCompass gives 16 points and handles missing values', () => {
+  expect(degreesToCompass(0)).toBe('N');
+  expect(degreesToCompass(157.5)).toBe('SSE');
+  expect(degreesToCompass(350)).toBe('N');
+  expect(degreesToCompass(null)).toBe('--');
+});

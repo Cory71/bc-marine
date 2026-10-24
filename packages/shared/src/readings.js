@@ -31,3 +31,24 @@ export function getCurrentPhase(weather, now = new Date()) {
 export function hasCurrentData(weather) {
   return Boolean(weather?.some(hour => hour.currentSpeedKts != null));
 }
+
+// The closest hour plus the following hours, e.g. for an 8-hour table
+export function getUpcomingHours(readings, count = 8, now = new Date()) {
+  const closest = findClosestReading(readings, now);
+  if (!closest) return [];
+  const startIndex = readings.indexOf(closest);
+  return readings.slice(startIndex, startIndex + count);
+}
+
+// 'Rising' or 'Falling': compare the first reading after now with the one before it
+export function getTideTrend(tides, now = new Date()) {
+  const nextIndex = (tides ?? []).findIndex(tide => new Date(tide.time) >= now);
+  if (nextIndex <= 0) return null;
+  return tides[nextIndex].heightFt > tides[nextIndex - 1].heightFt ? 'Rising' : 'Falling';
+}
+
+// Tide events from an hour ago onward, so a tide that just turned is still listed
+export function getRecentAndUpcomingEvents(events, now = new Date()) {
+  const ONE_HOUR_MS = 60 * 60 * 1000;
+  return (events ?? []).filter(event => new Date(event.time) > now - ONE_HOUR_MS);
+}

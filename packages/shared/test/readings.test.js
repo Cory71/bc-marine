@@ -1,5 +1,13 @@
 import { test, expect } from 'vitest';
-import { findClosestReading, getNextTideEvent, getCurrentPhase, hasCurrentData } from '../src/index.js';
+import {
+  findClosestReading,
+  getNextTideEvent,
+  getCurrentPhase,
+  hasCurrentData,
+  getUpcomingHours,
+  getTideTrend,
+  getRecentAndUpcomingEvents,
+} from '../src/index.js';
 
 const NOW = new Date('2026-10-24T17:20:00Z');
 
@@ -49,4 +57,21 @@ test('hasCurrentData false for all-null speeds', () => {
   expect(hasCurrentData([reading(16, { currentSpeedKts: null })])).toBe(false);
   expect(hasCurrentData([reading(16, { currentSpeedKts: 0.2 })])).toBe(true);
   expect(hasCurrentData(null)).toBe(false);
+});
+
+test('getUpcomingHours starts at the closest hour', () => {
+  const weather = [reading(15), reading(16), reading(17), reading(18), reading(19)];
+  expect(getUpcomingHours(weather, 2, NOW)).toEqual([weather[2], weather[3]]);
+  expect(getUpcomingHours([], 8, NOW)).toEqual([]);
+});
+
+test('getTideTrend compares the readings around now', () => {
+  expect(getTideTrend([reading(17, { heightFt: 3 }), reading(18, { heightFt: 4 })], NOW)).toBe('Rising');
+  expect(getTideTrend([reading(17, { heightFt: 4 }), reading(18, { heightFt: 3 })], NOW)).toBe('Falling');
+  expect(getTideTrend([reading(18, { heightFt: 3 })], NOW)).toBeNull();
+});
+
+test('getRecentAndUpcomingEvents keeps events from the last hour onward', () => {
+  const events = [reading(15, { type: 'LOW' }), reading(17, { type: 'HIGH' }), reading(23, { type: 'LOW' })];
+  expect(getRecentAndUpcomingEvents(events, NOW)).toEqual([events[1], events[2]]);
 });

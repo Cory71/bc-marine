@@ -41,6 +41,13 @@ export function degreesToCardinal(deg) {
   return dirs[Math.round(deg / 45) % 8];
 }
 
+// Converts a direction in degrees to a 16-point compass label ('SSE'), or '--' if missing
+export function degreesToCompass(deg) {
+  if (deg == null) return '--';
+  const dirs = ['N', 'NNE', 'NE', 'ENE', 'E', 'ESE', 'SE', 'SSE', 'S', 'SSW', 'SW', 'WSW', 'W', 'WNW', 'NW', 'NNW'];
+  return dirs[Math.round(deg / 22.5) % 16];
+}
+
 // Returns the nearest station to a given GPS coordinate
 export function findNearestStation(lat, lon, stations) {
   let nearest = null;

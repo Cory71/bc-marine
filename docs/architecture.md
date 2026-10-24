@@ -21,17 +21,17 @@ The repo is an npm-workspaces monorepo. Both apps depend on `@bc-marine/shared`,
 
 `packages/shared` holds everything that isn't UI:
 
-| Module | Purpose |
-| --- | --- |
-| `services/dfoService.js` | DFO tide heights, high/low events, 7-day maximums |
-| `services/weatherService.js` | Open-Meteo wind, waves, swell, visibility and currents |
-| `services/ecService.js`, `ecFeeds.js` | EC feed codes, configurable feed URL, Atom/RSS parsing |
-| `services/cache.js` | In-memory 30-minute cache |
-| `loadStationData.js` | Loads all five data sets for a station; never throws |
-| `bcTime.js` | Pacific-time date ranges and formatting |
-| `readings.js` | "Right now" helpers: closest reading, next tide, flood/ebb, upcoming hours |
-| `stations.js`, `constants.js` | Station list, URL slugs, default station |
-| `units.js` | Unit conversion, compass labels, sun/moon, nearest station |
+| Module                                | Purpose                                                                    |
+| ------------------------------------- | -------------------------------------------------------------------------- |
+| `services/dfoService.js`              | DFO tide heights, high/low events, 7-day maximums                          |
+| `services/weatherService.js`          | Open-Meteo wind, waves, swell, visibility and currents                     |
+| `services/ecService.js`, `ecFeeds.js` | EC feed codes, configurable feed URL, Atom/RSS parsing                     |
+| `services/cache.js`                   | In-memory 30-minute cache                                                  |
+| `loadStationData.js`                  | Loads all five data sets for a station; never throws                       |
+| `bcTime.js`                           | Pacific-time date ranges and formatting                                    |
+| `readings.js`                         | "Right now" helpers: closest reading, next tide, flood/ebb, upcoming hours |
+| `stations.js`, `constants.js`         | Station list, URL slugs, default station                                   |
+| `units.js`                            | Unit conversion, compass labels, sun/moon, nearest station                 |
 
 The rule is that shared code never imports React, React Native, Expo or browser globals. That keeps it usable by the mobile app, the web app and the Node-based proxy, and testable in plain Node. A fix to an API call or a unit conversion reaches both apps at once.
 
@@ -43,11 +43,11 @@ The rule is that shared code never imports React, React Native, Expo or browser 
 
 The three data sources behave differently in a browser:
 
-| Source | CORS header | Browser can call it directly? |
-| --- | --- | --- |
-| DFO IWLS API | `access-control-allow-origin: *` | Yes |
-| Open-Meteo | `access-control-allow-origin: *` | Yes |
-| Environment Canada RSS/Atom feeds | none | No |
+| Source                            | CORS header                      | Browser can call it directly? |
+| --------------------------------- | -------------------------------- | ----------------------------- |
+| DFO IWLS API                      | `access-control-allow-origin: *` | Yes                           |
+| Open-Meteo                        | `access-control-allow-origin: *` | Yes                           |
+| Environment Canada RSS/Atom feeds | none                             | No                            |
 
 The mobile app isn't subject to CORS, so it fetches EC feeds directly. The web app calls `configureEcFeedUrl()` once at start-up so the shared service builds `/api/ec-feed?code=06400` instead of the EC URL. That endpoint is a small Vercel function that fetches the feed server-side and returns the XML.
 

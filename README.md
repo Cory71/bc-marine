@@ -4,7 +4,7 @@ Live tides, wind, waves, currents and Environment Canada marine forecasts for th
 
 [![CI](https://github.com/Cory71/bc-marine/actions/workflows/ci.yml/badge.svg)](https://github.com/Cory71/bc-marine/actions/workflows/ci.yml)
 
-**Live demo:** coming soon <!-- TODO: Vercel URL (Task 15) --> (no install, works on desktop and phone browsers)
+**Live demo: [bc-marine.vercel.app](https://bc-marine.vercel.app)** (no install, works on desktop and phone browsers)
 
 ## Screenshots
 

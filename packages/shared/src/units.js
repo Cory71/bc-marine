@@ -1,22 +1,19 @@
 import SunCalc from 'suncalc';
+import { formatBcTime } from './bcTime.js';
 
 // Convert DFO metres to feet
 export function metresToFeet(metres) {
   return (metres * 3.28084).toFixed(1);
 }
 
-// Format a JS Date to "9:15 AM"
+// Format a JS Date to "9:15 AM" in BC time
 export function formatTime(date) {
-  return new Date(date).toLocaleTimeString('en-CA', {
-    hour: 'numeric',
-    minute: '2-digit',
-    hour12: true,
-  });
+  return formatBcTime(date);
 }
 
-// Returns "Updated 9:15 AM" string from a timestamp
+// Returns "Updated 9:15 AM PT" string from a timestamp
 export function timeSince(date) {
-  return `Updated ${formatTime(date)}`;
+  return `Updated ${formatTime(date)} PT`;
 }
 
 // Returns sunrise, sunset, and moon phase for a given lat/lon

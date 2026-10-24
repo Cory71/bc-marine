@@ -2,6 +2,7 @@ import axios from 'axios';
 import { API } from '../constants.js';
 import { metresToFeet } from '../units.js';
 import { setCache, getCache } from './cache.js';
+import { parseUtcTimestamp } from '../bcTime.js';
 
 // Fetch hourly marine weather for a lat/lon coordinate using Open-Meteo (free, no key needed)
 export async function fetchWeather(lat, lon) {
@@ -20,7 +21,7 @@ export async function fetchWeather(lat, lon) {
         latitude: lat,
         longitude: lon,
         hourly: 'wave_height,wave_period,wave_direction,swell_wave_height,swell_wave_direction,ocean_current_velocity,ocean_current_direction',
-        timezone: 'America/Vancouver',
+        timezone: 'GMT', // UTC times, so every viewer's device reads them the same way
       },
     }),
     axios.get(API.OPEN_METEO_WEATHER, {
@@ -30,7 +31,7 @@ export async function fetchWeather(lat, lon) {
         longitude: lon,
         hourly: 'windspeed_10m,winddirection_10m,visibility',
         wind_speed_unit: 'kn', // request knots directly
-        timezone: 'America/Vancouver',
+        timezone: 'GMT', // UTC times, so every viewer's device reads them the same way
       },
     }),
   ]);
@@ -56,7 +57,7 @@ export async function fetchWeather(lat, lon) {
 
   // Zip the two hourly arrays together by index — missing fields become null so the UI shows dashes
   const data = timeArray.map((time, i) => ({
-    time: new Date(time),
+    time: parseUtcTimestamp(time),
     windSpeedKts: weather?.windspeed_10m?.[i] ?? null,
     windDirectionDeg: weather?.winddirection_10m?.[i] ?? null,
     waveHeightFt: marine?.wave_height?.[i] != null ? parseFloat(metresToFeet(marine.wave_height[i])) : null,

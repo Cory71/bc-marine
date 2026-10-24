@@ -5,6 +5,7 @@ import {
   findStationBySlug,
   getDefaultStation,
   getStationRegion,
+  BC_STATIONS,
 } from '../src/index.js';
 
 test('toStationSlug lowercases and dashes', () => {
@@ -28,4 +29,13 @@ test('getDefaultStation is Victoria', () => expect(getDefaultStation().name).toB
 test('getStationRegion uses region or looks it up by id', () => {
   expect(getStationRegion({ id: 'x', region: 'Howe Sound' })).toBe('Howe Sound');
   expect(getStationRegion({ id: '5cebf1df3d0f4a073c4bbd1e' })).toBe('Juan de Fuca Strait');
+});
+
+test('every location has a 24-character DFO station id', () => {
+  for (const location of ALL_LOCATIONS) expect(location.id).toMatch(/^[0-9a-f]{24}$/);
+});
+
+test('no two tide stations share a DFO id', () => {
+  const ids = BC_STATIONS.map(station => station.id);
+  expect(new Set(ids).size).toBe(ids.length);
 });

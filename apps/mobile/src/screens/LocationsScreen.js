@@ -92,8 +92,8 @@ export default function LocationsScreen({ navigation }) {
                 onPress={() => handleSelectStation(station)}
               >
                 <View>
-                  <Text style={[styles.stationName, station.id === activeStation.id && { color: COLORS.safe }]}>
-                    {station.name} {station.id === activeStation.id ? '●' : ''}
+                  <Text style={[styles.stationName, station.name === activeStation.name && { color: COLORS.safe }]}>
+                    {station.name} {station.name === activeStation.name ? '●' : ''}
                   </Text>
                   <Text style={styles.stationArea}>{station.region}</Text>
                 </View>
@@ -128,8 +128,8 @@ export default function LocationsScreen({ navigation }) {
                           style={[styles.stationRow, i < area.stations.length - 1 && styles.stationBorder]}
                           onPress={() => handleSelectStation({ ...station, region: area.name, coast: region.name })}
                         >
-                          <Text style={[styles.stationName, station.id === activeStation.id && { color: COLORS.safe }]}>
-                            {station.name} {station.id === activeStation.id ? '●' : ''}
+                          <Text style={[styles.stationName, station.name === activeStation.name && { color: COLORS.safe }]}>
+                            {station.name} {station.name === activeStation.name ? '●' : ''}
                           </Text>
                           <Text style={styles.arrow}>›</Text>
                         </TouchableOpacity>

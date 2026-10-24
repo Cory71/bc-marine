@@ -1,9 +1,15 @@
-import axios from 'axios';
-import { XMLParser } from 'fast-xml-parser';
 import { setCache, getCache } from './cache.js';
+import { getText } from './http.js';
 import { EC_FEED_CODES, EC_SUBAREA, buildDirectEcFeedUrl } from './ecFeeds.js';
 
-const parser = new XMLParser();
+// The XML parser is only loaded when a forecast is first parsed, so it stays
+// out of the web app's first download (about 60 KB)
+let xmlParserPromise = null;
+
+function getXmlParser() {
+  xmlParserPromise ??= import('fast-xml-parser').then(({ XMLParser }) => new XMLParser());
+  return xmlParserPromise;
+}
 
 // Builds the feed URL from a code — the web app swaps this for its proxy
 let currentBuildUrl = buildDirectEcFeedUrl;
@@ -22,14 +28,15 @@ export async function fetchMarineForecast(regionName) {
   const code = EC_FEED_CODES[regionName];
   if (!code) return { warnings: [], forecast: 'No forecast available for this region.' };
 
-  const response = await axios.get(currentBuildUrl(code));
-  const data = parseMarineFeed(response.data, regionName);
+  const xml = await getText(currentBuildUrl(code));
+  const data = await parseMarineFeed(xml, regionName);
   setCache(cacheKey, data);
   return data;
 }
 
 // Turn an EC feed's XML into { warnings, forecast } for one region
-export function parseMarineFeed(xml, regionName) {
+export async function parseMarineFeed(xml, regionName) {
+  const parser = await getXmlParser();
   const parsed = parser.parse(xml);
 
   // EC feeds can be Atom (feed.entry) or RSS 2.0 (rss.channel.item)
@@ -42,7 +49,11 @@ export function parseMarineFeed(xml, regionName) {
   // whose title mentions this region's sub-area
   const subArea = EC_SUBAREA[regionName];
   const entries = subArea
-    ? allEntries.filter(e => String(e.title ?? '').toLowerCase().includes(subArea))
+    ? allEntries.filter(e =>
+        String(e.title ?? '')
+          .toLowerCase()
+          .includes(subArea)
+      )
     : allEntries;
 
   const warnings = entries
@@ -53,7 +64,12 @@ export function parseMarineFeed(xml, regionName) {
     .map(e => ({ title: e.title, summary: getEntryText(e) }));
 
   // Use first entry that mentions forecast, or fall back to the first entry
-  const forecastEntry = entries.find(e => String(e.title ?? '').toLowerCase().includes('forecast')) ?? entries[0];
+  const forecastEntry =
+    entries.find(e =>
+      String(e.title ?? '')
+        .toLowerCase()
+        .includes('forecast')
+    ) ?? entries[0];
   const forecast = forecastEntry ? getEntryText(forecastEntry) : 'No forecast available.';
 
   return { warnings, forecast };
@@ -63,7 +79,9 @@ export function parseMarineFeed(xml, regionName) {
 function getEntryText(entry) {
   const raw = entry.summary ?? entry.description ?? '';
   return String(raw)
-    .replace(/&#60;/g, '<').replace(/&#62;/g, '>').replace(/&amp;/g, '&')
+    .replace(/&#60;/g, '<')
+    .replace(/&#62;/g, '>')
+    .replace(/&amp;/g, '&')
     .replace(/<br\s*\/?>/gi, '\n')
     .replace(/<[^>]+>/g, '')
     .trim();

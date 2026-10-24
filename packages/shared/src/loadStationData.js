@@ -4,27 +4,36 @@ import { fetchMarineForecast } from './services/ecService.js';
 import { clearCache } from './services/cache.js';
 import { getStationRegion } from './stations.js';
 
-// Names for each data set, in the same order as the fetches below
-const DATA_KEYS = ['tides', 'tideEvents', 'weeklyTides', 'weather', 'marineForecast'];
+// Every data set the apps show for a station. To add a new data layer,
+// add an entry here: its key in the result, and how to load it.
+const DATA_SOURCES = [
+  { key: 'tides', load: station => fetchTides(station.id) },
+  { key: 'tideEvents', load: station => fetchTideEvents(station.id) },
+  { key: 'weeklyTides', load: station => fetchWeeklyTides(station.id) },
+  { key: 'weather', load: station => fetchWeather(station.lat, station.lon) },
+  { key: 'marineForecast', load: (station, region) => fetchMarineForecast(region) },
+];
 
 // Load every data set for a station. Never throws: a failed fetch gives null
 // for that key and its name in `failures`, so callers can keep the old data.
-export async function loadStationData(station, { forceRefresh = false } = {}) {
+// Optional `onData(key, value)` is called as each source arrives, so screens
+// can show fast sources without waiting for the slowest one.
+export async function loadStationData(station, { forceRefresh = false, onData } = {}) {
   const region = getStationRegion(station);
   if (forceRefresh) clearStationCache(station, region);
 
   // allSettled so one broken API doesn't wipe out the others
-  const results = await Promise.allSettled([
-    fetchTides(station.id),
-    fetchTideEvents(station.id),
-    fetchWeeklyTides(station.id),
-    fetchWeather(station.lat, station.lon),
-    fetchMarineForecast(region),
-  ]);
+  const results = await Promise.allSettled(
+    DATA_SOURCES.map(async source => {
+      const value = await source.load(station, region);
+      onData?.(source.key, value);
+      return value;
+    })
+  );
 
   const data = { failures: [] };
   results.forEach((result, i) => {
-    const key = DATA_KEYS[i];
+    const { key } = DATA_SOURCES[i];
     data[key] = result.status === 'fulfilled' ? result.value : null;
     if (result.status === 'rejected') data.failures.push(key);
   });

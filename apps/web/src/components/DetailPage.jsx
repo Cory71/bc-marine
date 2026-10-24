@@ -7,10 +7,11 @@ import Skeleton from './Skeleton.jsx';
 export default function DetailPage({ title, source, children }) {
   const { search } = useLocation();
   const { activeStation, loading, lastUpdated } = useApp();
-  const isFirstLoad = loading && !lastUpdated;
+  // Fade the old numbers slightly while a refresh is running
+  const isRefreshing = loading && Boolean(lastUpdated);
 
   return (
-    <div className={`detail ${loading && !isFirstLoad ? 'is-refreshing' : ''}`} aria-busy={loading}>
+    <div className={`detail ${isRefreshing ? 'is-refreshing' : ''}`} aria-busy={loading}>
       <Link to={{ pathname: '/', search }} className="back-link">
         <Icon name="chevron" size={14} />
         Back to dashboard
@@ -21,7 +22,7 @@ export default function DetailPage({ title, source, children }) {
           {activeStation.name} · {source}
         </p>
       </div>
-      {isFirstLoad ? <DetailSkeleton /> : children}
+      {children}
     </div>
   );
 }
@@ -36,10 +37,11 @@ export function EmptyState({ message, detail }) {
   );
 }
 
-function DetailSkeleton() {
+// Placeholder shaped like a detail view, shown until its data source arrives
+export function DetailPlaceholder() {
   return (
     <>
-      <p className="visually-hidden">Loading…</p>
+      <span className="visually-hidden">Loading…</span>
       <div className="card">
         <Skeleton width="30%" height={12} />
         <Skeleton width="50%" height={28} />

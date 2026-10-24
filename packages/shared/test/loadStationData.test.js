@@ -9,7 +9,13 @@ vi.mock('../src/services/dfoService.js');
 vi.mock('../src/services/weatherService.js');
 vi.mock('../src/services/ecService.js');
 
-const victoria = { id: 'vic', name: 'Victoria', lat: 48.4, lon: -123.4, region: 'Juan de Fuca Strait' };
+const victoria = {
+  id: 'vic',
+  name: 'Victoria',
+  lat: 48.4,
+  lon: -123.4,
+  region: 'Juan de Fuca Strait',
+};
 const MOCK_TIDES = [{ time: new Date(), heightFt: 5 }];
 
 beforeEach(() => {
@@ -44,4 +50,21 @@ test('without forceRefresh the cache is left alone', async () => {
   const clearSpy = vi.spyOn(cache, 'clearCache');
   await loadStationData(victoria);
   expect(clearSpy).not.toHaveBeenCalled();
+});
+
+test('onData reports each source as soon as it arrives, without waiting for the slowest', async () => {
+  // Weekly tides never finish during this check; the others resolve right away
+  let finishWeekly;
+  fetchWeeklyTides.mockReturnValue(new Promise(resolve => (finishWeekly = resolve)));
+  const received = [];
+
+  const loading = loadStationData(victoria, { onData: key => received.push(key) });
+  await new Promise(resolve => setTimeout(resolve, 0));
+  expect(received).toEqual(['tides', 'tideEvents', 'weather']);
+
+  finishWeekly([]);
+  const result = await loading;
+  expect(received).toContain('weeklyTides');
+  expect(received).not.toContain('marineForecast'); // failed sources aren't reported to onData
+  expect(result.failures).toEqual(['marineForecast']);
 });

@@ -86,41 +86,63 @@ function useSavedStations() {
 }
 
 // --- Tide, weather and forecast data for the active station ---
+
+// What each data set holds before it first loads (same as the mobile app)
+const EMPTY_DATA = {
+  tides: [],
+  tideEvents: [],
+  weeklyTides: [],
+  weather: [],
+  marineForecast: EMPTY_FORECAST,
+};
+
+// Which sources have arrived or failed, and for which station
+const NO_SOURCES = { station: null, arrived: [], failed: [] };
+
 function useStationData(station) {
-  const [tides, setTides] = useState([]);
-  const [tideEvents, setTideEvents] = useState([]);
-  const [weeklyTides, setWeeklyTides] = useState([]);
-  const [weather, setWeather] = useState([]);
-  const [marineForecast, setMarineForecast] = useState(EMPTY_FORECAST);
-  const [failures, setFailures] = useState([]);
+  const [data, setData] = useState(EMPTY_DATA);
+  const [sources, setSources] = useState(NO_SOURCES);
   const [lastUpdated, setLastUpdated] = useState(null);
-  // Which station the data on screen belongs to, and whether a manual refresh is running
+  // Which station the finished load belongs to, and whether a manual refresh is running
   const [loadedStation, setLoadedStation] = useState(null);
   const [refreshing, setRefreshing] = useState(false);
   // Counts requests so a slow, older response can't overwrite a newer station's data
   const latestRequestId = useRef(0);
 
-  // Loading until the data matches the active station (no extra state to keep in sync)
+  // Loading until every source has answered for the active station
   const loading = loadedStation !== station || refreshing;
+  const isCurrentStation = sources.station === station;
+
+  // 'ready' (show data), 'failed' (show an error) or 'loading' (show a placeholder).
+  // A refresh keeps 'ready' so the current numbers stay on screen meanwhile.
+  function getSourceStatus(key) {
+    if (isCurrentStation && sources.arrived.includes(key)) return 'ready';
+    if (isCurrentStation && sources.failed.includes(key)) return 'failed';
+    return 'loading';
+  }
 
   const loadData = useCallback(
     async (forceRefresh = false) => {
       const requestId = ++latestRequestId.current;
       const isLatestRequest = () => requestId === latestRequestId.current;
+
+      // Show each source on screen as soon as it arrives
+      function showSource(key, value) {
+        if (!isLatestRequest()) return;
+        setData(previous => ({ ...previous, [key]: value }));
+        setSources(previous => markArrived(previous, station, key));
+      }
+
       try {
-        const result = await loadStationData(station, { forceRefresh });
+        const result = await loadStationData(station, { forceRefresh, onData: showSource });
         if (!isLatestRequest()) return;
 
-        result.failures.forEach(label => console.warn(`[loadData] ${label} failed`));
-
+        result.failures.forEach(key => console.warn(`[loadData] ${key} failed`));
         // A null key means that fetch failed — keep the previous data on screen
-        if (result.tides) setTides(result.tides);
-        if (result.tideEvents) setTideEvents(result.tideEvents);
-        if (result.weeklyTides) setWeeklyTides(result.weeklyTides);
-        if (result.weather) setWeather(result.weather);
-        if (result.marineForecast) setMarineForecast(result.marineForecast);
-
-        setFailures(result.failures);
+        for (const key of Object.keys(EMPTY_DATA)) {
+          if (result[key]) showSource(key, result[key]);
+        }
+        setSources(previous => ({ ...markArrived(previous, station), failed: result.failures }));
         setLastUpdated(new Date());
       } finally {
         if (isLatestRequest()) {
@@ -144,14 +166,24 @@ function useStationData(station) {
   }, [loadData]);
 
   return {
-    tides,
-    tideEvents,
-    weeklyTides,
-    weather,
-    marineForecast,
-    failures,
+    ...data,
+    failures: isCurrentStation ? sources.failed : [],
+    getSourceStatus,
     loading,
     lastUpdated,
     refresh,
+  };
+}
+
+// Record that a source arrived. Arrivals for an older station are dropped first.
+function markArrived(sources, station, key) {
+  const isSameStation = sources.station === station;
+  const arrived = isSameStation ? sources.arrived : [];
+  const failed = isSameStation ? sources.failed : [];
+  if (!key || arrived.includes(key)) return { station, arrived, failed };
+  return {
+    station,
+    arrived: [...arrived, key],
+    failed: failed.filter(failedKey => failedKey !== key),
   };
 }

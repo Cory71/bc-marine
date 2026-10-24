@@ -1,8 +1,13 @@
-import axios from 'axios';
 import { API } from '../constants.js';
 import { metresToFeet } from '../units.js';
 import { setCache, getCache } from './cache.js';
-import { getBcDateString, addDaysToDateString, getBcDayRangeUtc, formatBcWeekday } from '../bcTime.js';
+import { getJson } from './http.js';
+import {
+  getBcDateString,
+  addDaysToDateString,
+  getBcDayRangeUtc,
+  formatBcWeekday,
+} from '../bcTime.js';
 
 // Fetch hourly tide predictions for today (BC day) at a DFO station
 export async function fetchTides(stationId) {
@@ -13,9 +18,9 @@ export async function fetchTides(stationId) {
   const { from, to } = getBcDayRangeUtc(getBcDateString());
   const url = `${API.DFO_BASE}/stations/${stationId}/data?time-series-code=wlp&from=${from}&to=${to}&resolution=SIXTY_MINUTES`;
 
-  const response = await axios.get(url);
+  const readings = await getJson(url);
   // DFO returns an array of { eventDate, value } objects — value is in metres
-  const data = response.data.map(item => ({
+  const data = readings.map(item => ({
     time: new Date(item.eventDate),
     heightFt: parseFloat(metresToFeet(item.value)),
   }));
@@ -36,13 +41,11 @@ export async function fetchTideEvents(stationId) {
   const { to } = getBcDayRangeUtc(addDaysToDateString(today, 1));
   const url = `${API.DFO_BASE}/stations/${stationId}/data?time-series-code=wlp-hilo&from=${from}&to=${to}`;
 
-  const response = await axios.get(url);
-  const events = response.data;
+  const events = await getJson(url);
   // Tide events always alternate HIGH/LOW. Determine which comes first by comparing
   // the first two values — whichever is larger is the high tide.
-  const firstIsHigh = events.length >= 2
-    ? events[0].value > events[1].value
-    : (events[0]?.value ?? 0) > 0;
+  const firstIsHigh =
+    events.length >= 2 ? events[0].value > events[1].value : (events[0]?.value ?? 0) > 0;
   const data = events.map((item, i) => ({
     time: new Date(item.eventDate),
     heightFt: parseFloat(metresToFeet(item.value)),
@@ -73,8 +76,8 @@ export async function fetchWeeklyTides(stationId) {
 async function fetchDayMaxTide(stationId, day) {
   const { from, to } = getBcDayRangeUtc(day);
   const url = `${API.DFO_BASE}/stations/${stationId}/data?time-series-code=wlp-hilo&from=${from}&to=${to}`;
-  const response = await axios.get(url);
-  const maxFt = Math.max(...response.data.map(item => parseFloat(metresToFeet(item.value))));
+  const readings = await getJson(url);
+  const maxFt = Math.max(...readings.map(item => parseFloat(metresToFeet(item.value))));
   // Noon UTC on that date is the same calendar day in BC, so the weekday is right
   const label = formatBcWeekday(`${day}T12:00:00Z`);
   return { label, maxFt };

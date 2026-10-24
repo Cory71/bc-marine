@@ -4,7 +4,7 @@ import reactHooks from 'eslint-plugin-react-hooks';
 
 export default [
   // The mobile app isn't linted here (Expo has its own tooling)
-  { ignores: ['apps/mobile/**', '**/dist/**', '**/node_modules/**'] },
+  { ignores: ['apps/mobile/**', '**/dist/**', '**/node_modules/**', '.playwright-mcp/**'] },
 
   // Recommended rules for all linted JavaScript
   js.configs.recommended,

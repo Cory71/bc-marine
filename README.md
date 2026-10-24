@@ -18,7 +18,7 @@ Live tides, wind, waves, currents and Environment Canada marine forecasts for th
 
 ### Mobile app (Expo)
 
-<!-- TODO: mobile screenshots from Cory -->
+<!-- TODO: mobile screenshots -->
 
 ## Features
 
@@ -63,7 +63,7 @@ The design reasoning is in [docs/architecture.md](docs/architecture.md).
 
 ## Tech Stack
 
-- **Shared:** JavaScript (ES modules) · Axios · fast-xml-parser · SunCalc
+- **Shared:** JavaScript (ES modules) · built-in `fetch` · fast-xml-parser · SunCalc
 - **Web:** React 19 · Vite · React Router · hand-built SVG charts and CSS (no UI or chart libraries) · Vercel Functions
 - **Mobile:** Expo SDK 57 · React Native · React Navigation · AsyncStorage · react-native-svg · expo-location
 - **Quality:** Vitest · Testing Library · ESLint · Prettier · GitHub Actions · Lighthouse (desktop: Performance 98+, Accessibility 100)

@@ -28,7 +28,8 @@ export async function fetchMarineForecast(regionName) {
   const code = EC_FEED_CODES[regionName];
   if (!code) return { warnings: [], forecast: 'No forecast available for this region.' };
 
-  const xml = await getText(currentBuildUrl(code));
+  // Download the feed and the XML parser at the same time, not one after the other
+  const [xml] = await Promise.all([getText(currentBuildUrl(code)), getXmlParser()]);
   const data = await parseMarineFeed(xml, regionName);
   setCache(cacheKey, data);
   return data;

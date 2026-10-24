@@ -1,5 +1,5 @@
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
-import { COLORS } from '../utils/constants';
+import { COLORS } from '../theme';
 
 function degreesToCompass(deg) {
   if (deg == null) return '--';

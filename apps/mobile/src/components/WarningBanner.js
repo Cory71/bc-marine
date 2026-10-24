@@ -1,5 +1,5 @@
 import { View, Text, StyleSheet } from 'react-native';
-import { COLORS } from '../utils/constants';
+import { COLORS } from '../theme';
 
 export default function WarningBanner({ warnings }) {
   if (!warnings || warnings.length === 0) return null;

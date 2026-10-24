@@ -1,7 +1,7 @@
 import { View, Text, ScrollView, TouchableOpacity, StyleSheet, useWindowDimensions } from 'react-native';
 import { useApp } from '../context/AppContext';
-import { COLORS } from '../utils/constants';
-import { formatTime } from '../utils/units';
+import { COLORS } from '../theme';
+import { formatTime } from '@bc-marine/shared';
 import TideCurve from '../components/TideCurve';
 
 export default function TideDetailScreen({ navigation }) {

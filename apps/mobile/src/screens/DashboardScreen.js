@@ -1,7 +1,7 @@
 import { View, Text, ScrollView, RefreshControl, StyleSheet, ActivityIndicator } from 'react-native';
 import { useApp } from '../context/AppContext';
-import { COLORS } from '../utils/constants';
-import { timeSince, formatTime, getSunMoon, degreesToCardinal } from '../utils/units';
+import { COLORS } from '../theme';
+import { timeSince, formatTime, getSunMoon, degreesToCardinal } from '@bc-marine/shared';
 import WarningBanner from '../components/WarningBanner';
 import CardWrapper from '../components/CardWrapper';
 

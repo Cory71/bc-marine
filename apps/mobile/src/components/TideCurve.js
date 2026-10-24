@@ -1,7 +1,7 @@
 import { View } from 'react-native';
 import Svg, { Path, Circle, Line, Text as SvgText } from 'react-native-svg';
-import { COLORS } from '../utils/constants';
-import { formatTime } from '../utils/units';
+import { COLORS } from '../theme';
+import { formatTime } from '@bc-marine/shared';
 
 // Draws a smooth tide curve from an array of { time, heightFt } hourly points
 export default function TideCurve({ tides, width = 300, height = 80 }) {

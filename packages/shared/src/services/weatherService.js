@@ -1,7 +1,7 @@
 import axios from 'axios';
-import { API } from '../utils/constants';
-import { metresToFeet } from '../utils/units';
-import { setCache, getCache } from './cache';
+import { API } from '../constants.js';
+import { metresToFeet } from '../units.js';
+import { setCache, getCache } from './cache.js';
 
 // Fetch hourly marine weather for a lat/lon coordinate using Open-Meteo (free, no key needed)
 export async function fetchWeather(lat, lon) {

@@ -9,7 +9,7 @@
     "node": ">=20"
   },
   "scripts": {
-    "test": "echo \"No tests yet\"",
+    "test": "npm run test --workspace @bc-marine/shared",
     "lint": "echo \"No lint yet\"",
     "build:web": "echo \"No web app yet\""
   }

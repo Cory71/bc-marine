@@ -1,6 +1,6 @@
 import axios from 'axios';
 import { XMLParser } from 'fast-xml-parser';
-import { setCache, getCache } from './cache';
+import { setCache, getCache } from './cache.js';
 
 const parser = new XMLParser();
 

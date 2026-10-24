@@ -1,7 +1,7 @@
 import { View, Text, ScrollView, TouchableOpacity, StyleSheet } from 'react-native';
 import { useApp } from '../context/AppContext';
-import { COLORS } from '../utils/constants';
-import { formatTime } from '../utils/units';
+import { COLORS } from '../theme';
+import { formatTime } from '@bc-marine/shared';
 
 // 16-point compass for more precise wind/swell direction
 function degreesToCompass(deg) {

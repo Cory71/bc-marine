@@ -2,7 +2,7 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createStackNavigator } from '@react-navigation/stack';
 import { Text } from 'react-native';
-import { COLORS } from './src/utils/constants';
+import { COLORS } from './src/theme';
 import { AppProvider } from './src/context/AppContext';
 
 import DashboardScreen from './src/screens/DashboardScreen';

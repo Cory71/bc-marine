@@ -1,10 +1,14 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { BC_STATIONS } from '../utils/constants';
-import { fetchTides, fetchTideEvents, fetchWeeklyTides } from '../services/dfoService';
-import { fetchWeather } from '../services/weatherService';
-import { fetchMarineForecast } from '../services/ecService';
-import { clearCache } from '../services/cache';
+import {
+  BC_STATIONS,
+  fetchTides,
+  fetchTideEvents,
+  fetchWeeklyTides,
+  fetchWeather,
+  fetchMarineForecast,
+  clearCache,
+} from '@bc-marine/shared';
 
 const AppContext = createContext(null);
 

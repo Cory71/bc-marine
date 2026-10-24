@@ -2,8 +2,8 @@ import { useState } from 'react';
 import { View, Text, TextInput, ScrollView, StyleSheet, TouchableOpacity, Alert } from 'react-native';
 import * as Location from 'expo-location';
 import { useApp } from '../context/AppContext';
-import { COLORS, BC_REGIONS, BC_STATIONS, BC_COMMUNITIES } from '../utils/constants';
-import { findNearestStation } from '../utils/units';
+import { COLORS } from '../theme';
+import { BC_REGIONS, BC_STATIONS, BC_COMMUNITIES, findNearestStation } from '@bc-marine/shared';
 
 export default function LocationsScreen({ navigation }) {
   const { activeStation, setActiveStation, savedStations, saveStation } = useApp();

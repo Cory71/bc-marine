@@ -263,6 +263,17 @@
   font-size: 0.875rem;
 }
 
+/* Gale, storm and hurricane-force warnings: same layout, coral-red instead of amber */
+.warning-banner--severe {
+  border-color: rgba(255, 123, 114, 0.5);
+  background: rgba(255, 123, 114, 0.12);
+  color: var(--color-danger);
+}
+
+.warning-banner--severe .warning-banner__body {
+  color: #f4b8b2;
+}
+
 /* ---------- Small screens: sidebar becomes a slide-in drawer ---------- */
 @media (max-width: 1023px) {
   .sidebar {

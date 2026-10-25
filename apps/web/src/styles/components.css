@@ -348,3 +348,122 @@
   color: var(--color-accent);
   font-weight: 700;
 }
+
+/* ---------- Nearby observations ---------- */
+.obs-lines {
+  display: flex;
+  flex-direction: column;
+}
+
+.obs-lines__row {
+  display: grid;
+  grid-template-columns: minmax(120px, 1fr) 2fr auto;
+  gap: 4px 16px;
+  align-items: baseline;
+  padding: 7px 0;
+  border-bottom: 1px solid var(--color-card-border);
+}
+
+.obs-lines__row:last-child {
+  border-bottom: none;
+}
+
+.obs-lines__name {
+  font-weight: 600;
+}
+
+/* Tiles: 3 across on desktop, stacked on phones */
+.obs-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 16px;
+}
+
+@media (min-width: 600px) {
+  .obs-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 1024px) {
+  .obs-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.obs-tile {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 16px 18px;
+  border: 1px solid var(--color-card-border);
+  border-radius: 12px;
+  background: var(--color-card-bg);
+}
+
+/* Readings older than 3 hours fade back so they don't pass for current ones */
+.obs-tile--old {
+  opacity: 0.6;
+}
+
+.obs-tile__top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.obs-tile__name {
+  font-size: 1.0625rem;
+}
+
+.obs-tile__old {
+  color: var(--color-warning);
+  font-weight: 600;
+}
+
+.obs-tile__stats {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px 16px;
+  margin: 6px 0 0;
+}
+
+.obs-tile__stats dd {
+  margin: 0;
+}
+
+.obs-tile__value {
+  font-size: 1.25rem;
+  font-weight: 700;
+}
+
+.obs-badge {
+  padding: 2px 8px;
+  border-radius: 6px;
+  font-size: 0.6875rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.obs-badge--lighthouse {
+  background: rgba(126, 206, 244, 0.16);
+  color: var(--color-accent);
+}
+
+.obs-badge--buoy {
+  background: rgba(77, 204, 136, 0.16);
+  color: var(--color-safe);
+}
+
+@media (max-width: 599px) {
+  .obs-lines__row {
+    grid-template-columns: 1fr auto;
+  }
+
+  .obs-lines__row > :nth-child(2) {
+    grid-column: 1 / -1;
+    grid-row: 2;
+  }
+}

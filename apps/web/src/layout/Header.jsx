@@ -9,6 +9,7 @@ const NAV_ITEMS = [
   { label: 'Tides', path: '/tides' },
   { label: 'Weather', path: '/weather' },
   { label: 'Currents', path: '/currents' },
+  { label: 'Observations', path: '/observations' },
 ];
 
 export default function Header({ onOpenDrawer, menuButtonRef, drawerOpen }) {

@@ -39,9 +39,9 @@ const BUOY_READING = {
 };
 
 test('formats each reading value with its unit', () => {
-  expect(formatWind(LIGHTHOUSE_READING)).toBe('E 17 kn');
-  expect(formatWind({ ...LIGHTHOUSE_READING, windDirDeg: null })).toBe('17 kn');
-  expect(formatGust(LIGHTHOUSE_READING)).toBe('25 kn');
+  expect(formatWind(LIGHTHOUSE_READING)).toBe('E 17 kts');
+  expect(formatWind({ ...LIGHTHOUSE_READING, windDirDeg: null })).toBe('17 kts');
+  expect(formatGust(LIGHTHOUSE_READING)).toBe('25 kts');
   expect(formatWaves(BUOY_READING)).toBe('1.3 ft');
   expect(formatWavePeriod(BUOY_READING)).toBe('4 s');
   expect(formatPressure(LIGHTHOUSE_READING)).toBe('1007.5 hPa');
@@ -69,10 +69,10 @@ test('readings older than 3 hours count as old', () => {
 
 test('summarizeObservation gives the short dashboard line', () => {
   expect(summarizeObservation({ site: { type: 'lighthouse' }, reading: LIGHTHOUSE_READING })).toBe(
-    'E 17 kn, gust 25'
+    'E 17 kts, gust 25'
   );
   expect(summarizeObservation({ site: { type: 'buoy' }, reading: BUOY_READING })).toBe(
-    'W 8 kn, waves 1.3 ft'
+    'W 8 kts, waves 1.3 ft'
   );
   expect(summarizeObservation({ site: { type: 'buoy' }, reading: null })).toBe('No recent report');
 });

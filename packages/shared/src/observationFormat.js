@@ -12,15 +12,15 @@ function withUnit(value, unit) {
   return value == null ? NO_VALUE : `${value} ${unit}`;
 }
 
-// 'E 17 kn' — speed only if the direction is missing
+// 'E 17 kts' — speed only if the direction is missing
 export function formatWind(reading) {
   if (reading?.windKts == null) return NO_VALUE;
-  const speed = `${reading.windKts} kn`;
+  const speed = `${reading.windKts} kts`;
   return reading.windDirDeg == null ? speed : `${degreesToCompass(reading.windDirDeg)} ${speed}`;
 }
 
 export function formatGust(reading) {
-  return withUnit(reading?.gustKts, 'kn');
+  return withUnit(reading?.gustKts, 'kts');
 }
 
 export function formatWaves(reading) {

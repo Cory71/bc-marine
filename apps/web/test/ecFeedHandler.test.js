@@ -21,8 +21,17 @@ test('returns XML with CDN cache headers', async () => {
 });
 
 test('maps upstream failure to 502', async () => {
-  expect((await handleEcFeedRequest('06400', vi.fn().mockRejectedValue(new Error('down')))).status).toBe(502);
-  expect((await handleEcFeedRequest('06400', vi.fn().mockResolvedValue(new Response('', { status: 503 })))).status).toBe(502);
+  expect(
+    (await handleEcFeedRequest('06400', vi.fn().mockRejectedValue(new Error('down')))).status
+  ).toBe(502);
+  expect(
+    (
+      await handleEcFeedRequest(
+        '06400',
+        vi.fn().mockResolvedValue(new Response('', { status: 503 }))
+      )
+    ).status
+  ).toBe(502);
 });
 
 test('a half-written feed is rejected and not cached', async () => {

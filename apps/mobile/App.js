@@ -9,6 +9,7 @@ import DashboardScreen from './src/screens/DashboardScreen';
 import TideDetailScreen from './src/screens/TideDetailScreen';
 import WeatherDetailScreen from './src/screens/WeatherDetailScreen';
 import CurrentsDetailScreen from './src/screens/CurrentsDetailScreen';
+import ObservationsDetailScreen from './src/screens/ObservationsDetailScreen';
 import LocationsScreen from './src/screens/LocationsScreen';
 
 const Tab = createBottomTabNavigator();
@@ -22,6 +23,7 @@ function HomeStack() {
       <Stack.Screen name="TideDetail" component={TideDetailScreen} />
       <Stack.Screen name="WeatherDetail" component={WeatherDetailScreen} />
       <Stack.Screen name="CurrentsDetail" component={CurrentsDetailScreen} />
+      <Stack.Screen name="ObservationsDetail" component={ObservationsDetailScreen} />
     </Stack.Navigator>
   );
 }

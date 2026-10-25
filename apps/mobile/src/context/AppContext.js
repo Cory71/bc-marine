@@ -13,6 +13,7 @@ export function AppProvider({ children }) {
   const [weeklyTides, setWeeklyTides] = useState([]);
   const [weather, setWeather] = useState([]);
   const [marineForecast, setMarineForecast] = useState({ warnings: [], forecast: '' });
+  const [observations, setObservations] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [lastUpdated, setLastUpdated] = useState(null);
@@ -50,6 +51,7 @@ export function AppProvider({ children }) {
       if (result.weeklyTides) setWeeklyTides(result.weeklyTides);
       if (result.weather) setWeather(result.weather);
       if (result.marineForecast) setMarineForecast(result.marineForecast);
+      if (result.observations) setObservations(result.observations);
 
       setLastUpdated(new Date());
     } catch (e) {
@@ -81,7 +83,7 @@ export function AppProvider({ children }) {
     <AppContext.Provider value={{
       activeStation, setActiveStation,
       savedStations, saveStation, removeStation,
-      tides, tideEvents, weeklyTides, weather, marineForecast,
+      tides, tideEvents, weeklyTides, weather, marineForecast, observations,
       loading, error, lastUpdated,
       refresh: () => loadData(true),
     }}>

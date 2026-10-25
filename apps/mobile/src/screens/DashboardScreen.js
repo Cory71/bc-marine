@@ -1,12 +1,12 @@
 import { View, Text, ScrollView, RefreshControl, StyleSheet, ActivityIndicator } from 'react-native';
 import { useApp } from '../context/AppContext';
 import { COLORS } from '../theme';
-import { timeSince, formatTime, getSunMoon, degreesToCardinal, tidyForecastText } from '@bc-marine/shared';
+import { timeSince, formatTime, getSunMoon, degreesToCardinal, tidyForecastText, summarizeObservation, formatReadingAge } from '@bc-marine/shared';
 import WarningBanner from '../components/WarningBanner';
 import CardWrapper from '../components/CardWrapper';
 
 export default function DashboardScreen({ navigation }) {
-  const { activeStation, tides, weather, tideEvents, marineForecast, loading, error, lastUpdated, refresh } = useApp();
+  const { activeStation, tides, weather, tideEvents, marineForecast, observations, loading, error, lastUpdated, refresh } = useApp();
 
   const now = new Date();
   const sunMoon = getSunMoon(activeStation.lat, activeStation.lon);
@@ -68,6 +68,21 @@ export default function DashboardScreen({ navigation }) {
       <CardWrapper label="📡 EC Marine Forecast">
         <Text style={styles.forecastText}>{tidyForecastText(marineForecast.forecast)}</Text>
         <Text style={styles.sourceText}>Source: Environment Canada · {activeStation.region}</Text>
+      </CardWrapper>
+
+      {/* Nearby lighthouses and buoys: what's actually happening right now */}
+      <CardWrapper label="🗼 Nearby Observations" linkText="All Readings" onPress={() => navigation.navigate('ObservationsDetail')}>
+        {observations.length === 0 ? (
+          <Text style={styles.sourceText}>No observation sites nearby.</Text>
+        ) : (
+          observations.map(observation => (
+            <View key={observation.site.id} style={styles.obsRow}>
+              <Text style={styles.obsName}>{observation.site.name}</Text>
+              <Text style={styles.obsSummary}>{summarizeObservation(observation)}</Text>
+              {observation.reading && <Text style={styles.obsAge}>{formatReadingAge(observation.reading.observedAt)}</Text>}
+            </View>
+          ))
+        )}
       </CardWrapper>
 
       {/* Wind & Weather */}
@@ -147,6 +162,10 @@ const styles = StyleSheet.create({
   statLabel: { color: COLORS.accent, fontSize: 9, textTransform: 'uppercase' },
   statValue: { color: COLORS.textPrimary, fontSize: 14, fontWeight: 'bold', marginTop: 2 },
   statSub: { color: COLORS.textSecondary, fontSize: 10, marginTop: 1 },
+  obsRow: { flexDirection: 'row', alignItems: 'baseline', paddingVertical: 5, borderBottomWidth: 1, borderBottomColor: 'rgba(126,206,244,0.08)', gap: 8 },
+  obsName: { color: COLORS.textPrimary, fontSize: 12, fontWeight: 'bold', flex: 1.1 },
+  obsSummary: { color: COLORS.textSecondary, fontSize: 12, flex: 1.6 },
+  obsAge: { color: COLORS.textMuted, fontSize: 10 },
   forecastText: { color: COLORS.textSecondary, fontSize: 11, lineHeight: 18 },
   sourceText: { color: COLORS.textMuted, fontSize: 10, marginTop: 6 },
   loadingText: { color: COLORS.textSecondary, marginTop: 12 },

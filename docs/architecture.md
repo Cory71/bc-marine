@@ -64,7 +64,9 @@ The mobile app isn't subject to CORS, so it fetches EC feeds directly. The web a
 
 **Why an allowlist.** A proxy that fetches whatever URL it's given is an open relay that anyone could abuse. This one only accepts a feed **code**, and only codes from the app's own list (`isValidEcFeedCode`). Anything else gets `400 Unknown feed code` without any outbound request. EC failures map to `502`.
 
-**Caching.** Successful responses carry `Cache-Control: s-maxage=1800, stale-while-revalidate=600`, so Vercel's CDN serves each feed for 30 minutes (matching the app's own cache) and most visitors never trigger a function call.
+**Caching.** Successful responses carry `Cache-Control: s-maxage=600, stale-while-revalidate=120`, so Vercel's CDN serves each feed for 10 minutes and most visitors never trigger a function call, while a new forecast (EC issues them around 4:00 AM, 10:30 AM, 4:00 PM and 9:30 PM) still reaches everyone soon after release.
+
+**Half-written feeds.** EC rewrites a feed file when it issues a forecast, and a fetch during that write can return a truncated file. This happened on the 4:00 PM issue on Oct 25, 2026: the CDN cached the broken copy, and one area showed "Forecast unavailable" until it expired. The proxy now only returns, and allows caching of, a feed that ends with its closing `</feed>` or `</rss>` tag. Anything else gets an uncached `502`, so the next request retries EC.
 
 The handler (`server/ecFeedHandler.js`) is a pure function that takes a code and a `fetch` implementation and returns `{ status, headers, body }`. The Vercel function, the Vite dev server and `vite preview` all wrap that same function, so local development behaves like production, and the tests can exercise it without a network.
 

@@ -87,3 +87,8 @@ function getEntryText(entry) {
     .replace(/<[^>]+>/g, '')
     .trim();
 }
+
+// EC hard-wraps its text mid-sentence. Join those lines, but keep "Issued ..." on its own line.
+export function tidyForecastText(text) {
+  return text.replace(/\s*\n(?!Issued)\s*/g, ' ');
+}

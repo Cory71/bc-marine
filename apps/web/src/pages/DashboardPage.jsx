@@ -6,6 +6,7 @@ import {
   getSunMoon,
   degreesToCardinal,
   formatTime,
+  tidyForecastText,
 } from '@bc-marine/shared';
 import { useApp } from '../context/AppContext.jsx';
 import Card from '../components/Card.jsx';
@@ -170,11 +171,6 @@ function ForecastText() {
       <p className="card__source">Source: Environment Canada · {activeStation.region}</p>
     </>
   );
-}
-
-// EC hard-wraps its text mid-sentence. Join those lines, but keep "Issued ..." on its own line.
-function tidyForecastText(text) {
-  return text.replace(/\s*\n(?!Issued)\s*/g, ' ');
 }
 
 function ForecastPlaceholder() {

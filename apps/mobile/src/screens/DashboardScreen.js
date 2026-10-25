@@ -1,7 +1,7 @@
 import { View, Text, ScrollView, RefreshControl, StyleSheet, ActivityIndicator } from 'react-native';
 import { useApp } from '../context/AppContext';
 import { COLORS } from '../theme';
-import { timeSince, formatTime, getSunMoon, degreesToCardinal } from '@bc-marine/shared';
+import { timeSince, formatTime, getSunMoon, degreesToCardinal, tidyForecastText } from '@bc-marine/shared';
 import WarningBanner from '../components/WarningBanner';
 import CardWrapper from '../components/CardWrapper';
 
@@ -66,7 +66,7 @@ export default function DashboardScreen({ navigation }) {
 
       {/* EC Marine Forecast */}
       <CardWrapper label="📡 EC Marine Forecast">
-        <Text style={styles.forecastText}>{marineForecast.forecast}</Text>
+        <Text style={styles.forecastText}>{tidyForecastText(marineForecast.forecast)}</Text>
         <Text style={styles.sourceText}>Source: Environment Canada · {activeStation.region}</Text>
       </CardWrapper>
 

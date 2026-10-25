@@ -40,7 +40,14 @@ export default function TideCurve({ tides, events = [], width, height = 240, now
             chartWidth={chartWidth}
           />
         ))}
-        {nowPoint && <NowMarker point={nowPoint} top={PADDING.top - 10} bottom={scale.baseY} />}
+        {nowPoint && (
+          <NowMarker
+            point={nowPoint}
+            top={PADDING.top - 10}
+            bottom={scale.baseY}
+            nearbyEvent={findNearbyEvent(visibleEvents, nowPoint, scale)}
+          />
+        )}
       </svg>
     </div>
   );
@@ -56,7 +63,8 @@ function buildScale(tides, events, width, height) {
   const plotWidth = width - PADDING.left - PADDING.right;
   const plotHeight = height - PADDING.top - PADDING.bottom;
 
-  const xForTime = time => PADDING.left + ((new Date(time) - startMs) / (endMs - startMs)) * plotWidth;
+  const xForTime = time =>
+    PADDING.left + ((new Date(time) - startMs) / (endMs - startMs)) * plotWidth;
   const yForHeight = heightFt => PADDING.top + (1 - (heightFt - minFt) / range) * plotHeight;
 
   return {
@@ -76,7 +84,10 @@ function buildCurvePath(points) {
     const before = points[i - 2] ?? points[i - 1];
     const start = points[i - 1];
     const after = points[i + 1] ?? point;
-    const control1 = { x: start.x + (point.x - before.x) / 6, y: start.y + (point.y - before.y) / 6 };
+    const control1 = {
+      x: start.x + (point.x - before.x) / 6,
+      y: start.y + (point.y - before.y) / 6,
+    };
     const control2 = { x: point.x - (after.x - start.x) / 6, y: point.y - (after.y - start.y) / 6 };
     return `${path} C${control1.x},${control1.y} ${control2.x},${control2.y} ${point.x},${point.y}`;
   }, '');
@@ -142,17 +153,28 @@ function EventMarker({ event, point, chartWidth }) {
   );
 }
 
-// Dashed line and dot at the current time, labelled beside the dot (like mobile)
-function NowMarker({ point, top, bottom }) {
+// Dashed line and dot at the current time. The label sits beside the dot, but moves
+// out of the way of a nearby high (labelled above) or low (labelled below).
+function NowMarker({ point, top, bottom, nearbyEvent }) {
+  let labelY = point.y + 4;
+  if (nearbyEvent?.type === 'HIGH') labelY = point.y + 20;
+  if (nearbyEvent?.type === 'LOW') labelY = point.y - 12;
+
   return (
     <g className="tide-curve__now">
       <line x1={point.x} y1={top} x2={point.x} y2={bottom} strokeDasharray="4 4" />
       <circle cx={point.x} cy={point.y} r="5" />
-      <text x={point.x + 9} y={point.y + 4} className="tide-curve__label">
+      <text x={point.x + 9} y={labelY} className="tide-curve__label">
         Now
       </text>
     </g>
   );
+}
+
+// The high/low event whose label could collide with the "Now" label, if any
+function findNearbyEvent(events, nowPoint, scale) {
+  const LABEL_ROOM_PX = 90;
+  return events.find(event => Math.abs(scale.xForTime(event.time) - nowPoint.x) < LABEL_ROOM_PX);
 }
 
 // Keep labels near the chart's edges from being cut off

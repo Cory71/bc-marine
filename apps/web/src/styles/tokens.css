@@ -10,5 +10,6 @@
   --color-text-secondary: #9cc8e8;
   --color-text-muted: #7b9bba;
   --color-warning: #ff9f43;
+  --color-danger: #ff7b72; /* gale and above: soft coral that sits well on the navy */
   --color-safe: #4dcc88;
 }

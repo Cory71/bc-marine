@@ -6,6 +6,7 @@ export * from './readings.js';
 export * from './stations.js';
 export * from './loadStationData.js';
 export * from './warnings.js';
+export * from './observationSites.js';
 export * from './services/cache.js';
 export * from './services/dfoService.js';
 export * from './services/weatherService.js';

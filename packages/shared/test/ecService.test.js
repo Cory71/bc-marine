@@ -6,6 +6,7 @@ import {
   parseMarineFeed,
   fetchMarineForecast,
   clearCache,
+  tidyForecastText,
 } from '../src/index.js';
 
 // Small EC-style Atom feed: one warning and one forecast entry
@@ -84,3 +85,8 @@ test('unknown region returns the existing fallback', async () => {
     forecast: 'No forecast available for this region.',
   });
 });
+
+test('tidyForecastText joins mid-sentence breaks but keeps "Issued" on its own line', () =>
+  expect(tidyForecastText('Wind light near noon and\nto southeast 20.\nIssued 10:30 AM PDT')).toBe(
+    'Wind light near noon and to southeast 20.\nIssued 10:30 AM PDT'
+  ));

@@ -26,10 +26,23 @@ test('TideCurve renders an accessible svg and a Now marker', () => {
 test('TideCurve label summarises the next high and low', () => {
   render(<TideCurve tides={SIX_HOURLY_POINTS} events={EVENTS} now={NOW} width={600} />);
   const label = screen.getByRole('img').getAttribute('aria-label');
-  expect(label).toBe('Tide curve for today. Next high 6.2 ft at 10:30 AM, next low 1.1 ft at 4:45 PM.');
+  expect(label).toBe(
+    'Tide curve for today. Next high 6.2 ft at 10:30 AM, next low 1.1 ft at 4:45 PM.'
+  );
 });
 
 test('TideCurve renders nothing with fewer than 2 points', () => {
   const { container } = render(<TideCurve tides={[]} />);
   expect(container.firstChild).toBeNull();
+});
+
+test('the Now label moves below its dot when a high tide is close by', () => {
+  // NOW is 10 minutes before the 10:30 AM high, so their labels would overlap
+  const { container } = render(
+    <TideCurve tides={SIX_HOURLY_POINTS} events={EVENTS} now={NOW} width={600} />
+  );
+  const nowGroup = container.querySelector('.tide-curve__now');
+  const dotY = Number(nowGroup.querySelector('circle').getAttribute('cy'));
+  const labelY = Number(nowGroup.querySelector('text').getAttribute('y'));
+  expect(labelY).toBeGreaterThanOrEqual(dotY + 12);
 });

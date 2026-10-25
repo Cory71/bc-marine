@@ -1,6 +1,7 @@
 import { fetchTides, fetchTideEvents, fetchWeeklyTides } from './services/dfoService.js';
 import { fetchWeather } from './services/weatherService.js';
 import { fetchMarineForecast } from './services/ecService.js';
+import { fetchNearbyObservations } from './services/observationService.js';
 import { clearCache } from './services/cache.js';
 import { getStationRegion } from './stations.js';
 
@@ -12,6 +13,7 @@ const DATA_SOURCES = [
   { key: 'weeklyTides', load: station => fetchWeeklyTides(station.id) },
   { key: 'weather', load: station => fetchWeather(station.lat, station.lon) },
   { key: 'marineForecast', load: (station, region) => fetchMarineForecast(region) },
+  { key: 'observations', load: station => fetchNearbyObservations(station) },
 ];
 
 // Load every data set for a station. Never throws: a failed fetch gives null
@@ -47,4 +49,5 @@ function clearStationCache(station, region) {
   clearCache(`weekly_${station.id}`);
   clearCache(`weather_${station.lat}_${station.lon}`);
   clearCache(`ec_${region}`);
+  clearCache(`observations_${station.lat}_${station.lon}`);
 }

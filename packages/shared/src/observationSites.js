@@ -67,13 +67,6 @@ const SITES = [
     sourceId: '1062251',
   },
   { name: 'Saturna Island', type: 'lighthouse', lat: 48.7832, lon: -123.0458, sourceId: '1017101' },
-  {
-    name: 'Esquimalt Harbour',
-    type: 'lighthouse',
-    lat: 48.432,
-    lon: -123.4393,
-    sourceId: '1012710',
-  },
   // Ocean buoys (Environment Canada buoys, published by NOAA NDBC)
   { name: 'Central Dixon Entrance', type: 'buoy', lat: 54.3667, lon: -132.4439, sourceId: '46145' },
   { name: 'East Dellwood', type: 'buoy', lat: 50.8742, lon: -129.9158, sourceId: '46207' },

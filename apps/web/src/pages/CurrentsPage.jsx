@@ -5,6 +5,7 @@ import {
   hasCurrentData,
   degreesToCompass,
   formatTime,
+  formatSpeed,
 } from '@bc-marine/shared';
 import { useApp } from '../context/AppContext.jsx';
 import DetailPage, { EmptyState, DetailPlaceholder } from '../components/DetailPage.jsx';
@@ -29,7 +30,7 @@ export default function CurrentsPage() {
 }
 
 function CurrentsContent() {
-  const { weather } = useApp();
+  const { weather, units } = useApp();
   // Open-Meteo has no current data for fjords, inlets and many sheltered waters
   if (!hasCurrentData(weather)) {
     return (
@@ -46,7 +47,7 @@ function CurrentsContent() {
     <>
       <Card title="Now">
         <div className="stat-row">
-          <Stat label="Speed" value={`${now?.currentSpeedKts?.toFixed(1) ?? '--'} kts`} />
+          <Stat label="Speed" value={formatSpeed(now?.currentSpeedKts, units, 1)} />
           <Stat label="Direction" value={degreesToCompass(now?.currentDirectionDeg)} />
           <Stat label="Phase" value={phase ?? '--'} tone={PHASE_TONES[phase] ?? 'muted'} />
         </div>
@@ -59,6 +60,7 @@ function CurrentsContent() {
 }
 
 function HourlyCurrentsTable({ hours }) {
+  const { units } = useApp();
   return (
     <div className="table-scroll">
       <table className="data-table">
@@ -73,7 +75,7 @@ function HourlyCurrentsTable({ hours }) {
           {hours.map((hour, i) => (
             <tr key={hour.time.toString()} className={i === 0 ? 'data-table__now' : ''}>
               <th scope="row">{i === 0 ? 'Now' : formatTime(hour.time)}</th>
-              <td>{hour.currentSpeedKts?.toFixed(1) ?? '--'} kts</td>
+              <td>{formatSpeed(hour.currentSpeedKts, units, 1)}</td>
               <td>{degreesToCompass(hour.currentDirectionDeg)}</td>
             </tr>
           ))}

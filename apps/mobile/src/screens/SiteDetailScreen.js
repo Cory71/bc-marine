@@ -18,7 +18,7 @@ import {
 // One lighthouse or buoy: its latest reading and the last 12 hours, so you can
 // see whether the wind is building, easing or holding steady
 export default function SiteDetailScreen({ route, navigation }) {
-  const { activeStation } = useApp();
+  const { activeStation, units } = useApp();
   const site = findObservationSite(route.params?.siteId);
   const { status, history } = useSiteHistory(site);
 
@@ -36,10 +36,10 @@ export default function SiteDetailScreen({ route, navigation }) {
             {site.name} · {site.type === 'buoy' ? 'Buoy' : 'Lighthouse'}
           </Text>
           <Text style={styles.subtitle}>
-            {formatDistance(distanceKm(activeStation.lat, activeStation.lon, site.lat, site.lon))} from{' '}
+            {formatDistance(distanceKm(activeStation.lat, activeStation.lon, site.lat, site.lon), units)} from{' '}
             {activeStation.name} · {site.type === 'buoy' ? 'NOAA NDBC' : 'Environment Canada'}
           </Text>
-          <SiteReadings status={status} history={history} showWaves={site.type === 'buoy'} />
+          <SiteReadings status={status} history={history} showWaves={site.type === 'buoy'} units={units} />
         </>
       )}
       <View style={{ height: 20 }} />
@@ -47,7 +47,7 @@ export default function SiteDetailScreen({ route, navigation }) {
   );
 }
 
-function SiteReadings({ status, history, showWaves }) {
+function SiteReadings({ status, history, showWaves, units }) {
   if (status === 'loading') return <ActivityIndicator color={COLORS.accent} style={{ marginTop: 24 }} />;
   if (status === 'failed') return <Message text="Readings unavailable. Try again shortly." />;
   const latest = history[0];
@@ -57,7 +57,7 @@ function SiteReadings({ status, history, showWaves }) {
     <>
       <View style={styles.card}>
         <Text style={styles.cardLabel}>Latest · {formatReadingAge(latest.observedAt)}</Text>
-        <ReadingStats reading={latest} />
+        <ReadingStats reading={latest} units={units} />
       </View>
       <View style={styles.card}>
         <Text style={styles.cardLabel}>Last 12 Hours</Text>
@@ -70,9 +70,9 @@ function SiteReadings({ status, history, showWaves }) {
         {history.map(reading => (
           <View key={reading.observedAt.toISOString()} style={styles.tableRow}>
             <Text style={[styles.colText, styles.timeCol]}>{formatTime(reading.observedAt)}</Text>
-            <Text style={styles.colText}>{formatWind(reading)}</Text>
-            <Text style={styles.colText}>{formatGust(reading)}</Text>
-            {showWaves && <Text style={styles.colText}>{formatWaves(reading)}</Text>}
+            <Text style={styles.colText}>{formatWind(reading, units)}</Text>
+            <Text style={styles.colText}>{formatGust(reading, units)}</Text>
+            {showWaves && <Text style={styles.colText}>{formatWaves(reading, units)}</Text>}
           </View>
         ))}
       </View>

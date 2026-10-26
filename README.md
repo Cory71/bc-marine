@@ -27,12 +27,13 @@ Live tides, wind, waves, currents and Environment Canada marine forecasts for th
 ## Features
 
 - **Dashboard**: wind, waves, visibility, tide, tidal currents and sun/moon for the active station, plus today's tide curve and the full EC marine forecast
-- **Tides**: current height and trend, next high/low, today's curve, upcoming events and a 7-day max tide chart (all in feet)
+- **Tides**: current height and trend, next high/low, today's curve, upcoming events and a 7-day max tide chart
 - **Wind & Weather**: 16-point compass headings, wave height and period, swell, visibility and an 8-hour breakdown
 - **Tidal Currents**: speed, direction and flooding/ebbing phase
 - **Locations**: search by name or weather area, browse by EC marine region, save favourites, or use your location to find the nearest station
 - **Nearby observations**: live wind, gusts, waves, pressure and temperatures from the nearest lighthouse weather stations and ocean buoys on the same part of the coast, with how fresh each reading is. Each lighthouse and buoy has its own page with the last 12 hours, and can be found by search
 - **Marine warnings**: active EC warnings shown at the top of every screen, most severe first, with gale and above in red
+- **Your units**: pick knots, km/h or mph; feet or metres; °C or °F; km or nautical miles. Set in the web sidebar or the mobile Locations tab, and remembered on that device until changed
 - **Web extras**: shareable links (`/tides?station=tofino`), a desktop layout with a station sidebar, keyboard navigation and screen-reader labels
 
 ## Data Sources
@@ -72,7 +73,7 @@ The design reasoning is in [docs/architecture.md](docs/architecture.md).
 
 - **Shared:** JavaScript (ES modules) · built-in `fetch` · fast-xml-parser · SunCalc
 - **Web:** React 19 · Vite · React Router · hand-built SVG charts and CSS (no UI or chart libraries) · Vercel Functions
-- **Mobile:** Expo SDK 57 · React Native · React Navigation · AsyncStorage · react-native-svg · expo-location
+- **Mobile:** Expo SDK 58 · React Native · React Navigation · AsyncStorage · react-native-svg · expo-location
 - **Quality:** Vitest · Testing Library · ESLint · Prettier · GitHub Actions · Lighthouse (desktop: Performance 98+, Accessibility 100)
 
 ## Running Locally

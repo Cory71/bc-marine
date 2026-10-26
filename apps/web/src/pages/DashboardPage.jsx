@@ -7,6 +7,9 @@ import {
   degreesToCardinal,
   formatTime,
   tidyForecastText,
+  formatSpeed,
+  formatHeight,
+  formatDistance,
 } from '@bc-marine/shared';
 import { useApp } from '../context/AppContext.jsx';
 import Card from '../components/Card.jsx';
@@ -91,32 +94,36 @@ function useWeatherNow() {
 
 function WindReading() {
   const now = useWeatherNow();
+  const { units } = useApp();
   const direction = now?.windDirectionDeg != null ? degreesToCardinal(now.windDirectionDeg) : '';
-  const speed = now?.windSpeedKts != null ? Math.round(now.windSpeedKts) : NO_VALUE;
-  return <Stat label="Now" value={`${direction} ${speed} kts`.trim()} />;
+  return (
+    <Stat label="Now" value={`${direction} ${formatSpeed(now?.windSpeedKts, units)}`.trim()} />
+  );
 }
 
 function WavesReading() {
   const now = useWeatherNow();
-  const swell = now?.swellHeightFt != null ? `Swell ${now.swellHeightFt} ft` : undefined;
-  return <Stat label="Height" value={`${now?.waveHeightFt ?? NO_VALUE} ft`} detail={swell} />;
+  const { units } = useApp();
+  const swell =
+    now?.swellHeightFt != null ? `Swell ${formatHeight(now.swellHeightFt, units)}` : undefined;
+  return <Stat label="Height" value={formatHeight(now?.waveHeightFt, units)} detail={swell} />;
 }
 
 function VisibilityReading() {
   const now = useWeatherNow();
-  const visibility = now?.visibilityKm != null ? Math.round(now.visibilityKm) : NO_VALUE;
-  return <Stat label="Now" value={`${visibility} km`} />;
+  const { units } = useApp();
+  return <Stat label="Now" value={formatDistance(now?.visibilityKm, units)} />;
 }
 
 function TideNowReading() {
-  const { tides, tideEvents } = useApp();
+  const { tides, tideEvents, units } = useApp();
   const current = findClosestReading(tides);
   const nextHigh = getNextTideEvent(tideEvents, 'HIGH');
   const nextLow = getNextTideEvent(tideEvents, 'LOW');
 
   return (
     <>
-      <Stat label="Now" value={current ? `${current.heightFt} ft` : NO_VALUE} />
+      <Stat label="Now" value={formatHeight(current?.heightFt, units)} />
       <p className="card__note numeric">
         High {nextHigh ? formatTime(nextHigh.time) : NO_VALUE} · Low{' '}
         {nextLow ? formatTime(nextLow.time) : NO_VALUE}
@@ -126,7 +133,7 @@ function TideNowReading() {
 }
 
 function CurrentsReading() {
-  const { weather } = useApp();
+  const { weather, units } = useApp();
   const now = useWeatherNow();
   if (!hasCurrentData(weather))
     return <p className="card__note">No current data for this station.</p>;
@@ -137,11 +144,7 @@ function CurrentsReading() {
     now?.currentDirectionDeg != null ? degreesToCardinal(now.currentDirectionDeg) : NO_VALUE;
   return (
     <>
-      <Stat
-        label="Speed"
-        value={`${now?.currentSpeedKts?.toFixed(1) ?? NO_VALUE} kts`}
-        detail={direction}
-      />
+      <Stat label="Speed" value={formatSpeed(now?.currentSpeedKts, units, 1)} detail={direction} />
       <p className={`card__note stat__value--${phaseTone}`}>{phase ?? NO_VALUE}</p>
     </>
   );
@@ -163,8 +166,8 @@ function SunMoonCard() {
 }
 
 function TodaysTideCurve() {
-  const { tides, tideEvents } = useApp();
-  return <TideCurve tides={tides} events={tideEvents} />;
+  const { tides, tideEvents, units } = useApp();
+  return <TideCurve tides={tides} events={tideEvents} units={units} />;
 }
 
 function ForecastText() {

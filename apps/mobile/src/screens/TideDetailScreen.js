@@ -1,11 +1,11 @@
 import { View, Text, ScrollView, TouchableOpacity, StyleSheet, useWindowDimensions } from 'react-native';
 import { useApp } from '../context/AppContext';
 import { COLORS } from '../theme';
-import { formatTime } from '@bc-marine/shared';
+import { formatTime, formatHeight } from '@bc-marine/shared';
 import TideCurve from '../components/TideCurve';
 
 export default function TideDetailScreen({ navigation }) {
-  const { activeStation, tides, tideEvents, weeklyTides } = useApp();
+  const { activeStation, tides, tideEvents, weeklyTides, units } = useApp();
   const { width: screenWidth } = useWindowDimensions();
   const chartWidth = screenWidth - 56; // account for card padding and margins
 
@@ -49,14 +49,14 @@ export default function TideDetailScreen({ navigation }) {
       <View style={styles.hero}>
         <View>
           <Text style={styles.heroLabel}>Current Height</Text>
-          <Text style={styles.heroValue}>{currentTide?.heightFt ?? '--'} ft</Text>
+          <Text style={styles.heroValue}>{formatHeight(currentTide?.heightFt, units)}</Text>
           <Text style={[styles.heroSub, { color: isRising ? COLORS.safe : COLORS.accent }]}>
             {isRising ? '↑ Rising' : '↓ Falling'}
           </Text>
         </View>
         <View style={{ alignItems: 'flex-end' }}>
           <Text style={styles.heroLabel}>Next Event</Text>
-          <Text style={styles.heroValue}>{nextEvent ? `${nextEvent.type} ${nextEvent.heightFt} ft` : '--'}</Text>
+          <Text style={styles.heroValue}>{nextEvent ? `${nextEvent.type} ${formatHeight(nextEvent.heightFt, units)}` : '--'}</Text>
           <Text style={styles.heroSub}>{nextEvent ? formatTime(nextEvent.time) : ''}</Text>
         </View>
       </View>
@@ -75,7 +75,7 @@ export default function TideDetailScreen({ navigation }) {
             <Text style={[styles.eventType, { color: event.type === 'HIGH' ? COLORS.warning : COLORS.accent }]}>
               {event.type === 'HIGH' ? '↑ HIGH' : '↓ LOW'}
             </Text>
-            <Text style={styles.eventHeight}>{event.heightFt} ft</Text>
+            <Text style={styles.eventHeight}>{formatHeight(event.heightFt, units)}</Text>
             <Text style={styles.eventTime}>{formatTime(event.time)}</Text>
           </View>
         ))}
@@ -91,7 +91,7 @@ export default function TideDetailScreen({ navigation }) {
               const barHeight = (day.maxFt / maxAllDays) * 56;
               return (
                 <View key={i} style={{ alignItems: 'center', flex: 1 }}>
-                  <Text style={{ color: COLORS.textSecondary, fontSize: 9 }}>{day.maxFt}</Text>
+                  <Text style={{ color: COLORS.textSecondary, fontSize: 9 }}>{formatHeight(day.maxFt, units)}</Text>
                   <View style={{ width: 20, height: barHeight, backgroundColor: i === 0 ? COLORS.accent : 'rgba(126,206,244,0.3)', borderRadius: 3, marginTop: 4 }} />
                   <Text style={{ color: i === 0 ? COLORS.accent : COLORS.textMuted, fontSize: 9, marginTop: 4 }}>{day.label}</Text>
                 </View>

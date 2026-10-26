@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState, useEffect, useRef } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { ALL_LOCATIONS, BC_STATIONS, loadStationData } from '@bc-marine/shared';
+import { ALL_LOCATIONS, BC_STATIONS, loadStationData, normalizeUnits, DEFAULT_UNITS } from '@bc-marine/shared';
 
 const AppContext = createContext(null);
 
@@ -18,6 +18,7 @@ export function AppProvider({ children }) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [lastUpdated, setLastUpdated] = useState(null);
+  const [units, setUnits] = useState(DEFAULT_UNITS);
   // Counts requests so a slow, older response can't overwrite a newer station's data
   const latestRequestId = useRef(0);
 
@@ -30,6 +31,20 @@ export function AppProvider({ children }) {
     marineForecast: setMarineForecast,
     observations: setObservations,
   };
+
+  // Load the saved unit choices on app start (bad or missing data gives the defaults)
+  useEffect(() => {
+    AsyncStorage.getItem('units')
+      .then(json => setUnits(normalizeUnits(JSON.parse(json))))
+      .catch(() => setUnits(DEFAULT_UNITS));
+  }, []);
+
+  // Change one unit and remember it on this phone until it's changed again
+  function setUnit(kind, value) {
+    const updated = { ...units, [kind]: value };
+    setUnits(updated);
+    AsyncStorage.setItem('units', JSON.stringify(updated));
+  }
 
   // Load saved stations from device storage on app start
   useEffect(() => {
@@ -118,6 +133,7 @@ export function AppProvider({ children }) {
       savedStations, saveStation, removeStation,
       tides, tideEvents, weeklyTides, weather, marineForecast, observations, observationsLoading,
       loading, error, lastUpdated,
+      units, setUnit,
       refresh: () => loadData(true),
     }}>
       {children}

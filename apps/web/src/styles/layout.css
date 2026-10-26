@@ -283,14 +283,18 @@
     width: min(320px, 88vw);
     transform: translateX(-100%);
     visibility: hidden; /* also removes it from the tab order while closed */
-    transition: transform 0.2s ease, visibility 0.2s;
+    transition:
+      transform 0.2s ease,
+      visibility 0.2s;
   }
 
   .sidebar--open {
     transform: translateX(0);
     visibility: visible;
     /* Become visible at once when opening, so the search box can take focus */
-    transition: transform 0.2s ease, visibility 0s;
+    transition:
+      transform 0.2s ease,
+      visibility 0s;
   }
 
   .drawer-backdrop {
@@ -358,4 +362,50 @@
   * {
     transition: none !important;
   }
+}
+
+/* ---------- Units picker (sidebar) ---------- */
+.units-picker {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.units-picker__row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.units-picker__label {
+  color: var(--color-text-secondary);
+  font-size: 0.8125rem;
+}
+
+.units-picker__options {
+  display: flex;
+  border: 1px solid var(--color-card-border);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.units-picker__option {
+  min-width: 46px;
+  padding: 5px 8px;
+  border: none;
+  background: transparent;
+  color: var(--color-text-secondary);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.units-picker__option + .units-picker__option {
+  border-left: 1px solid var(--color-card-border);
+}
+
+.units-picker__option[aria-pressed='true'] {
+  background: rgba(126, 206, 244, 0.18);
+  color: var(--color-accent);
 }

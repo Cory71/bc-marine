@@ -9,6 +9,7 @@ export * from './warnings.js';
 export * from './observationSites.js';
 export * from './observationReaders.js';
 export * from './observationFormat.js';
+export * from './unitPreferences.js';
 export * from './services/cache.js';
 export * from './services/dfoService.js';
 export * from './services/weatherService.js';

@@ -33,6 +33,7 @@ function ObservationLines() {
 // One site's line. Readings older than 3 hours are faded and labelled, so they
 // never pass for current conditions.
 function ObservationLine({ observation }) {
+  const { units } = useApp();
   const { site, reading } = observation;
   const isOld = reading && isOldReading(reading.observedAt);
 
@@ -44,9 +45,9 @@ function ObservationLine({ observation }) {
       </span>
       {reading ? (
         <>
-          <span className="obs-lines__wind numeric">{formatWind(reading)}</span>
+          <span className="obs-lines__wind numeric">{formatWind(reading, units)}</span>
           <span className="obs-lines__detail card__note numeric">
-            {observationDetail(observation)}
+            {observationDetail(observation, units)}
           </span>
           <span className="obs-lines__age card__note">
             {isOld && <span className="obs-tile__old">Old reading · </span>}

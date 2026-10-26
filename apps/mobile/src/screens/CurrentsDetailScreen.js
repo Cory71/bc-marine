@@ -1,7 +1,7 @@
 import { View, Text, ScrollView, TouchableOpacity, StyleSheet } from 'react-native';
 import { useApp } from '../context/AppContext';
 import { COLORS } from '../theme';
-import { formatTime } from '@bc-marine/shared';
+import { formatTime, formatSpeed } from '@bc-marine/shared';
 
 function degreesToCompass(deg) {
   if (deg == null) return '--';
@@ -10,7 +10,7 @@ function degreesToCompass(deg) {
 }
 
 export default function CurrentsDetailScreen({ navigation }) {
-  const { activeStation, weather } = useApp();
+  const { activeStation, weather, units } = useApp();
 
   const now = new Date();
 
@@ -56,7 +56,7 @@ export default function CurrentsDetailScreen({ navigation }) {
       <View style={styles.hero}>
         <View style={styles.statBox}>
           <Text style={styles.statLabel}>Speed</Text>
-          <Text style={styles.statValue}>{current?.currentSpeedKts?.toFixed(1) ?? '--'} kts</Text>
+          <Text style={styles.statValue}>{formatSpeed(current?.currentSpeedKts, units, 1)}</Text>
         </View>
         <View style={styles.statBox}>
           <Text style={styles.statLabel}>Direction</Text>
@@ -83,7 +83,7 @@ export default function CurrentsDetailScreen({ navigation }) {
               {i === 0 ? 'Now' : formatTime(hour.time)}
             </Text>
             <Text style={[styles.colText, { fontWeight: i === 0 ? 'bold' : 'normal', color: i === 0 ? COLORS.textPrimary : COLORS.textSecondary }]}>
-              {hour.currentSpeedKts?.toFixed(1) ?? '--'} kts
+              {formatSpeed(hour.currentSpeedKts, units, 1)}
             </Text>
             <Text style={styles.colText}>{degreesToCompass(hour.currentDirectionDeg)}</Text>
           </View>

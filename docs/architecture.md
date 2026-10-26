@@ -32,6 +32,7 @@ The repo is an npm-workspaces monorepo. Both apps depend on `@bc-marine/shared`,
 | `readings.js`                         | "Right now" helpers: closest reading, next tide, flood/ebb, upcoming hours |
 | `stations.js`, `constants.js`         | Station list, URL slugs, default station                                   |
 | `units.js`                            | Unit conversion, compass labels, sun/moon, nearest station                 |
+| `unitPreferences.js`                  | The user's chosen units (kts, km/h, mph, ft, m, °C, °F, km, nm) and formatters |
 
 The rule is that shared code never imports React, React Native, Expo or browser globals. That keeps it usable by the mobile app, the web app and the Node-based proxy, and testable in plain Node. A fix to an API call or a unit conversion reaches both apps at once.
 
@@ -85,7 +86,7 @@ The dashboard shows what's actually happening on the water next to the forecast,
 - **Freshness.** Observations are cached for 10 minutes (other data keeps 30). Each tile shows how long ago the site reported, and readings older than 3 hours are dimmed and labelled "Old reading".
 - **Buoy relay.** `/api/buoy-feed` follows the same rules as the EC proxy: only buoy IDs from the site list are accepted, an incomplete file (the newest row must have a value for every column) is never passed on or cached, and successful responses are CDN-cached for 10 minutes.
 - **Site pages.** Each lighthouse and buoy has its own page (`/observations/<site>` on web, a detail screen on mobile) with its latest reading and the last 12 hourly readings, reachable from the Observations tiles and from search. EC stations that report every minute are queried with `_is-minutely_obs-value=false`, which returns one reading per hour; buoy history comes from the same NOAA file as the latest reading.
-- **Units in one place.** All observation text comes from `observationFormat.js`, so user-chosen units can later be applied by changing that one module.
+- **Units in one place.** Data stays in knots, feet, °C and km. Only the display converts, through `unitPreferences.js`, using the units each person picks (web sidebar, mobile Locations tab). The choice is saved on the device until changed.
 
 ## BC time
 

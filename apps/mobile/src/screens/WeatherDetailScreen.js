@@ -1,7 +1,7 @@
 import { View, Text, ScrollView, TouchableOpacity, StyleSheet } from 'react-native';
 import { useApp } from '../context/AppContext';
 import { COLORS } from '../theme';
-import { formatTime } from '@bc-marine/shared';
+import { formatTime, formatSpeed, formatHeight, formatDistance } from '@bc-marine/shared';
 
 // 16-point compass for more precise wind/swell direction
 function degreesToCompass(deg) {
@@ -11,7 +11,7 @@ function degreesToCompass(deg) {
 }
 
 export default function WeatherDetailScreen({ navigation }) {
-  const { activeStation, weather } = useApp();
+  const { activeStation, weather, units } = useApp();
 
   const now = new Date();
 
@@ -51,23 +51,23 @@ export default function WeatherDetailScreen({ navigation }) {
         <View style={styles.row}>
           <View style={styles.statBox}>
             <Text style={styles.statLabel}>Wind</Text>
-            <Text style={styles.statValue}>{degreesToCompass(current?.windDirectionDeg)} {current?.windSpeedKts?.toFixed(0) ?? '--'} kts</Text>
+            <Text style={styles.statValue}>{degreesToCompass(current?.windDirectionDeg)} {formatSpeed(current?.windSpeedKts, units)}</Text>
           </View>
           <View style={styles.statBox}>
             <Text style={styles.statLabel}>Waves</Text>
-            <Text style={styles.statValue}>{current?.waveHeightFt ?? '--'} ft</Text>
+            <Text style={styles.statValue}>{formatHeight(current?.waveHeightFt, units)}</Text>
             <Text style={styles.statSub}>{current?.wavePeriodS?.toFixed(0) ?? '--'} s period</Text>
           </View>
         </View>
         <View style={[styles.row, { marginTop: 8 }]}>
           <View style={styles.statBox}>
             <Text style={styles.statLabel}>Swell</Text>
-            <Text style={styles.statValue}>{current?.swellHeightFt ?? '--'} ft</Text>
+            <Text style={styles.statValue}>{formatHeight(current?.swellHeightFt, units)}</Text>
             <Text style={styles.statSub}>{degreesToCompass(current?.swellDirectionDeg)}</Text>
           </View>
           <View style={styles.statBox}>
             <Text style={styles.statLabel}>Visibility</Text>
-            <Text style={styles.statValue}>{current?.visibilityKm?.toFixed(0) ?? '--'} km</Text>
+            <Text style={styles.statValue}>{formatDistance(current?.visibilityKm, units)}</Text>
           </View>
         </View>
       </View>
@@ -87,12 +87,12 @@ export default function WeatherDetailScreen({ navigation }) {
               {i === 0 ? 'Now' : formatTime(hour.time)}
             </Text>
             <Text style={[styles.colText, { fontWeight: i === 0 ? 'bold' : 'normal' }]}>
-              {degreesToCompass(hour.windDirectionDeg)} {hour.windSpeedKts?.toFixed(0) ?? '--'}
+              {degreesToCompass(hour.windDirectionDeg)} {formatSpeed(hour.windSpeedKts, units)}
             </Text>
             <Text style={[styles.colText, { fontWeight: i === 0 ? 'bold' : 'normal' }]}>
-              {hour.waveHeightFt ?? '--'} ft
+              {formatHeight(hour.waveHeightFt, units)}
             </Text>
-            <Text style={styles.colText}>{hour.visibilityKm?.toFixed(0) ?? '--'} km</Text>
+            <Text style={styles.colText}>{formatDistance(hour.visibilityKm, units)}</Text>
           </View>
         ))}
       </View>

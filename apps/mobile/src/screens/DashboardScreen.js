@@ -1,12 +1,12 @@
 import { View, Text, ScrollView, RefreshControl, StyleSheet, ActivityIndicator } from 'react-native';
 import { useApp } from '../context/AppContext';
 import { COLORS } from '../theme';
-import { timeSince, formatTime, getSunMoon, degreesToCardinal, tidyForecastText, formatWind, observationDetail, formatReadingAge, isOldReading } from '@bc-marine/shared';
+import { timeSince, formatTime, getSunMoon, degreesToCardinal, tidyForecastText, formatWind, observationDetail, formatReadingAge, isOldReading, formatSpeed, formatHeight, formatDistance } from '@bc-marine/shared';
 import WarningBanner from '../components/WarningBanner';
 import CardWrapper from '../components/CardWrapper';
 
 export default function DashboardScreen({ navigation }) {
-  const { activeStation, tides, weather, tideEvents, marineForecast, observations, observationsLoading, loading, error, lastUpdated, refresh } = useApp();
+  const { activeStation, tides, weather, tideEvents, marineForecast, observations, observationsLoading, loading, error, lastUpdated, refresh, units } = useApp();
 
   const now = new Date();
   const sunMoon = getSunMoon(activeStation.lat, activeStation.lon);
@@ -76,16 +76,16 @@ export default function DashboardScreen({ navigation }) {
           <View style={styles.statBox}>
             <Text style={styles.statLabel}>Wind</Text>
             <Text style={styles.statValue}>
-              {currentWeather?.windDirectionDeg != null ? degreesToCardinal(currentWeather.windDirectionDeg) + ' ' : ''}{currentWeather?.windSpeedKts?.toFixed(0) ?? '--'} kts
+              {currentWeather?.windDirectionDeg != null ? degreesToCardinal(currentWeather.windDirectionDeg) + ' ' : ''}{formatSpeed(currentWeather?.windSpeedKts, units)}
             </Text>
           </View>
           <View style={styles.statBox}>
             <Text style={styles.statLabel}>Waves</Text>
-            <Text style={styles.statValue}>{currentWeather?.waveHeightFt ?? '--'} ft</Text>
+            <Text style={styles.statValue}>{formatHeight(currentWeather?.waveHeightFt, units)}</Text>
           </View>
           <View style={styles.statBox}>
             <Text style={styles.statLabel}>Visibility</Text>
-            <Text style={styles.statValue}>{currentWeather?.visibilityKm?.toFixed(0) ?? '--'} km</Text>
+            <Text style={styles.statValue}>{formatDistance(currentWeather?.visibilityKm, units)}</Text>
           </View>
         </View>
       </CardWrapper>
@@ -119,8 +119,8 @@ export default function DashboardScreen({ navigation }) {
                 {/* Line 2: the big wind reading, then gust (lighthouses) or waves (buoys) */}
                 {observation.reading ? (
                   <View style={[styles.obsLine2, isOld && styles.obsOld]}>
-                    <Text style={styles.obsWind}>{formatWind(observation.reading)}</Text>
-                    <Text style={styles.obsDetail}>{observationDetail(observation)}</Text>
+                    <Text style={styles.obsWind}>{formatWind(observation.reading, units)}</Text>
+                    <Text style={styles.obsDetail}>{observationDetail(observation, units)}</Text>
                   </View>
                 ) : (
                   <Text style={styles.obsDetail}>No recent report</Text>
@@ -136,17 +136,17 @@ export default function DashboardScreen({ navigation }) {
         <View style={styles.row}>
           <View style={styles.statBox}>
             <Text style={styles.statLabel}>Next High</Text>
-            <Text style={styles.statValue}>{nextHigh ? `${nextHigh.heightFt} ft` : '--'}</Text>
+            <Text style={styles.statValue}>{nextHigh ? formatHeight(nextHigh.heightFt, units) : '--'}</Text>
             <Text style={styles.statSub}>{nextHigh ? formatTime(nextHigh.time) : ''}</Text>
           </View>
           <View style={styles.statBox}>
             <Text style={styles.statLabel}>Next Low</Text>
-            <Text style={styles.statValue}>{nextLow ? `${nextLow.heightFt} ft` : '--'}</Text>
+            <Text style={styles.statValue}>{nextLow ? formatHeight(nextLow.heightFt, units) : '--'}</Text>
             <Text style={styles.statSub}>{nextLow ? formatTime(nextLow.time) : ''}</Text>
           </View>
           <View style={styles.statBox}>
             <Text style={styles.statLabel}>Now</Text>
-            <Text style={styles.statValue}>{currentTide?.heightFt != null ? `${currentTide.heightFt} ft` : '--'}</Text>
+            <Text style={styles.statValue}>{formatHeight(currentTide?.heightFt, units)}</Text>
           </View>
         </View>
       </CardWrapper>
@@ -156,7 +156,7 @@ export default function DashboardScreen({ navigation }) {
         <View style={styles.row}>
           <View style={styles.statBox}>
             <Text style={styles.statLabel}>Speed</Text>
-            <Text style={styles.statValue}>{currentWeather?.currentSpeedKts?.toFixed(1) ?? '--'} kts</Text>
+            <Text style={styles.statValue}>{formatSpeed(currentWeather?.currentSpeedKts, units, 1)}</Text>
           </View>
           <View style={styles.statBox}>
             <Text style={styles.statLabel}>Direction</Text>

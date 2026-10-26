@@ -4,6 +4,7 @@ import {
   getTideTrend,
   getRecentAndUpcomingEvents,
   formatTime,
+  formatHeight,
 } from '@bc-marine/shared';
 import { useApp } from '../context/AppContext.jsx';
 import DetailPage, { EmptyState, DetailPlaceholder } from '../components/DetailPage.jsx';
@@ -29,7 +30,7 @@ export default function TidesPage() {
 }
 
 function TidesContent() {
-  const { tides, tideEvents } = useApp();
+  const { tides, tideEvents, units } = useApp();
   if (tides.length === 0) return <EmptyState message="No tide data available for this station." />;
 
   const current = findClosestReading(tides);
@@ -40,16 +41,24 @@ function TidesContent() {
     <>
       <Card title="Now">
         <div className="stat-row stat-row--spread">
-          <Stat label="Current height" value={`${current?.heightFt ?? '--'} ft`} detail={trend} />
+          <Stat
+            label="Current height"
+            value={formatHeight(current?.heightFt, units)}
+            detail={trend}
+          />
           <Stat
             label="Next event"
-            value={nextEvent ? `${capitalize(nextEvent.type)} ${nextEvent.heightFt} ft` : '--'}
+            value={
+              nextEvent
+                ? `${capitalize(nextEvent.type)} ${formatHeight(nextEvent.heightFt, units)}`
+                : '--'
+            }
             detail={nextEvent && formatTime(nextEvent.time)}
           />
         </div>
       </Card>
       <Card title="Today's tide">
-        <TideCurve tides={tides} events={tideEvents} height={280} />
+        <TideCurve tides={tides} events={tideEvents} height={280} units={units} />
       </Card>
       <div className="detail__columns">
         <Card title="Highs and lows">
@@ -71,12 +80,13 @@ function TidesContent() {
 }
 
 function WeeklyTides() {
-  const { weeklyTides } = useApp();
-  return <WeeklyTideBars days={weeklyTides} />;
+  const { weeklyTides, units } = useApp();
+  return <WeeklyTideBars days={weeklyTides} units={units} />;
 }
 
 // Events from an hour ago onward, so a tide that just turned is still listed (like mobile)
 function TideEventsTable({ events }) {
+  const { units } = useApp();
   const recentAndUpcoming = getRecentAndUpcomingEvents(events);
   if (recentAndUpcoming.length === 0) return <p className="card__note">No upcoming events.</p>;
 
@@ -98,7 +108,7 @@ function TideEventsTable({ events }) {
             >
               {event.type === 'HIGH' ? '↑ High' : '↓ Low'}
             </th>
-            <td>{event.heightFt} ft</td>
+            <td>{formatHeight(event.heightFt, units)}</td>
             <td>{formatTime(event.time)}</td>
           </tr>
         ))}

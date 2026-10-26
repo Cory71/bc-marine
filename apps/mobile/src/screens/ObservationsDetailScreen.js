@@ -17,7 +17,7 @@ const TYPE_LABELS = { lighthouse: 'LIGHTHOUSE', buoy: 'BUOY' };
 
 // Live readings from the lighthouses and buoys nearest the active station
 export default function ObservationsDetailScreen({ navigation }) {
-  const { activeStation, observations } = useApp();
+  const { activeStation, observations, units } = useApp();
 
   return (
     <ScrollView style={styles.container}>
@@ -39,7 +39,7 @@ export default function ObservationsDetailScreen({ navigation }) {
             key={observation.site.id}
             onPress={() => navigation.navigate('SiteDetail', { siteId: observation.site.id })}
           >
-            <ObservationTile {...observation} />
+            <ObservationTile {...observation} units={units} />
           </TouchableOpacity>
         ))
       )}
@@ -49,7 +49,7 @@ export default function ObservationsDetailScreen({ navigation }) {
 }
 
 // One site: name, type, distance, reading age, then every value it reports
-function ObservationTile({ site, distanceKm, reading }) {
+function ObservationTile({ site, distanceKm, reading, units }) {
   const isOld = reading && isOldReading(reading.observedAt);
   const isBuoy = site.type === 'buoy';
 
@@ -62,25 +62,25 @@ function ObservationTile({ site, distanceKm, reading }) {
         </Text>
       </View>
       <Text style={styles.meta}>
-        {formatDistance(distanceKm)}
+        {formatDistance(distanceKm, units)}
         {reading && ` · ${formatReadingAge(reading.observedAt)}`}
         {isOld && <Text style={styles.oldLabel}> · Old reading</Text>}
       </Text>
-      {reading ? <ReadingStats reading={reading} /> : <Text style={styles.meta}>No recent report</Text>}
+      {reading ? <ReadingStats reading={reading} units={units} /> : <Text style={styles.meta}>No recent report</Text>}
     </View>
   );
 }
 
 // Label/value pairs in two columns, skipping anything the site didn't report
-export function ReadingStats({ reading }) {
+export function ReadingStats({ reading, units }) {
   const stats = [
-    ['Wind', reading.windKts, formatWind(reading)],
-    ['Gust (1 h)', reading.gustKts, formatGust(reading)],
-    ['Waves', reading.waveHeightFt, formatWaves(reading)],
+    ['Wind', reading.windKts, formatWind(reading, units)],
+    ['Gust (1 h)', reading.gustKts, formatGust(reading, units)],
+    ['Waves', reading.waveHeightFt, formatWaves(reading, units)],
     ['Period', reading.wavePeriodS, formatWavePeriod(reading)],
-    ['Water', reading.waterTempC, formatTemp(reading.waterTempC)],
+    ['Water', reading.waterTempC, formatTemp(reading.waterTempC, units)],
     ['Pressure', reading.pressureHpa, formatPressure(reading)],
-    ['Air', reading.airTempC, formatTemp(reading.airTempC)],
+    ['Air', reading.airTempC, formatTemp(reading.airTempC, units)],
   ].filter(([, rawValue]) => rawValue != null);
 
   return (

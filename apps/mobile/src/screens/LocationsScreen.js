@@ -1,13 +1,15 @@
 import { useState } from 'react';
-import { View, Text, TextInput, ScrollView, StyleSheet, TouchableOpacity, Alert } from 'react-native';
+import { View, Text, TextInput, ScrollView, TouchableOpacity, Alert } from 'react-native';
 import * as Location from 'expo-location';
 import { useApp } from '../context/AppContext';
 import SettingsButton from '../components/SettingsButton';
 import { useSavedSites } from '../context/useSavedSites';
-import { COLORS } from '../theme';
+import { useColors, makeStyles } from '../theme';
 import { BC_REGIONS, BC_STATIONS, BC_COMMUNITIES, OBSERVATION_SITES, findNearestStation } from '@bc-marine/shared';
 
 export default function LocationsScreen({ navigation }) {
+  const styles = useStyles();
+  const COLORS = useColors();
   const { activeStation, setActiveStation, savedStations, saveStation } = useApp();
   const [query, setQuery] = useState('');
   const [openRegions, setOpenRegions] = useState({});
@@ -201,32 +203,32 @@ export default function LocationsScreen({ navigation }) {
   );
 }
 
-const styles = StyleSheet.create({
+const useStyles = makeStyles(COLORS => ({
   container: { flex: 1, backgroundColor: COLORS.background },
   titleRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-end', paddingRight: 10 },
   title: { color: COLORS.textPrimary, fontSize: 18, fontWeight: 'bold', paddingHorizontal: 16, paddingTop: 16 },
   subtitle: { color: COLORS.textMuted, fontSize: 10, paddingHorizontal: 16, marginBottom: 12 },
-  searchBar: { marginHorizontal: 16, marginBottom: 8, backgroundColor: 'rgba(126,206,244,0.08)', borderWidth: 1, borderColor: 'rgba(126,206,244,0.2)', borderRadius: 8, padding: 8, flexDirection: 'row', alignItems: 'center', gap: 8 },
+  searchBar: { marginHorizontal: 16, marginBottom: 8, backgroundColor: `rgba(${COLORS.accentRgb},0.08)`, borderWidth: 1, borderColor: `rgba(${COLORS.accentRgb},0.2)`, borderRadius: 8, padding: 8, flexDirection: 'row', alignItems: 'center', gap: 8 },
   searchIcon: { fontSize: 13 },
   searchInput: { flex: 1, color: COLORS.textPrimary, fontSize: 11 },
-  locationBtn: { marginHorizontal: 16, marginBottom: 12, backgroundColor: 'rgba(126,206,244,0.12)', borderWidth: 1, borderColor: 'rgba(126,206,244,0.3)', borderRadius: 8, padding: 12, alignItems: 'center' },
+  locationBtn: { marginHorizontal: 16, marginBottom: 12, backgroundColor: `rgba(${COLORS.accentRgb},0.12)`, borderWidth: 1, borderColor: `rgba(${COLORS.accentRgb},0.3)`, borderRadius: 8, padding: 12, alignItems: 'center' },
   locationBtnText: { color: COLORS.accent, fontSize: 12, fontWeight: 'bold' },
   section: { marginBottom: 10 },
-  savedList: { marginHorizontal: 16, backgroundColor: 'rgba(126,206,244,0.06)', borderWidth: 1, borderColor: 'rgba(126,206,244,0.15)', borderRadius: 10 },
+  savedList: { marginHorizontal: 16, backgroundColor: `rgba(${COLORS.accentRgb},0.06)`, borderWidth: 1, borderColor: `rgba(${COLORS.accentRgb},0.15)`, borderRadius: 10 },
   sectionLabel: { color: COLORS.accent, fontSize: 10, textTransform: 'uppercase', letterSpacing: 1, marginHorizontal: 16, marginBottom: 6 },
   emptyText: { color: COLORS.textMuted, fontSize: 12, paddingHorizontal: 16 },
   accordion: { marginHorizontal: 16, marginBottom: 6 },
-  regionHeader: { backgroundColor: 'rgba(126,206,244,0.08)', borderWidth: 1, borderColor: 'rgba(126,206,244,0.2)', borderRadius: 8, padding: 12, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
+  regionHeader: { backgroundColor: `rgba(${COLORS.accentRgb},0.08)`, borderWidth: 1, borderColor: `rgba(${COLORS.accentRgb},0.2)`, borderRadius: 8, padding: 12, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
   regionName: { color: COLORS.textPrimary, fontSize: 13, fontWeight: 'bold' },
   regionToggle: { color: COLORS.accent, fontSize: 13 },
-  regionBody: { borderLeftWidth: 1, borderRightWidth: 1, borderBottomWidth: 1, borderColor: 'rgba(126,206,244,0.2)', borderBottomLeftRadius: 8, borderBottomRightRadius: 8 },
-  areaLabel: { backgroundColor: 'rgba(126,206,244,0.06)', padding: 6, paddingHorizontal: 12 },
+  regionBody: { borderLeftWidth: 1, borderRightWidth: 1, borderBottomWidth: 1, borderColor: `rgba(${COLORS.accentRgb},0.2)`, borderBottomLeftRadius: 8, borderBottomRightRadius: 8 },
+  areaLabel: { backgroundColor: `rgba(${COLORS.accentRgb},0.06)`, padding: 6, paddingHorizontal: 12 },
   areaName: { color: COLORS.accent, fontSize: 9, textTransform: 'uppercase', letterSpacing: 1 },
   stationRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', padding: 10, paddingHorizontal: 12 },
-  stationBorder: { borderBottomWidth: 1, borderBottomColor: 'rgba(126,206,244,0.06)' },
+  stationBorder: { borderBottomWidth: 1, borderBottomColor: `rgba(${COLORS.accentRgb},0.06)` },
   stationName: { color: COLORS.textSecondary, fontSize: 13 },
   stationArea: { color: COLORS.textMuted, fontSize: 10, marginTop: 1 },
   arrow: { color: COLORS.textMuted, fontSize: 16 },
   siteButton: { flex: 1 },
   removeText: { color: COLORS.textMuted, fontSize: 14, paddingHorizontal: 4 },
-});
+}));

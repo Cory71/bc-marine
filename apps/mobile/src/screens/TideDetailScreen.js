@@ -1,11 +1,13 @@
-import { View, Text, ScrollView, TouchableOpacity, StyleSheet, useWindowDimensions } from 'react-native';
+import { View, Text, ScrollView, TouchableOpacity, useWindowDimensions } from 'react-native';
 import { useApp } from '../context/AppContext';
 import SettingsButton from '../components/SettingsButton';
-import { COLORS } from '../theme';
+import { useColors, makeStyles } from '../theme';
 import { formatTime, formatHeight } from '@bc-marine/shared';
 import TideCurve from '../components/TideCurve';
 
 export default function TideDetailScreen({ navigation }) {
+  const styles = useStyles();
+  const COLORS = useColors();
   const { activeStation, tides, tideEvents, weeklyTides, units } = useApp();
   const { width: screenWidth } = useWindowDimensions();
   const chartWidth = screenWidth - 56; // account for card padding and margins
@@ -99,7 +101,7 @@ export default function TideDetailScreen({ navigation }) {
               return (
                 <View key={i} style={{ alignItems: 'center', flex: 1 }}>
                   <Text style={{ color: COLORS.textSecondary, fontSize: 9 }}>{formatHeight(day.maxFt, units)}</Text>
-                  <View style={{ width: 20, height: barHeight, backgroundColor: i === 0 ? COLORS.accent : 'rgba(126,206,244,0.3)', borderRadius: 3, marginTop: 4 }} />
+                  <View style={{ width: 20, height: barHeight, backgroundColor: i === 0 ? COLORS.accent : `rgba(${COLORS.accentRgb},0.3)`, borderRadius: 3, marginTop: 4 }} />
                   <Text style={{ color: i === 0 ? COLORS.accent : COLORS.textMuted, fontSize: 9, marginTop: 4 }}>{day.label}</Text>
                 </View>
               );
@@ -113,25 +115,25 @@ export default function TideDetailScreen({ navigation }) {
   );
 }
 
-const styles = StyleSheet.create({
+const useStyles = makeStyles(COLORS => ({
   container: { flex: 1, backgroundColor: COLORS.background },
   topRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingRight: 10 },
   back: { padding: 16, paddingBottom: 4 },
   backText: { color: COLORS.accent, fontSize: 13 },
   title: { color: COLORS.textPrimary, fontSize: 18, fontWeight: 'bold', paddingHorizontal: 16 },
   subtitle: { color: COLORS.textMuted, fontSize: 10, paddingHorizontal: 16, marginBottom: 12 },
-  hero: { flexDirection: 'row', justifyContent: 'space-between', marginHorizontal: 16, backgroundColor: 'rgba(126,206,244,0.1)', borderWidth: 1, borderColor: 'rgba(126,206,244,0.25)', borderRadius: 10, padding: 12, marginBottom: 10 },
+  hero: { flexDirection: 'row', justifyContent: 'space-between', marginHorizontal: 16, backgroundColor: `rgba(${COLORS.accentRgb},0.1)`, borderWidth: 1, borderColor: `rgba(${COLORS.accentRgb},0.25)`, borderRadius: 10, padding: 12, marginBottom: 10 },
   heroLabel: { color: COLORS.accent, fontSize: 10, textTransform: 'uppercase', letterSpacing: 1 },
   heroValue: { color: COLORS.textPrimary, fontSize: 26, fontWeight: 'bold' },
   heroSub: { color: COLORS.textSecondary, fontSize: 12 },
-  card: { marginHorizontal: 16, marginBottom: 10, backgroundColor: 'rgba(126,206,244,0.06)', borderWidth: 1, borderColor: 'rgba(126,206,244,0.15)', borderRadius: 10, padding: 12 },
+  card: { marginHorizontal: 16, marginBottom: 10, backgroundColor: `rgba(${COLORS.accentRgb},0.06)`, borderWidth: 1, borderColor: `rgba(${COLORS.accentRgb},0.15)`, borderRadius: 10, padding: 12 },
   cardLabel: { color: COLORS.accent, fontSize: 10, textTransform: 'uppercase', letterSpacing: 1, marginBottom: 8 },
   tableRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingVertical: 6 },
-  rowBorder: { borderBottomWidth: 1, borderBottomColor: 'rgba(126,206,244,0.08)' },
+  rowBorder: { borderBottomWidth: 1, borderBottomColor: `rgba(${COLORS.accentRgb},0.08)` },
   eventType: { fontSize: 11, fontWeight: 'bold', width: 60 },
   eventHeight: { color: COLORS.textPrimary, fontSize: 13, fontWeight: 'bold' },
   eventTime: { color: COLORS.textSecondary, fontSize: 12 },
-  emptyCard: { marginHorizontal: 16, marginTop: 12, padding: 16, backgroundColor: 'rgba(126,206,244,0.06)', borderWidth: 1, borderColor: 'rgba(126,206,244,0.15)', borderRadius: 10, alignItems: 'center' },
+  emptyCard: { marginHorizontal: 16, marginTop: 12, padding: 16, backgroundColor: `rgba(${COLORS.accentRgb},0.06)`, borderWidth: 1, borderColor: `rgba(${COLORS.accentRgb},0.15)`, borderRadius: 10, alignItems: 'center' },
   emptyText: { color: COLORS.textSecondary, fontSize: 13, textAlign: 'center' },
   emptySub: { color: COLORS.textMuted, fontSize: 11, marginTop: 6, textAlign: 'center' },
-});
+}));

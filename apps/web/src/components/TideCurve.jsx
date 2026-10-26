@@ -35,7 +35,7 @@ export default function TideCurve({
         role="img"
         aria-label={describeTides(events, now, units)}
       >
-        <path d={areaPath} fill="rgba(126, 206, 244, 0.12)" />
+        <path d={areaPath} fill="rgba(var(--accent-rgb), 0.12)" />
         <path d={curvePath} fill="none" stroke="var(--color-accent)" strokeWidth="2.5" />
 
         <HourAxis points={points} y={height - 12} chartWidth={chartWidth} />

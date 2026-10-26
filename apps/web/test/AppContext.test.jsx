@@ -87,3 +87,43 @@ test('choosing a unit updates the app and is remembered on this device', async (
   expect(result.current.app.units.height).toBe('m');
   expect(JSON.parse(window.localStorage.getItem('units')).height).toBe('m');
 });
+
+test('with no ?station=, the saved opening station opens', async () => {
+  window.localStorage.setItem('openingStation', 'tofino');
+  const { result } = renderApp('/');
+  expect(result.current.app.activeStation.name).toBe('Tofino');
+  await waitFor(() => expect(result.current.location.search).toBe('?station=tofino'));
+});
+
+test('a shared ?station= link still wins over the opening station', () => {
+  window.localStorage.setItem('openingStation', 'tofino');
+  const { result } = renderApp('/?station=sidney');
+  expect(result.current.app.activeStation.name).toBe('Sidney');
+});
+
+test('an unknown saved opening station falls back to Victoria', () => {
+  window.localStorage.setItem('openingStation', 'atlantis');
+  const { result } = renderApp('/');
+  expect(result.current.app.activeStation.name).toBe('Victoria');
+});
+
+test('setOpeningStation remembers the station for next time', () => {
+  const { result } = renderApp('/');
+  expect(result.current.app.openingStation.name).toBe('Victoria');
+  act(() => result.current.app.setOpeningStation(findStationBySlug('sidney')));
+  expect(result.current.app.openingStation.name).toBe('Sidney');
+  expect(window.localStorage.getItem('openingStation')).toBe('sidney');
+});
+
+test('the theme follows the device until one is chosen, then is remembered', () => {
+  const { result } = renderApp('/');
+  expect(result.current.app.theme).toBe('device');
+  expect(document.documentElement.dataset.theme).toBeUndefined();
+
+  act(() => result.current.app.setTheme('light'));
+  expect(document.documentElement.dataset.theme).toBe('light');
+  expect(window.localStorage.getItem('theme')).toBe('light');
+
+  act(() => result.current.app.setTheme('device'));
+  expect(document.documentElement.dataset.theme).toBeUndefined();
+});

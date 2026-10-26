@@ -8,16 +8,20 @@ import {
 } from '@bc-marine/shared';
 import { readSavedSlugs, writeSavedSlugs } from './savedStationsStorage.js';
 import { readUnits, writeUnits } from './unitsStorage.js';
+import { readOpeningSlug, writeOpeningSlug } from './openingStationStorage.js';
+import { readTheme, writeTheme, applyTheme } from './themeStorage.js';
 
 const AppContext = createContext(null);
 
 const EMPTY_FORECAST = { warnings: [], forecast: '' };
 
 export function AppProvider({ children }) {
-  const activeStation = useActiveStationFromUrl();
+  const opening = useOpeningStation();
+  const activeStation = useActiveStationFromUrl(opening.openingStation);
   const saved = useSavedStations();
   const data = useStationData(activeStation.station);
   const unitChoices = useUnitChoices();
+  const themeChoice = useThemeChoice();
 
   const value = {
     activeStation: activeStation.station,
@@ -25,6 +29,8 @@ export function AppProvider({ children }) {
     ...saved,
     ...data,
     ...unitChoices,
+    ...opening,
+    ...themeChoice,
   };
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;
 }
@@ -35,11 +41,12 @@ export function useApp() {
 }
 
 // --- Active station lives in the URL (?station=tofino) so links can be shared ---
-function useActiveStationFromUrl() {
+// With no (or an unknown) ?station=, the opening station is shown instead
+function useActiveStationFromUrl(openingStation) {
   const [searchParams, setSearchParams] = useSearchParams();
   const slug = searchParams.get('station');
   const matchedStation = slug ? findStationBySlug(slug) : undefined;
-  const station = matchedStation ?? getDefaultStation();
+  const station = matchedStation ?? openingStation;
 
   const setBySlug = useCallback(
     newSlug =>
@@ -53,12 +60,41 @@ function useActiveStationFromUrl() {
     [setSearchParams]
   );
 
-  // A missing or unknown slug shows Victoria — rewrite the URL to match
+  // A missing or unknown slug shows the opening station — rewrite the URL to match
   useEffect(() => {
     if (!matchedStation) setBySlug(toStationSlug(station.name));
   }, [matchedStation, station, setBySlug]);
 
   return { station, setBySlug };
+}
+
+// --- The station the app opens with on this device (Victoria until one is chosen) ---
+function useOpeningStation() {
+  const [openingSlug, setOpeningSlug] = useState(() => readOpeningSlug());
+  const openingStation = (openingSlug && findStationBySlug(openingSlug)) ?? getDefaultStation();
+
+  function setOpeningStation(station) {
+    const slug = toStationSlug(station.name);
+    setOpeningSlug(slug);
+    writeOpeningSlug(slug);
+  }
+
+  return { openingStation, setOpeningStation };
+}
+
+// --- Light / dark theme ("device" follows the computer or phone), kept in localStorage ---
+function useThemeChoice() {
+  const [theme, setThemeState] = useState(() => readTheme());
+
+  // Show the theme on the page whenever it changes
+  useEffect(() => applyTheme(theme), [theme]);
+
+  function setTheme(newTheme) {
+    setThemeState(newTheme);
+    writeTheme(newTheme);
+  }
+
+  return { theme, setTheme };
 }
 
 // --- Display units (kts/km/h/mph, ft/m, °C/°F, km/nm), kept in localStorage ---

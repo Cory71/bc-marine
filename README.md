@@ -33,7 +33,7 @@ Live tides, wind, waves, currents and Environment Canada marine forecasts for th
 - **Locations**: search by name or weather area, browse by EC marine region, save favourites, or use your location to find the nearest station
 - **Nearby observations**: live wind, gusts, waves, pressure and temperatures from the nearest lighthouse weather stations and ocean buoys on the same part of the coast, with how fresh each reading is. Each lighthouse and buoy has its own page with charts and a table of the last 12 hours (wind and gusts, wave height for buoys, and pressure), can be found by search, and can be starred to keep it in a "Saved lighthouses & buoys" list on this device
 - **Marine warnings**: active EC warnings shown at the top of every screen, most severe first, with gale and above in red
-- **Your units**: pick knots, km/h or mph; feet or metres; °C or °F; km or nautical miles. Set from the Settings button at the top of every screen, and remembered on that device until changed
+- **Settings** (top of every screen, remembered on that device until changed): pick the station the app opens with; a light or dark theme (or follow the device, the default); and your units: knots, km/h or mph; feet or metres; °C or °F; km or nautical miles
 - **Web extras**: shareable links (`/tides?station=tofino`), a desktop layout with a station sidebar, keyboard navigation and screen-reader labels
 
 ## Data Sources

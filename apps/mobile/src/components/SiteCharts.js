@@ -1,22 +1,25 @@
 import { useState } from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text } from 'react-native';
 import Svg, { G, Path, Circle, Line, Text as SvgText } from 'react-native-svg';
 import { buildSiteCharts, layoutChart, describeChart, DEFAULT_UNITS } from '@bc-marine/shared';
-import { COLORS } from '../theme';
+import { useColors, makeStyles } from '../theme';
 
 const CHART_HEIGHT = 150;
 
 // Colours for each line; gusts are also dashed so they differ by more than colour
-const LINE_STYLES = {
-  wind: { color: COLORS.accent, width: 2.5 },
-  gust: { color: COLORS.warning, width: 1.5, dash: '5,4' },
-  waves: { color: COLORS.accent, width: 2.5 },
-  pressure: { color: COLORS.textSecondary, width: 2.5 },
-};
+function lineStyles(COLORS) {
+  return {
+    wind: { color: COLORS.accent, width: 2.5 },
+    gust: { color: COLORS.warning, width: 1.5, dash: '5,4' },
+    waves: { color: COLORS.accent, width: 2.5 },
+    pressure: { color: COLORS.textSecondary, width: 2.5 },
+  };
+}
 
 // Line charts of a lighthouse or buoy's last 12 hours: wind and gusts, waves
 // (buoys only) and pressure, in the person's chosen units
 export default function SiteCharts({ history, units = DEFAULT_UNITS }) {
+  const styles = useStyles();
   const charts = buildSiteCharts(history, units);
   if (charts.length === 0) {
     return <Text style={styles.note}>Not enough readings yet to chart.</Text>;
@@ -26,6 +29,7 @@ export default function SiteCharts({ history, units = DEFAULT_UNITS }) {
 
 // One chart: a title with a legend, then the plot at the card's real width
 function SiteChart({ chart }) {
+  const styles = useStyles();
   const [width, setWidth] = useState(0);
   const layout = width > 0 ? layoutChart(chart, { width, height: CHART_HEIGHT }) : null;
 
@@ -60,6 +64,8 @@ function SiteChart({ chart }) {
 
 // Coloured keys for charts with more than one line (wind and gust)
 function Legend({ lines }) {
+  const styles = useStyles();
+  const LINE_STYLES = lineStyles(useColors());
   return (
     <View style={styles.legend}>
       {lines.map(line => (
@@ -74,6 +80,7 @@ function Legend({ lines }) {
 
 // Faint gridlines with their values down the left side
 function ValueAxis({ layout }) {
+  const COLORS = useColors();
   return layout.yTicks.map(tick => (
     <G key={tick.label}>
       <Line
@@ -93,6 +100,7 @@ function ValueAxis({ layout }) {
 
 // Start, middle and end times along the bottom, in Pacific time
 function TimeAxis({ layout }) {
+  const COLORS = useColors();
   return layout.xTicks.map(tick => (
     <SvgText
       key={tick.label}
@@ -109,7 +117,7 @@ function TimeAxis({ layout }) {
 
 // The line itself, plus a dot on every reading (so a lone reading between gaps still shows)
 function ChartLine({ line }) {
-  const style = LINE_STYLES[line.key];
+  const style = lineStyles(useColors())[line.key];
   return (
     <G>
       {line.path !== '' && (
@@ -130,7 +138,7 @@ function ChartLine({ line }) {
   );
 }
 
-const styles = StyleSheet.create({
+const useStyles = makeStyles(COLORS => ({
   chart: { marginBottom: 12 },
   header: {
     flexDirection: 'row',
@@ -145,4 +153,4 @@ const styles = StyleSheet.create({
   legendSwatch: { width: 12, height: 3, borderRadius: 2 },
   legendText: { color: COLORS.textSecondary, fontSize: 10 },
   note: { color: COLORS.textSecondary, fontSize: 12 },
-});
+}));

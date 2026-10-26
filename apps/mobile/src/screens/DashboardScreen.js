@@ -1,12 +1,14 @@
-import { View, Text, ScrollView, RefreshControl, StyleSheet, ActivityIndicator } from 'react-native';
+import { View, Text, ScrollView, RefreshControl, ActivityIndicator } from 'react-native';
 import { useApp } from '../context/AppContext';
 import SettingsButton from '../components/SettingsButton';
-import { COLORS } from '../theme';
+import { useColors, makeStyles } from '../theme';
 import { timeSince, formatTime, getSunMoon, degreesToCardinal, tidyForecastText, formatWind, observationDetail, formatReadingAge, isOldReading, formatSpeed, formatHeight, formatDistance } from '@bc-marine/shared';
 import WarningBanner from '../components/WarningBanner';
 import CardWrapper from '../components/CardWrapper';
 
 export default function DashboardScreen({ navigation }) {
+  const styles = useStyles();
+  const COLORS = useColors();
   const { activeStation, tides, weather, tideEvents, marineForecast, observations, observationsLoading, loading, error, lastUpdated, refresh, units } = useApp();
 
   const now = new Date();
@@ -180,7 +182,7 @@ export default function DashboardScreen({ navigation }) {
   );
 }
 
-const styles = StyleSheet.create({
+const useStyles = makeStyles(COLORS => ({
   container: { flex: 1, backgroundColor: COLORS.background },
   centered: { flex: 1, backgroundColor: COLORS.background, justifyContent: 'center', alignItems: 'center' },
   header: { padding: 16, paddingBottom: 8 },
@@ -189,17 +191,17 @@ const styles = StyleSheet.create({
   title: { color: COLORS.textPrimary, fontSize: 22, fontWeight: 'bold', marginTop: 2 },
   updated: { color: COLORS.textMuted, fontSize: 11, marginTop: 2 },
   row: { flexDirection: 'row', gap: 8 },
-  statBox: { flex: 1, backgroundColor: 'rgba(126,206,244,0.1)', borderRadius: 6, padding: 8, alignItems: 'center' },
+  statBox: { flex: 1, backgroundColor: `rgba(${COLORS.accentRgb},0.1)`, borderRadius: 6, padding: 8, alignItems: 'center' },
   statLabel: { color: COLORS.accent, fontSize: 9, textTransform: 'uppercase' },
   statValue: { color: COLORS.textPrimary, fontSize: 14, fontWeight: 'bold', marginTop: 2 },
   statSub: { color: COLORS.textSecondary, fontSize: 10, marginTop: 1 },
-  obsRow: { paddingVertical: 7, borderBottomWidth: 1, borderBottomColor: 'rgba(126,206,244,0.08)' },
+  obsRow: { paddingVertical: 7, borderBottomWidth: 1, borderBottomColor: `rgba(${COLORS.accentRgb},0.08)` },
   obsLine: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
   obsNameWrap: { flexDirection: 'row', alignItems: 'center', gap: 6, flexShrink: 1 },
   obsName: { color: COLORS.textPrimary, fontSize: 13, fontWeight: 'bold' },
   obsBadge: { fontSize: 8, fontWeight: 'bold', letterSpacing: 0.5, paddingHorizontal: 5, paddingVertical: 1, borderRadius: 4, overflow: 'hidden' },
-  obsLighthouse: { color: COLORS.accent, backgroundColor: 'rgba(126,206,244,0.16)' },
-  obsBuoy: { color: COLORS.safe, backgroundColor: 'rgba(77,204,136,0.16)' },
+  obsLighthouse: { color: COLORS.accent, backgroundColor: `rgba(${COLORS.accentRgb},0.16)` },
+  obsBuoy: { color: COLORS.safe, backgroundColor: `rgba(${COLORS.safeRgb},0.16)` },
   obsAge: { color: COLORS.textMuted, fontSize: 10 },
   obsLine2: { flexDirection: 'row', alignItems: 'baseline', gap: 10, marginTop: 2 },
   obsWind: { color: COLORS.textPrimary, fontSize: 17, fontWeight: 'bold' },
@@ -211,4 +213,4 @@ const styles = StyleSheet.create({
   errorText: { color: COLORS.warning, padding: 24, textAlign: 'center' },
   sunText: { color: COLORS.accent, fontSize: 11 },
   moonText: { color: COLORS.textSecondary, fontSize: 11, marginTop: 2 },
-});
+}));

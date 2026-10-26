@@ -1,7 +1,7 @@
-import { View, Text, ScrollView, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, Text, ScrollView, TouchableOpacity } from 'react-native';
 import { useApp } from '../context/AppContext';
 import SettingsButton from '../components/SettingsButton';
-import { COLORS } from '../theme';
+import { makeStyles } from '../theme';
 import {
   formatWind,
   formatGust,
@@ -18,6 +18,7 @@ const TYPE_LABELS = { lighthouse: 'LIGHTHOUSE', buoy: 'BUOY' };
 
 // Live readings from the lighthouses and buoys nearest the active station
 export default function ObservationsDetailScreen({ navigation }) {
+  const styles = useStyles();
   const { activeStation, observations, units } = useApp();
 
   return (
@@ -54,6 +55,7 @@ export default function ObservationsDetailScreen({ navigation }) {
 
 // One site: name, type, distance, reading age, then every value it reports
 function ObservationTile({ site, distanceKm, reading, units }) {
+  const styles = useStyles();
   const isOld = reading && isOldReading(reading.observedAt);
   const isBuoy = site.type === 'buoy';
 
@@ -77,6 +79,7 @@ function ObservationTile({ site, distanceKm, reading, units }) {
 
 // Label/value pairs in two columns, skipping anything the site didn't report
 export function ReadingStats({ reading, units }) {
+  const styles = useStyles();
   const stats = [
     ['Wind', reading.windKts, formatWind(reading, units)],
     ['Gust (1 h)', reading.gustKts, formatGust(reading, units)],
@@ -99,28 +102,28 @@ export function ReadingStats({ reading, units }) {
   );
 }
 
-const styles = StyleSheet.create({
+const useStyles = makeStyles(COLORS => ({
   container: { flex: 1, backgroundColor: COLORS.background },
   topRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingRight: 10 },
   back: { padding: 16, paddingBottom: 4 },
   backText: { color: COLORS.accent, fontSize: 13 },
   title: { color: COLORS.textPrimary, fontSize: 18, fontWeight: 'bold', paddingHorizontal: 16 },
   subtitle: { color: COLORS.textMuted, fontSize: 10, paddingHorizontal: 16, marginBottom: 12 },
-  tile: { marginHorizontal: 16, marginBottom: 10, backgroundColor: 'rgba(126,206,244,0.06)', borderWidth: 1, borderColor: 'rgba(126,206,244,0.15)', borderRadius: 10, padding: 12 },
+  tile: { marginHorizontal: 16, marginBottom: 10, backgroundColor: `rgba(${COLORS.accentRgb},0.06)`, borderWidth: 1, borderColor: `rgba(${COLORS.accentRgb},0.15)`, borderRadius: 10, padding: 12 },
   // Readings older than 3 hours fade back so they don't pass for current ones
   oldTile: { opacity: 0.6 },
   tileTop: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
   siteName: { color: COLORS.textPrimary, fontSize: 15, fontWeight: 'bold' },
   badge: { fontSize: 9, fontWeight: 'bold', letterSpacing: 0.5, paddingHorizontal: 6, paddingVertical: 2, borderRadius: 5, overflow: 'hidden' },
-  lighthouseBadge: { color: COLORS.accent, backgroundColor: 'rgba(126,206,244,0.16)' },
-  buoyBadge: { color: COLORS.safe, backgroundColor: 'rgba(77,204,136,0.16)' },
+  lighthouseBadge: { color: COLORS.accent, backgroundColor: `rgba(${COLORS.accentRgb},0.16)` },
+  buoyBadge: { color: COLORS.safe, backgroundColor: `rgba(${COLORS.safeRgb},0.16)` },
   meta: { color: COLORS.textSecondary, fontSize: 11, marginTop: 4 },
   oldLabel: { color: COLORS.warning, fontWeight: 'bold' },
   stats: { flexDirection: 'row', flexWrap: 'wrap', marginTop: 8 },
   stat: { width: '50%', marginBottom: 8 },
   statLabel: { color: COLORS.accent, fontSize: 9, textTransform: 'uppercase' },
   statValue: { color: COLORS.textPrimary, fontSize: 16, fontWeight: 'bold', marginTop: 2 },
-  emptyCard: { marginHorizontal: 16, marginTop: 12, padding: 16, backgroundColor: 'rgba(126,206,244,0.06)', borderWidth: 1, borderColor: 'rgba(126,206,244,0.15)', borderRadius: 10, alignItems: 'center' },
+  emptyCard: { marginHorizontal: 16, marginTop: 12, padding: 16, backgroundColor: `rgba(${COLORS.accentRgb},0.06)`, borderWidth: 1, borderColor: `rgba(${COLORS.accentRgb},0.15)`, borderRadius: 10, alignItems: 'center' },
   emptyText: { color: COLORS.textSecondary, fontSize: 13, textAlign: 'center' },
   emptySub: { color: COLORS.textMuted, fontSize: 11, marginTop: 6, textAlign: 'center' },
-});
+}));

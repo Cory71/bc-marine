@@ -8,13 +8,15 @@ import {
 } from '@bc-marine/shared';
 import { readSavedSlugs, writeSavedSlugs } from './savedStationsStorage.js';
 import { readUnits, writeUnits } from './unitsStorage.js';
+import { readOpeningSlug, writeOpeningSlug } from './openingStationStorage.js';
 
 const AppContext = createContext(null);
 
 const EMPTY_FORECAST = { warnings: [], forecast: '' };
 
 export function AppProvider({ children }) {
-  const activeStation = useActiveStationFromUrl();
+  const opening = useOpeningStation();
+  const activeStation = useActiveStationFromUrl(opening.openingStation);
   const saved = useSavedStations();
   const data = useStationData(activeStation.station);
   const unitChoices = useUnitChoices();
@@ -25,6 +27,7 @@ export function AppProvider({ children }) {
     ...saved,
     ...data,
     ...unitChoices,
+    ...opening,
   };
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;
 }
@@ -35,11 +38,12 @@ export function useApp() {
 }
 
 // --- Active station lives in the URL (?station=tofino) so links can be shared ---
-function useActiveStationFromUrl() {
+// With no (or an unknown) ?station=, the opening station is shown instead
+function useActiveStationFromUrl(openingStation) {
   const [searchParams, setSearchParams] = useSearchParams();
   const slug = searchParams.get('station');
   const matchedStation = slug ? findStationBySlug(slug) : undefined;
-  const station = matchedStation ?? getDefaultStation();
+  const station = matchedStation ?? openingStation;
 
   const setBySlug = useCallback(
     newSlug =>
@@ -53,12 +57,26 @@ function useActiveStationFromUrl() {
     [setSearchParams]
   );
 
-  // A missing or unknown slug shows Victoria — rewrite the URL to match
+  // A missing or unknown slug shows the opening station — rewrite the URL to match
   useEffect(() => {
     if (!matchedStation) setBySlug(toStationSlug(station.name));
   }, [matchedStation, station, setBySlug]);
 
   return { station, setBySlug };
+}
+
+// --- The station the app opens with on this device (Victoria until one is chosen) ---
+function useOpeningStation() {
+  const [openingSlug, setOpeningSlug] = useState(() => readOpeningSlug());
+  const openingStation = (openingSlug && findStationBySlug(openingSlug)) ?? getDefaultStation();
+
+  function setOpeningStation(station) {
+    const slug = toStationSlug(station.name);
+    setOpeningSlug(slug);
+    writeOpeningSlug(slug);
+  }
+
+  return { openingStation, setOpeningStation };
 }
 
 // --- Display units (kts/km/h/mph, ft/m, °C/°F, km/nm), kept in localStorage ---

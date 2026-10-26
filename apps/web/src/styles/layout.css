@@ -382,6 +382,15 @@
   box-shadow: 0 12px 32px rgba(0, 0, 0, 0.45);
 }
 
+.settings-menu__opening {
+  margin: 4px 0 8px;
+  font-size: 0.875rem;
+}
+
+.settings-menu__heading {
+  margin-top: 16px;
+}
+
 .settings-menu__note {
   margin-top: 10px;
   color: var(--color-text-secondary);

@@ -68,3 +68,11 @@ export function summarizeObservation({ site, reading }) {
       : reading.gustKts != null && `gust ${reading.gustKts}`;
   return extra ? `${formatWind(reading)}, ${extra}` : formatWind(reading);
 }
+
+// The second value for a site, shown beside its wind: gust for lighthouses, waves for buoys
+export function observationDetail({ site, reading }) {
+  if (!reading) return '';
+  if (site.type === 'buoy')
+    return reading.waveHeightFt == null ? '' : `waves ${formatWaves(reading)}`;
+  return reading.gustKts == null ? '' : `gust ${formatGust(reading)}`;
+}

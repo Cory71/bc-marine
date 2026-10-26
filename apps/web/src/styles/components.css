@@ -49,7 +49,10 @@
 }
 
 .card--link {
-  transition: border-color 0.15s, background 0.15s, transform 0.15s;
+  transition:
+    border-color 0.15s,
+    background 0.15s,
+    transform 0.15s;
 }
 
 .card--link:hover {
@@ -164,7 +167,12 @@
 .skeleton {
   display: block;
   border-radius: 6px;
-  background: linear-gradient(90deg, rgba(126, 206, 244, 0.06), rgba(126, 206, 244, 0.14), rgba(126, 206, 244, 0.06));
+  background: linear-gradient(
+    90deg,
+    rgba(126, 206, 244, 0.06),
+    rgba(126, 206, 244, 0.14),
+    rgba(126, 206, 244, 0.06)
+  );
   background-size: 200% 100%;
   animation: shimmer 1.4s ease-in-out infinite;
 }
@@ -357,10 +365,12 @@
 
 .obs-lines__row {
   display: grid;
-  grid-template-columns: minmax(120px, 1fr) 2fr auto;
+  /* A fixed-width age column keeps every row's columns lined up */
+  grid-template-columns: minmax(170px, 1.3fr) minmax(90px, 1fr) minmax(90px, 1.3fr) 9.5em;
+  grid-template-areas: 'name wind detail age';
   gap: 4px 16px;
-  align-items: baseline;
-  padding: 7px 0;
+  align-items: center;
+  padding: 9px 0;
   border-bottom: 1px solid var(--color-card-border);
 }
 
@@ -369,7 +379,26 @@
 }
 
 .obs-lines__name {
+  grid-area: name;
+  display: flex;
+  align-items: center;
+  gap: 8px;
   font-weight: 600;
+}
+
+.obs-lines__wind {
+  grid-area: wind;
+  font-size: 1.1875rem;
+  font-weight: 700;
+}
+
+.obs-lines__detail {
+  grid-area: detail;
+}
+
+.obs-lines__age {
+  grid-area: age;
+  justify-self: end;
 }
 
 /* Tiles: 3 across on desktop, stacked on phones */
@@ -457,18 +486,19 @@
   color: var(--color-safe);
 }
 
+/* Phones: two lines per site — name, badge and age; then the big wind and its detail */
 @media (max-width: 599px) {
   .obs-lines__row {
-    grid-template-columns: 1fr auto;
-  }
-
-  .obs-lines__row > :nth-child(2) {
-    grid-column: 1 / -1;
-    grid-row: 2;
+    grid-template-columns: auto 1fr auto;
+    grid-template-areas:
+      'name name age'
+      'wind detail detail';
+    column-gap: 10px;
   }
 }
 
 /* Old readings on the dashboard card fade back like the page's tiles */
-.obs-lines__row--old > :nth-child(-n + 2) {
+.obs-lines__row--old .obs-lines__wind,
+.obs-lines__row--old .obs-lines__detail {
   opacity: 0.6;
 }

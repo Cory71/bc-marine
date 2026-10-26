@@ -10,6 +10,7 @@ import {
   formatReadingAge,
   isOldReading,
   summarizeObservation,
+  observationDetail,
 } from '../src/index.js';
 
 const NOW = new Date('2026-10-25T23:30:00Z');
@@ -80,4 +81,15 @@ test('summarizeObservation gives the short dashboard line', () => {
 test('readings 48 hours or older show their age in days', () => {
   expect(formatReadingAge(new Date('2026-10-23T21:30:00Z'), NOW)).toBe('2 d ago');
   expect(formatReadingAge(new Date('2026-10-24T00:30:00Z'), NOW)).toBe('47 h ago');
+});
+
+test('observationDetail gives the second value for a site: gust or waves', () => {
+  expect(observationDetail({ site: { type: 'lighthouse' }, reading: LIGHTHOUSE_READING })).toBe(
+    'gust 25 kts'
+  );
+  expect(observationDetail({ site: { type: 'buoy' }, reading: BUOY_READING })).toBe('waves 1.3 ft');
+  expect(
+    observationDetail({ site: { type: 'buoy' }, reading: { ...BUOY_READING, waveHeightFt: null } })
+  ).toBe('');
+  expect(observationDetail({ site: { type: 'buoy' }, reading: null })).toBe('');
 });

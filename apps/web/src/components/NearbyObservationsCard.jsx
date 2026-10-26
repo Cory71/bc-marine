@@ -1,7 +1,9 @@
-import { summarizeObservation, formatReadingAge, isOldReading } from '@bc-marine/shared';
+import { formatWind, observationDetail, formatReadingAge, isOldReading } from '@bc-marine/shared';
 import { useApp } from '../context/AppContext.jsx';
 import Card from './Card.jsx';
 import SourceContent from './SourceContent.jsx';
+
+const TYPE_LABELS = { lighthouse: 'Lighthouse', buoy: 'Buoy' };
 
 // Dashboard card: a quick line per nearby lighthouse or buoy. The whole card
 // opens the Observations page with every value each site reports.
@@ -36,13 +38,23 @@ function ObservationLine({ observation }) {
 
   return (
     <li className={`obs-lines__row ${isOld ? 'obs-lines__row--old' : ''}`}>
-      <span className="obs-lines__name">{site.name}</span>
-      <span className="numeric">{summarizeObservation(observation)}</span>
-      {reading && (
-        <span className="card__note">
-          {isOld && <span className="obs-tile__old">Old reading · </span>}
-          {formatReadingAge(reading.observedAt)}
-        </span>
+      <span className="obs-lines__name">
+        {site.name}
+        <span className={`obs-badge obs-badge--${site.type}`}>{TYPE_LABELS[site.type]}</span>
+      </span>
+      {reading ? (
+        <>
+          <span className="obs-lines__wind numeric">{formatWind(reading)}</span>
+          <span className="obs-lines__detail card__note numeric">
+            {observationDetail(observation)}
+          </span>
+          <span className="obs-lines__age card__note">
+            {isOld && <span className="obs-tile__old">Old reading · </span>}
+            {formatReadingAge(reading.observedAt)}
+          </span>
+        </>
+      ) : (
+        <span className="obs-lines__detail card__note">No recent report</span>
       )}
     </li>
   );

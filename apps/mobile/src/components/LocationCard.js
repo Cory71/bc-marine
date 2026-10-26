@@ -1,5 +1,5 @@
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
-import { COLORS } from '../theme';
+import { View, Text, TouchableOpacity } from 'react-native';
+import { useColors, makeStyles } from '../theme';
 
 function degreesToCompass(deg) {
   if (deg == null) return '--';
@@ -8,6 +8,8 @@ function degreesToCompass(deg) {
 }
 
 export default function LocationCard({ station, weatherData, tideData, warnings, isActive, onPress }) {
+  const styles = useStyles();
+  const COLORS = useColors();
   const wind = weatherData?.windSpeedKts?.toFixed(0);
   const windDir = weatherData?.windDirectionDeg;
   const waves = weatherData?.waveHeightFt;
@@ -47,16 +49,16 @@ export default function LocationCard({ station, weatherData, tideData, warnings,
   );
 }
 
-const styles = StyleSheet.create({
-  card: { marginHorizontal: 16, marginBottom: 8, backgroundColor: 'rgba(126,206,244,0.06)', borderWidth: 1, borderColor: 'rgba(126,206,244,0.15)', borderRadius: 10, padding: 10 },
-  activeCard: { backgroundColor: 'rgba(126,206,244,0.12)', borderColor: 'rgba(126,206,244,0.35)' },
+const useStyles = makeStyles(COLORS => ({
+  card: { marginHorizontal: 16, marginBottom: 8, backgroundColor: `rgba(${COLORS.accentRgb},0.06)`, borderWidth: 1, borderColor: `rgba(${COLORS.accentRgb},0.15)`, borderRadius: 10, padding: 10 },
+  activeCard: { backgroundColor: `rgba(${COLORS.accentRgb},0.12)`, borderColor: `rgba(${COLORS.accentRgb},0.35)` },
   header: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 8 },
   name: { color: COLORS.textSecondary, fontSize: 13, fontWeight: 'bold' },
   meta: { color: COLORS.textMuted, fontSize: 9, marginTop: 2 },
   activeLabel: { color: COLORS.safe, fontSize: 9, fontWeight: 'bold' },
   row: { flexDirection: 'row', gap: 6 },
-  col: { flex: 1, backgroundColor: 'rgba(126,206,244,0.08)', borderRadius: 6, padding: 5, alignItems: 'center' },
-  warningCol: { backgroundColor: 'rgba(255,159,67,0.15)', borderWidth: 1, borderColor: 'rgba(255,159,67,0.3)' },
+  col: { flex: 1, backgroundColor: `rgba(${COLORS.accentRgb},0.08)`, borderRadius: 6, padding: 5, alignItems: 'center' },
+  warningCol: { backgroundColor: `rgba(${COLORS.warningRgb},0.15)`, borderWidth: 1, borderColor: `rgba(${COLORS.warningRgb},0.3)` },
   colLabel: { color: COLORS.accent, fontSize: 8, textTransform: 'uppercase' },
   colValue: { color: COLORS.textSecondary, fontSize: 10, fontWeight: 'bold', marginTop: 2, textAlign: 'center' },
-});
+}));

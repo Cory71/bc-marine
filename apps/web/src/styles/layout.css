@@ -118,7 +118,7 @@
 }
 
 .station-button[aria-current='true'] {
-  background: rgba(126, 206, 244, 0.16);
+  background: rgba(var(--accent-rgb), 0.16);
   color: var(--color-accent);
   font-weight: 600;
 }
@@ -235,9 +235,9 @@
   display: flex;
   gap: 10px;
   padding: 10px 12px;
-  border: 1px solid rgba(255, 159, 67, 0.5);
+  border: 1px solid rgba(var(--warning-rgb), 0.5);
   border-radius: 8px;
-  background: rgba(255, 159, 67, 0.12);
+  background: rgba(var(--warning-rgb), 0.12);
   color: var(--color-warning);
 }
 
@@ -259,19 +259,19 @@
 }
 
 .warning-banner__body {
-  color: #f0c690;
+  color: var(--color-warning-text);
   font-size: 0.875rem;
 }
 
 /* Gale, storm and hurricane-force warnings: same layout, coral-red instead of amber */
 .warning-banner--severe {
-  border-color: rgba(255, 123, 114, 0.5);
-  background: rgba(255, 123, 114, 0.12);
+  border-color: rgba(var(--danger-rgb), 0.5);
+  background: rgba(var(--danger-rgb), 0.12);
   color: var(--color-danger);
 }
 
 .warning-banner--severe .warning-banner__body {
-  color: #f4b8b2;
+  color: var(--color-danger-text);
 }
 
 /* ---------- Small screens: sidebar becomes a slide-in drawer ---------- */
@@ -391,6 +391,10 @@
   margin-top: 16px;
 }
 
+.settings-menu__theme-option {
+  flex: 1;
+}
+
 .settings-menu__note {
   margin-top: 10px;
   color: var(--color-text-secondary);
@@ -456,6 +460,6 @@
 }
 
 .units-picker__option[aria-pressed='true'] {
-  background: rgba(126, 206, 244, 0.18);
+  background: rgba(var(--accent-rgb), 0.18);
   color: var(--color-accent);
 }

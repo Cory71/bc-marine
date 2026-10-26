@@ -1,9 +1,9 @@
-import { NavigationContainer } from '@react-navigation/native';
+import { NavigationContainer, DarkTheme, DefaultTheme } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createStackNavigator } from '@react-navigation/stack';
-import { Text } from 'react-native';
-import { COLORS } from './src/theme';
-import { AppProvider } from './src/context/AppContext';
+import { Text, StatusBar } from 'react-native';
+import { ThemeProvider, useColors } from './src/theme';
+import { AppProvider, useApp } from './src/context/AppContext';
 
 import DashboardScreen from './src/screens/DashboardScreen';
 import TideDetailScreen from './src/screens/TideDetailScreen';
@@ -33,7 +33,43 @@ function HomeStack() {
 export default function App() {
   return (
     <AppProvider>
-    <NavigationContainer>
+      <ThemedApp />
+    </AppProvider>
+  );
+}
+
+// Applies the theme chosen in Settings (or the phone's own light/dark setting)
+function ThemedApp() {
+  const { theme } = useApp();
+  return (
+    <ThemeProvider theme={theme}>
+      <AppNavigator />
+    </ThemeProvider>
+  );
+}
+
+// Tells React Navigation the app's colours, so screen edges and transitions match
+function navigationTheme(COLORS) {
+  const base = COLORS.isLight ? DefaultTheme : DarkTheme;
+  return {
+    ...base,
+    colors: {
+      ...base.colors,
+      primary: COLORS.accent,
+      background: COLORS.background,
+      card: COLORS.navBar,
+      text: COLORS.textPrimary,
+      border: COLORS.cardBorder,
+    },
+  };
+}
+
+function AppNavigator() {
+  const COLORS = useColors();
+
+  return (
+    <NavigationContainer theme={navigationTheme(COLORS)}>
+      <StatusBar barStyle={COLORS.isLight ? 'dark-content' : 'light-content'} />
       <Tab.Navigator
         screenOptions={{
           headerShown: false,
@@ -54,6 +90,5 @@ export default function App() {
         />
       </Tab.Navigator>
     </NavigationContainer>
-    </AppProvider>
   );
 }

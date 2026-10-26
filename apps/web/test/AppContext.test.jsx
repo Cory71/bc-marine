@@ -114,3 +114,16 @@ test('setOpeningStation remembers the station for next time', () => {
   expect(result.current.app.openingStation.name).toBe('Sidney');
   expect(window.localStorage.getItem('openingStation')).toBe('sidney');
 });
+
+test('the theme follows the device until one is chosen, then is remembered', () => {
+  const { result } = renderApp('/');
+  expect(result.current.app.theme).toBe('device');
+  expect(document.documentElement.dataset.theme).toBeUndefined();
+
+  act(() => result.current.app.setTheme('light'));
+  expect(document.documentElement.dataset.theme).toBe('light');
+  expect(window.localStorage.getItem('theme')).toBe('light');
+
+  act(() => result.current.app.setTheme('device'));
+  expect(document.documentElement.dataset.theme).toBeUndefined();
+});

@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState, useEffect, useRef } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { ALL_LOCATIONS, BC_STATIONS, loadStationData, normalizeUnits, DEFAULT_UNITS, findStationBySlug, toStationSlug } from '@bc-marine/shared';
+import { ALL_LOCATIONS, BC_STATIONS, loadStationData, normalizeUnits, DEFAULT_UNITS, normalizeTheme, DEFAULT_THEME, findStationBySlug, toStationSlug } from '@bc-marine/shared';
 
 const AppContext = createContext(null);
 
@@ -19,6 +19,7 @@ export function AppProvider({ children }) {
   const [error, setError] = useState(null);
   const [lastUpdated, setLastUpdated] = useState(null);
   const [units, setUnits] = useState(DEFAULT_UNITS);
+  const [theme, setThemeState] = useState(DEFAULT_THEME);
   const [openingStation, setOpeningStationState] = useState(defaultStation);
   // Data waits until the saved opening station is read, so Victoria isn't fetched for nothing
   const [startupDone, setStartupDone] = useState(false);
@@ -47,6 +48,19 @@ export function AppProvider({ children }) {
     const updated = { ...units, [kind]: value };
     setUnits(updated);
     AsyncStorage.setItem('units', JSON.stringify(updated));
+  }
+
+  // Load the saved theme choice on app start ("device" follows the phone)
+  useEffect(() => {
+    AsyncStorage.getItem('theme')
+      .then(saved => setThemeState(normalizeTheme(saved)))
+      .catch(() => {});
+  }, []);
+
+  // Change the theme and remember it on this phone
+  function setTheme(newTheme) {
+    setThemeState(newTheme);
+    AsyncStorage.setItem('theme', newTheme);
   }
 
   // Open with the station chosen in Settings (Victoria until one is chosen)
@@ -158,6 +172,7 @@ export function AppProvider({ children }) {
       loading, error, lastUpdated,
       units, setUnit,
       openingStation, setOpeningStation,
+      theme, setTheme,
       refresh: () => loadData(true),
     }}>
       {children}

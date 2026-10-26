@@ -1,12 +1,14 @@
 import { useState } from 'react';
-import { View, Text, TouchableOpacity, Pressable, Modal, StyleSheet } from 'react-native';
+import { View, Text, TouchableOpacity, Pressable, Modal } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import UnitsPicker from './UnitsPicker';
 import { useApp } from '../context/AppContext';
-import { COLORS } from '../theme';
+import { THEME_OPTIONS } from '@bc-marine/shared';
+import { makeStyles } from '../theme';
 
 // Gear button for the top of each screen; opens a Settings panel that drops down from the top
 export default function SettingsButton() {
+  const styles = useStyles();
   const [open, setOpen] = useState(false);
 
   return (
@@ -25,6 +27,7 @@ export default function SettingsButton() {
 }
 
 function SettingsPanel({ visible, onClose }) {
+  const styles = useStyles();
   const insets = useSafeAreaInsets();
 
   return (
@@ -46,6 +49,7 @@ function SettingsPanel({ visible, onClose }) {
             </TouchableOpacity>
           </View>
           <OpeningStationSetting />
+          <ThemeSetting />
           <Text style={[styles.sectionLabel, styles.unitsLabel]}>UNITS</Text>
           <UnitsPicker />
           <Text style={styles.note}>Settings are saved on this phone until you change them.</Text>
@@ -57,6 +61,7 @@ function SettingsPanel({ visible, onClose }) {
 
 // Which station the app opens with, and a button to switch it to the one being viewed
 function OpeningStationSetting() {
+  const styles = useStyles();
   const { activeStation, openingStation, setOpeningStation } = useApp();
   const isViewingOpeningStation = activeStation.name === openingStation.name;
 
@@ -79,7 +84,36 @@ function OpeningStationSetting() {
   );
 }
 
-const styles = StyleSheet.create({
+// Device / Light / Dark buttons; Device follows the phone's own setting
+function ThemeSetting() {
+  const styles = useStyles();
+  const { theme, setTheme } = useApp();
+
+  return (
+    <View>
+      <Text style={[styles.sectionLabel, styles.unitsLabel]}>THEME</Text>
+      <View style={styles.themeOptions}>
+        {THEME_OPTIONS.map(option => {
+          const isSelected = theme === option.value;
+          return (
+            <TouchableOpacity
+              key={option.value}
+              style={[styles.themeOption, isSelected && styles.themeSelected]}
+              onPress={() => setTheme(option.value)}
+              accessibilityRole="button"
+              accessibilityState={{ selected: isSelected }}
+            >
+              <Text style={[styles.themeText, isSelected && styles.themeSelectedText]}>{option.label}</Text>
+            </TouchableOpacity>
+          );
+        })}
+      </View>
+      <Text style={styles.note}>Device follows your phone's light or dark setting.</Text>
+    </View>
+  );
+}
+
+const useStyles = makeStyles(COLORS => ({
   gear: { padding: 6 },
   gearText: { fontSize: 20 },
   backdrop: { flex: 1, backgroundColor: 'rgba(0,0,0,0.55)' },
@@ -121,5 +155,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   openButtonText: { color: COLORS.accent, fontSize: 14, fontWeight: '600' },
+  themeOptions: { flexDirection: 'row', borderWidth: 1, borderColor: COLORS.cardBorder, borderRadius: 8, overflow: 'hidden', marginTop: 4 },
+  themeOption: { flex: 1, paddingVertical: 8, alignItems: 'center' },
+  themeSelected: { backgroundColor: `rgba(${COLORS.accentRgb},0.18)` },
+  themeText: { color: COLORS.textSecondary, fontSize: 13, fontWeight: '600' },
+  themeSelectedText: { color: COLORS.accent },
   note: { color: COLORS.textSecondary, fontSize: 12, marginTop: 10 },
-});
+}));

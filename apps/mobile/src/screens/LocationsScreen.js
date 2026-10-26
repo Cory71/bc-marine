@@ -3,6 +3,7 @@ import { View, Text, TextInput, ScrollView, StyleSheet, TouchableOpacity, Alert 
 import * as Location from 'expo-location';
 import { useApp } from '../context/AppContext';
 import SettingsButton from '../components/SettingsButton';
+import { useSavedSites } from '../context/useSavedSites';
 import { COLORS } from '../theme';
 import { BC_REGIONS, BC_STATIONS, BC_COMMUNITIES, OBSERVATION_SITES, findNearestStation } from '@bc-marine/shared';
 
@@ -10,6 +11,7 @@ export default function LocationsScreen({ navigation }) {
   const { activeStation, setActiveStation, savedStations, saveStation } = useApp();
   const [query, setQuery] = useState('');
   const [openRegions, setOpenRegions] = useState({});
+  const { savedSites, removeSavedSite } = useSavedSites();
 
   const allSearchable = [...BC_STATIONS, ...BC_COMMUNITIES];
   const searchResults = query
@@ -26,6 +28,11 @@ export default function LocationsScreen({ navigation }) {
     setActiveStation(station);
     saveStation(station);
     navigation.navigate('Home');
+  }
+
+  // Lighthouses and buoys open their own screen on the Home tab
+  function openSite(site) {
+    navigation.navigate('Home', { screen: 'SiteDetail', params: { siteId: site.id } });
   }
 
   function toggleRegion(regionName) {
@@ -80,7 +87,7 @@ export default function LocationsScreen({ navigation }) {
             <TouchableOpacity
               key={site.id}
               style={styles.stationRow}
-              onPress={() => navigation.navigate('Home', { screen: 'SiteDetail', params: { siteId: site.id } })}
+              onPress={() => openSite(site)}
             >
               <View>
                 <Text style={styles.stationName}>{site.name}</Text>
@@ -120,6 +127,31 @@ export default function LocationsScreen({ navigation }) {
                 </View>
                 <Text style={styles.arrow}>›</Text>
               </TouchableOpacity>
+            ))}
+          </View>
+        </View>
+      )}
+
+      {/* Saved lighthouses and buoys, starred on their own screens */}
+      {query === '' && savedSites.length > 0 && (
+        <View style={styles.section}>
+          <Text style={styles.sectionLabel}>⭐ Saved Lighthouses & Buoys</Text>
+          <View style={styles.savedList}>
+            {savedSites.map((site, i) => (
+              <View key={site.id} style={[styles.stationRow, i < savedSites.length - 1 && styles.stationBorder]}>
+                <TouchableOpacity style={styles.siteButton} onPress={() => openSite(site)}>
+                  <Text style={styles.stationName}>{site.name}</Text>
+                  <Text style={styles.stationArea}>{site.type === 'buoy' ? 'Buoy' : 'Lighthouse'}</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  onPress={() => removeSavedSite(site.id)}
+                  accessibilityRole="button"
+                  accessibilityLabel={`Remove ${site.name}`}
+                  hitSlop={8}
+                >
+                  <Text style={styles.removeText}>✕</Text>
+                </TouchableOpacity>
+              </View>
             ))}
           </View>
         </View>
@@ -195,4 +227,6 @@ const styles = StyleSheet.create({
   stationName: { color: COLORS.textSecondary, fontSize: 13 },
   stationArea: { color: COLORS.textMuted, fontSize: 10, marginTop: 1 },
   arrow: { color: COLORS.textMuted, fontSize: 16 },
+  siteButton: { flex: 1 },
+  removeText: { color: COLORS.textMuted, fontSize: 14, paddingHorizontal: 4 },
 });

@@ -13,11 +13,13 @@ import {
   formatTime,
 } from '@bc-marine/shared';
 import { useApp } from '../context/AppContext.jsx';
+import { useSavedSites } from '../context/useSavedSites.js';
 import Card from '../components/Card.jsx';
 import Icon from '../components/Icon.jsx';
 import { EmptyState, DetailPlaceholder } from '../components/DetailPage.jsx';
 import PanelError from '../components/PanelError.jsx';
 import { ReadingStats } from '../components/ObservationTile.jsx';
+import SiteCharts from '../components/SiteCharts.jsx';
 
 const TYPE_LABELS = { lighthouse: 'Lighthouse', buoy: 'Buoy' };
 
@@ -55,6 +57,7 @@ function SiteContent({ site }) {
         <div className="site-title">
           <h2 className="detail__title">{site.name}</h2>
           <span className={`obs-badge obs-badge--${site.type}`}>{TYPE_LABELS[site.type]}</span>
+          <SaveSiteButton site={site} />
         </div>
         <p className="detail__source">
           {formatDistance(distance, units)} from {activeStation.name} ·{' '}
@@ -70,12 +73,33 @@ function SiteContent({ site }) {
           <Card title={`Latest · ${formatReadingAge(latest.observedAt)}`}>
             <ReadingStats reading={latest} units={units} />
           </Card>
+          <Card title="12-hour trend">
+            <SiteCharts history={history} units={units} />
+          </Card>
           <Card title="Last 12 hours">
             <HourlyTable history={history} showWaves={site.type === 'buoy'} />
           </Card>
         </>
       )}
     </>
+  );
+}
+
+// Star button that saves the site to the sidebar's list on this device
+function SaveSiteButton({ site }) {
+  const { isSiteSaved, toggleSavedSite } = useSavedSites();
+  const isSaved = isSiteSaved(site.id);
+
+  return (
+    <button
+      type="button"
+      className="save-button"
+      aria-pressed={isSaved}
+      onClick={() => toggleSavedSite(site.id)}
+    >
+      <Icon name="star" size={16} />
+      Save <span className="visually-hidden">{site.name}</span>
+    </button>
   );
 }
 

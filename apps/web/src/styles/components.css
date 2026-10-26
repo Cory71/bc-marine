@@ -529,3 +529,145 @@
 .sidebar__label--spaced {
   margin-top: 12px;
 }
+
+/* Star button beside a site's name; filled in once saved */
+.save-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-left: auto;
+  padding: 5px 12px;
+  border: 1px solid var(--color-card-border);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--color-text-secondary);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.save-button:hover {
+  border-color: rgba(126, 206, 244, 0.45);
+  color: var(--color-text-primary);
+}
+
+.save-button[aria-pressed='true'] {
+  border-color: var(--color-warning);
+  color: var(--color-warning);
+}
+
+.save-button[aria-pressed='true'] svg {
+  fill: currentColor;
+}
+
+/* ---------- Site charts (last 12 hours) ---------- */
+.site-charts {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 18px;
+}
+
+@media (min-width: 900px) {
+  .site-charts {
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  }
+}
+
+.site-chart {
+  min-width: 0; /* let the grid column shrink so the chart can measure it */
+  margin: 0;
+}
+
+.site-chart__header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 4px 12px;
+  margin-bottom: 4px;
+  font-size: 0.8125rem;
+}
+
+.site-chart__title {
+  color: var(--color-text-primary);
+  font-weight: 600;
+}
+
+.site-chart__legend {
+  display: flex;
+  gap: 12px;
+  color: var(--color-text-secondary);
+  font-size: 0.75rem;
+}
+
+/* A short coloured bar before each legend label */
+.site-chart__key::before {
+  content: '';
+  display: inline-block;
+  width: 14px;
+  height: 3px;
+  margin-right: 6px;
+  vertical-align: middle;
+  border-radius: 2px;
+  background: currentColor;
+}
+
+.site-chart__key--wind::before {
+  color: var(--color-accent);
+}
+
+.site-chart__key--gust::before {
+  color: var(--color-warning);
+}
+
+.site-chart__plot {
+  width: 100%;
+  overflow: hidden;
+}
+
+.site-chart__plot svg {
+  display: block;
+}
+
+.site-chart__grid {
+  stroke: var(--color-card-border);
+  stroke-width: 1;
+}
+
+.site-chart__axis {
+  fill: var(--color-text-secondary);
+  font-size: 11px;
+  font-variant-numeric: tabular-nums;
+}
+
+.site-chart__line path {
+  stroke-width: 2.5;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+}
+
+.site-chart__line--wind,
+.site-chart__line--waves {
+  fill: var(--color-accent);
+  stroke: var(--color-accent);
+}
+
+/* Gusts: dashed so the two lines differ by more than colour */
+.site-chart__line--gust {
+  fill: var(--color-warning);
+  stroke: var(--color-warning);
+}
+
+.site-chart__line--gust path {
+  stroke-width: 1.5;
+  stroke-dasharray: 5 4;
+}
+
+.site-chart__line--pressure {
+  fill: var(--color-text-secondary);
+  stroke: var(--color-text-secondary);
+}
+
+.site-chart__line circle {
+  stroke: none;
+}

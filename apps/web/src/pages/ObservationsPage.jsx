@@ -1,3 +1,4 @@
+import { Link, useLocation } from 'react-router';
 import { useApp } from '../context/AppContext.jsx';
 import DetailPage, { EmptyState, DetailPlaceholder } from '../components/DetailPage.jsx';
 import SourceContent from '../components/SourceContent.jsx';
@@ -20,6 +21,7 @@ export default function ObservationsPage() {
 
 function ObservationTiles() {
   const { observations } = useApp();
+  const { search } = useLocation();
   if (observations.length === 0) {
     return (
       <EmptyState
@@ -32,7 +34,13 @@ function ObservationTiles() {
   return (
     <div className="obs-grid">
       {observations.map(observation => (
-        <ObservationTile key={observation.site.id} {...observation} />
+        <Link
+          key={observation.site.id}
+          to={{ pathname: `/observations/${observation.site.id}`, search }}
+          className="obs-tile-link"
+        >
+          <ObservationTile {...observation} />
+        </Link>
       ))}
     </div>
   );

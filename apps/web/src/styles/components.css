@@ -502,3 +502,30 @@
 .obs-lines__row--old .obs-lines__detail {
   opacity: 0.6;
 }
+
+/* Observation tiles are links to each site's page */
+.obs-tile-link {
+  display: flex;
+  color: inherit;
+  text-decoration: none;
+}
+
+.obs-tile-link > .obs-tile {
+  flex: 1;
+  transition: border-color 0.15s, background 0.15s;
+}
+
+.obs-tile-link:hover > .obs-tile {
+  border-color: rgba(126, 206, 244, 0.5);
+  background: rgba(126, 206, 244, 0.12);
+}
+
+.site-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.sidebar__label--spaced {
+  margin-top: 12px;
+}

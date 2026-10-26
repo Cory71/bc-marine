@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { formatTime, getNextTideEvent } from '@bc-marine/shared';
+import { formatTime, getNextTideEvent, formatHeight, DEFAULT_UNITS } from '@bc-marine/shared';
 
 // Space around the curve for event labels (top/bottom) and the hour axis
 const PADDING = { top: 30, right: 16, bottom: 44, left: 16 };
@@ -7,7 +7,14 @@ const FALLBACK_WIDTH = 800;
 
 // Today's tide as a smooth curve, with high/low markers and a "Now" line.
 // Draws at the container's real pixel width so text stays readable on phones.
-export default function TideCurve({ tides, events = [], width, height = 240, now = new Date() }) {
+export default function TideCurve({
+  tides,
+  events = [],
+  width,
+  height = 240,
+  now = new Date(),
+  units = DEFAULT_UNITS,
+}) {
   const [containerRef, measuredWidth] = useContainerWidth(FALLBACK_WIDTH);
   if (!tides || tides.length < 2) return null;
 
@@ -26,7 +33,7 @@ export default function TideCurve({ tides, events = [], width, height = 240, now
         height={height}
         viewBox={`0 0 ${chartWidth} ${height}`}
         role="img"
-        aria-label={describeTides(events, now)}
+        aria-label={describeTides(events, now, units)}
       >
         <path d={areaPath} fill="rgba(126, 206, 244, 0.12)" />
         <path d={curvePath} fill="none" stroke="var(--color-accent)" strokeWidth="2.5" />
@@ -38,6 +45,7 @@ export default function TideCurve({ tides, events = [], width, height = 240, now
             event={event}
             point={scale.toPoint(event)}
             chartWidth={chartWidth}
+            units={units}
           />
         ))}
         {nowPoint && (
@@ -104,13 +112,16 @@ function findPointAtTime(points, x) {
 }
 
 // Screen-reader summary: "Tide curve for today. Next high 8.4 ft at 1:59 PM, next low 3 ft at 8:55 PM."
-function describeTides(events, now) {
+function describeTides(events, now, units) {
   const upcoming = [
     ['high', getNextTideEvent(events, 'HIGH', now)],
     ['low', getNextTideEvent(events, 'LOW', now)],
   ]
     .filter(([, event]) => event)
-    .map(([type, event]) => `next ${type} ${event.heightFt} ft at ${formatTime(event.time)}`);
+    .map(
+      ([type, event]) =>
+        `next ${type} ${formatHeight(event.heightFt, units)} at ${formatTime(event.time)}`
+    );
 
   if (upcoming.length === 0) return 'Tide curve for today.';
   const summary = upcoming.join(', ');
@@ -135,7 +146,7 @@ function HourAxis({ points, y, chartWidth }) {
 }
 
 // High tides are labelled above the dot, low tides below
-function EventMarker({ event, point, chartWidth }) {
+function EventMarker({ event, point, chartWidth, units }) {
   const isHigh = event.type === 'HIGH';
   const labelY = isHigh ? point.y - 10 : point.y + 18;
   return (
@@ -147,7 +158,7 @@ function EventMarker({ event, point, chartWidth }) {
         textAnchor={getLabelAnchor(point.x, chartWidth)}
         className="tide-curve__label"
       >
-        {event.heightFt} ft · {formatTime(event.time)}
+        {formatHeight(event.heightFt, units)} · {formatTime(event.time)}
       </text>
     </g>
   );

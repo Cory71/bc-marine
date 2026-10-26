@@ -1,6 +1,7 @@
 import { test, expect, vi, afterEach } from 'vitest';
 import { render, screen, cleanup, fireEvent } from '@testing-library/react';
 import { MemoryRouter } from 'react-router';
+import { DEFAULT_UNITS } from '@bc-marine/shared';
 import { useApp } from '../src/context/AppContext.jsx';
 import Sidebar from '../src/layout/Sidebar.jsx';
 import { VICTORIA } from './observations.fixtures.js';
@@ -16,6 +17,8 @@ test('search also finds lighthouses and buoys, linking to their pages', () => {
     saveStation: vi.fn(),
     savedStations: [],
     removeStation: vi.fn(),
+    units: DEFAULT_UNITS,
+    setUnit: vi.fn(),
   });
   render(
     <MemoryRouter initialEntries={['/?station=victoria']}>

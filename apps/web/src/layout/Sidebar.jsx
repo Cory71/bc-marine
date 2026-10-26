@@ -9,6 +9,7 @@ import {
 } from '@bc-marine/shared';
 import { useApp } from '../context/AppContext.jsx';
 import Icon from '../components/Icon.jsx';
+import UnitsPicker from '../components/UnitsPicker.jsx';
 
 // Station picker: search, nearest station, saved stations and the full region list
 export default function Sidebar({ open, onClose, searchInputRef }) {
@@ -51,6 +52,12 @@ export default function Sidebar({ open, onClose, searchInputRef }) {
           <NearestStationButton onSelect={selectStation} />
           <SavedStations onSelect={selectStation} />
           <RegionList onSelect={selectStation} />
+          <section className="sidebar__section" aria-labelledby="units-heading">
+            <h2 id="units-heading" className="sidebar__label">
+              Units
+            </h2>
+            <UnitsPicker />
+          </section>
         </>
       )}
     </aside>

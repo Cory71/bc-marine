@@ -3,6 +3,9 @@ import {
   getUpcomingHours,
   degreesToCompass,
   formatTime,
+  formatSpeed,
+  formatHeight,
+  formatDistance,
 } from '@bc-marine/shared';
 import { useApp } from '../context/AppContext.jsx';
 import DetailPage, { EmptyState, DetailPlaceholder } from '../components/DetailPage.jsx';
@@ -27,7 +30,7 @@ export default function WeatherPage() {
 }
 
 function WeatherContent() {
-  const { weather } = useApp();
+  const { weather, units } = useApp();
   if (weather.length === 0)
     return <EmptyState message="No weather data available for this station." />;
 
@@ -36,18 +39,18 @@ function WeatherContent() {
     <>
       <Card title="Current conditions">
         <div className="stat-row stat-row--spread">
-          <Stat label="Wind" value={formatWind(now)} />
+          <Stat label="Wind" value={formatWind(now, units)} />
           <Stat
             label="Waves"
-            value={`${now?.waveHeightFt ?? NO_VALUE} ft`}
+            value={formatHeight(now?.waveHeightFt, units)}
             detail={`${now?.wavePeriodS?.toFixed(0) ?? NO_VALUE} s period`}
           />
           <Stat
             label="Swell"
-            value={`${now?.swellHeightFt ?? NO_VALUE} ft`}
+            value={formatHeight(now?.swellHeightFt, units)}
             detail={degreesToCompass(now?.swellDirectionDeg)}
           />
-          <Stat label="Visibility" value={formatVisibility(now)} />
+          <Stat label="Visibility" value={formatVisibility(now, units)} />
         </div>
       </Card>
       <Card title="Next 8 hours">
@@ -57,17 +60,17 @@ function WeatherContent() {
   );
 }
 
-// e.g. "SSE 12 kts"
-function formatWind(hour) {
-  const speed = hour?.windSpeedKts != null ? Math.round(hour.windSpeedKts) : NO_VALUE;
-  return `${degreesToCompass(hour?.windDirectionDeg)} ${speed} kts`;
+// e.g. "SSE 12 kts" (or km/h / mph)
+function formatWind(hour, units) {
+  return `${degreesToCompass(hour?.windDirectionDeg)} ${formatSpeed(hour?.windSpeedKts, units)}`;
 }
 
-function formatVisibility(hour) {
-  return `${hour?.visibilityKm != null ? Math.round(hour.visibilityKm) : NO_VALUE} km`;
+function formatVisibility(hour, units) {
+  return formatDistance(hour?.visibilityKm, units);
 }
 
 function HourlyWeatherTable({ hours }) {
+  const { units } = useApp();
   return (
     <div className="table-scroll">
       <table className="data-table">
@@ -84,12 +87,12 @@ function HourlyWeatherTable({ hours }) {
           {hours.map((hour, i) => (
             <tr key={hour.time.toString()} className={i === 0 ? 'data-table__now' : ''}>
               <th scope="row">{i === 0 ? 'Now' : formatTime(hour.time)}</th>
-              <td>{formatWind(hour)}</td>
-              <td>{hour.waveHeightFt ?? NO_VALUE} ft</td>
+              <td>{formatWind(hour, units)}</td>
+              <td>{formatHeight(hour.waveHeightFt, units)}</td>
               <td>
-                {hour.swellHeightFt ?? NO_VALUE} ft {degreesToCompass(hour.swellDirectionDeg)}
+                {formatHeight(hour.swellHeightFt, units)} {degreesToCompass(hour.swellDirectionDeg)}
               </td>
-              <td>{formatVisibility(hour)}</td>
+              <td>{formatVisibility(hour, units)}</td>
             </tr>
           ))}
         </tbody>

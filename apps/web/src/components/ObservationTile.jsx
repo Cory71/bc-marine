@@ -9,12 +9,14 @@ import {
   formatReadingAge,
   isOldReading,
 } from '@bc-marine/shared';
+import { useApp } from '../context/AppContext.jsx';
 
 const TYPE_LABELS = { lighthouse: 'Lighthouse', buoy: 'Buoy' };
 
 // One lighthouse or buoy: name, type, distance, how fresh the reading is, then
 // every value the site reports (values it doesn't report are left out)
 export default function ObservationTile({ site, distanceKm, reading }) {
+  const { units } = useApp();
   const isOld = reading && isOldReading(reading.observedAt);
 
   return (
@@ -24,7 +26,7 @@ export default function ObservationTile({ site, distanceKm, reading }) {
         <span className={`obs-badge obs-badge--${site.type}`}>{TYPE_LABELS[site.type]}</span>
       </div>
       <p className="card__note numeric">
-        {formatDistance(distanceKm)}
+        {formatDistance(distanceKm, units)}
         {reading && ` · ${formatReadingAge(reading.observedAt)}`}
         {isOld && (
           <>
@@ -34,7 +36,7 @@ export default function ObservationTile({ site, distanceKm, reading }) {
         )}
       </p>
       {reading ? (
-        <ReadingStats reading={reading} />
+        <ReadingStats reading={reading} units={units} />
       ) : (
         <p className="card__note">No recent report</p>
       )}
@@ -43,15 +45,15 @@ export default function ObservationTile({ site, distanceKm, reading }) {
 }
 
 // Label and value pairs, skipping anything the site didn't report
-export function ReadingStats({ reading }) {
+export function ReadingStats({ reading, units }) {
   const stats = [
-    ['Wind', reading.windKts, formatWind(reading)],
-    ['Gust (1 h)', reading.gustKts, formatGust(reading)],
-    ['Waves', reading.waveHeightFt, formatWaves(reading)],
+    ['Wind', reading.windKts, formatWind(reading, units)],
+    ['Gust (1 h)', reading.gustKts, formatGust(reading, units)],
+    ['Waves', reading.waveHeightFt, formatWaves(reading, units)],
     ['Period', reading.wavePeriodS, formatWavePeriod(reading)],
-    ['Water', reading.waterTempC, formatTemp(reading.waterTempC)],
+    ['Water', reading.waterTempC, formatTemp(reading.waterTempC, units)],
     ['Pressure', reading.pressureHpa, formatPressure(reading)],
-    ['Air', reading.airTempC, formatTemp(reading.airTempC)],
+    ['Air', reading.airTempC, formatTemp(reading.airTempC, units)],
   ].filter(([, rawValue]) => rawValue != null);
 
   return (

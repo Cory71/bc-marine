@@ -44,7 +44,7 @@ export default function SitePage() {
 }
 
 function SiteContent({ site }) {
-  const { activeStation } = useApp();
+  const { activeStation, units } = useApp();
   const { status, history } = useSiteHistory(site);
   const latest = history[0];
   const distance = distanceKm(activeStation.lat, activeStation.lon, site.lat, site.lon);
@@ -57,7 +57,7 @@ function SiteContent({ site }) {
           <span className={`obs-badge obs-badge--${site.type}`}>{TYPE_LABELS[site.type]}</span>
         </div>
         <p className="detail__source">
-          {formatDistance(distance)} from {activeStation.name} ·{' '}
+          {formatDistance(distance, units)} from {activeStation.name} ·{' '}
           {site.type === 'buoy' ? 'NOAA NDBC' : 'Environment Canada'}
         </p>
       </div>
@@ -68,7 +68,7 @@ function SiteContent({ site }) {
       {status === 'ready' && latest && (
         <>
           <Card title={`Latest · ${formatReadingAge(latest.observedAt)}`}>
-            <ReadingStats reading={latest} />
+            <ReadingStats reading={latest} units={units} />
           </Card>
           <Card title="Last 12 hours">
             <HourlyTable history={history} showWaves={site.type === 'buoy'} />
@@ -99,6 +99,7 @@ function useSiteHistory(site) {
 }
 
 function HourlyTable({ history, showWaves }) {
+  const { units } = useApp();
   return (
     <div className="table-scroll">
       <table className="data-table">
@@ -115,9 +116,9 @@ function HourlyTable({ history, showWaves }) {
           {history.map(reading => (
             <tr key={reading.observedAt.toISOString()}>
               <th scope="row">{formatTime(reading.observedAt)}</th>
-              <td>{formatWind(reading)}</td>
-              <td>{formatGust(reading)}</td>
-              {showWaves && <td>{formatWaves(reading)}</td>}
+              <td>{formatWind(reading, units)}</td>
+              <td>{formatGust(reading, units)}</td>
+              {showWaves && <td>{formatWaves(reading, units)}</td>}
               <td>{formatPressure(reading)}</td>
             </tr>
           ))}

@@ -7,6 +7,7 @@ import {
   getDefaultStation,
 } from '@bc-marine/shared';
 import { readSavedSlugs, writeSavedSlugs } from './savedStationsStorage.js';
+import { readUnits, writeUnits } from './unitsStorage.js';
 
 const AppContext = createContext(null);
 
@@ -16,12 +17,14 @@ export function AppProvider({ children }) {
   const activeStation = useActiveStationFromUrl();
   const saved = useSavedStations();
   const data = useStationData(activeStation.station);
+  const unitChoices = useUnitChoices();
 
   const value = {
     activeStation: activeStation.station,
     setActiveStationBySlug: activeStation.setBySlug,
     ...saved,
     ...data,
+    ...unitChoices,
   };
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;
 }
@@ -56,6 +59,19 @@ function useActiveStationFromUrl() {
   }, [matchedStation, station, setBySlug]);
 
   return { station, setBySlug };
+}
+
+// --- Display units (kts/km/h/mph, ft/m, °C/°F, km/nm), kept in localStorage ---
+function useUnitChoices() {
+  const [units, setUnits] = useState(() => readUnits());
+
+  function setUnit(kind, value) {
+    const updated = { ...units, [kind]: value };
+    setUnits(updated);
+    writeUnits(updated);
+  }
+
+  return { units, setUnit };
 }
 
 // --- Saved stations, kept in localStorage as slugs ---

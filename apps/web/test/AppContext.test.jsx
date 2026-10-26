@@ -79,3 +79,11 @@ test('a failed source keeps the other data and is listed in failures', async () 
   expect(result.current.app.marineForecast).toEqual({ warnings: [], forecast: '' });
   expect(result.current.app.failures).toEqual(['marineForecast']);
 });
+
+test('choosing a unit updates the app and is remembered on this device', async () => {
+  const { result } = renderApp('/?station=victoria');
+  expect(result.current.app.units.height).toBe('ft');
+  act(() => result.current.app.setUnit('height', 'm'));
+  expect(result.current.app.units.height).toBe('m');
+  expect(JSON.parse(window.localStorage.getItem('units')).height).toBe('m');
+});

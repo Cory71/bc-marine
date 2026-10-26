@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { View, Text, TextInput, ScrollView, StyleSheet, TouchableOpacity, Alert } from 'react-native';
 import * as Location from 'expo-location';
 import { useApp } from '../context/AppContext';
+import UnitsPicker from '../components/UnitsPicker';
 import { COLORS } from '../theme';
 import { BC_REGIONS, BC_STATIONS, BC_COMMUNITIES, OBSERVATION_SITES, findNearestStation } from '@bc-marine/shared';
 
@@ -161,6 +162,12 @@ export default function LocationsScreen({ navigation }) {
       )}
 
       <View style={{ height: 24 }} />
+      {/* Display units, remembered on this phone until changed */}
+      <View style={styles.section}>
+        <Text style={styles.sectionLabel}>Units</Text>
+        <UnitsPicker />
+      </View>
+
     </ScrollView>
   );
 }

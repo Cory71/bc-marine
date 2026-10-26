@@ -5,7 +5,7 @@ import { useApp } from '../context/AppContext';
 import SettingsButton from '../components/SettingsButton';
 import { useSavedSites } from '../context/useSavedSites';
 import { useColors, makeStyles } from '../theme';
-import { BC_REGIONS, BC_STATIONS, BC_COMMUNITIES, OBSERVATION_SITES, findNearestStation } from '@bc-marine/shared';
+import { BC_REGIONS, BC_STATIONS, BC_COMMUNITIES, OBSERVATION_SITES, findNearestStation, isRoughLocation } from '@bc-marine/shared';
 
 export default function LocationsScreen({ navigation }) {
   const styles = useStyles();
@@ -47,9 +47,24 @@ export default function LocationsScreen({ navigation }) {
       Alert.alert('Permission Denied', 'Location access is needed to find your nearest station.');
       return;
     }
-    const loc = await Location.getCurrentPositionAsync({});
-    const nearest = findNearestStation(loc.coords.latitude, loc.coords.longitude, allSearchable);
-    handleSelectStation(nearest);
+    // Ask for the precise (GPS) location, not a rough network guess
+    const loc = await Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.High });
+    const { latitude, longitude, accuracy } = loc.coords;
+    const nearest = findNearestStation(latitude, longitude, allSearchable);
+    if (isRoughLocation(accuracy)) confirmRoughLocation(nearest, accuracy);
+    else handleSelectStation(nearest);
+  }
+
+  // The phone only roughly knows where it is (e.g. precise location is off), so ask first
+  function confirmRoughLocation(station, accuracyMetres) {
+    Alert.alert(
+      'Rough location',
+      `Your phone could only place you within about ${Math.round(accuracyMetres / 1000)} km, near ${station.name}. If that's wrong, pick your station from the list.`,
+      [
+        { text: 'Pick from list', style: 'cancel' },
+        { text: `Use ${station.name}`, onPress: () => handleSelectStation(station) },
+      ]
+    );
   }
 
   return (

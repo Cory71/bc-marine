@@ -56,6 +56,15 @@
   font-size: 0.875rem;
 }
 
+.sidebar__note {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 8px;
+  color: var(--color-text-secondary);
+  font-size: 0.8125rem;
+}
+
 .sidebar__error {
   color: var(--color-warning);
   font-size: 0.8125rem;

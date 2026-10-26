@@ -60,18 +60,25 @@ export function distanceKm(lat1, lon1, lat2, lon2) {
   return 2 * EARTH_RADIUS_KM * Math.asin(Math.sqrt(a));
 }
 
-// Returns the nearest station to a given GPS coordinate
+// Returns the nearest station to a given GPS coordinate, by real distance in km
+// (a degree of longitude is only about 2/3 as far as a degree of latitude in BC)
 export function findNearestStation(lat, lon, stations) {
   let nearest = null;
   let minDist = Infinity;
   for (const station of stations) {
-    const dist = Math.sqrt(
-      Math.pow(station.lat - lat, 2) + Math.pow(station.lon - lon, 2)
-    );
+    const dist = distanceKm(lat, lon, station.lat, station.lon);
     if (dist < minDist) {
       minDist = dist;
       nearest = station;
     }
   }
   return nearest;
+}
+
+// Computers without GPS guess their location from the internet connection, which can be
+// tens of km off. A fix only known to within 10 km or more is too rough to trust silently.
+const ROUGH_LOCATION_METRES = 10000;
+
+export function isRoughLocation(accuracyMetres) {
+  return accuracyMetres >= ROUGH_LOCATION_METRES;
 }

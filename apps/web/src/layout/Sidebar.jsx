@@ -5,6 +5,7 @@ import {
   ALL_LOCATIONS,
   OBSERVATION_SITES,
   findNearestStation,
+  isRoughLocation,
   toStationSlug,
 } from '@bc-marine/shared';
 import { useApp } from '../context/AppContext.jsx';
@@ -155,25 +156,36 @@ function SiteLink({ site, search, onPick }) {
   );
 }
 
-// Finds the closest station using the browser's location (hidden if unsupported)
+// Ask for the precise location (GPS where there is one), and don't reuse an old one
+const LOCATION_OPTIONS = { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 };
+
+// Finds the closest station using the browser's location (hidden if unsupported).
+// A rough location (common on computers) is shown as a guess instead of jumping there.
 function NearestStationButton({ onSelect }) {
   const [error, setError] = useState('');
   const [locating, setLocating] = useState(false);
+  const [roughGuess, setRoughGuess] = useState(null);
   if (!('geolocation' in navigator)) return null;
+
+  function handlePosition(position) {
+    setLocating(false);
+    const { latitude, longitude, accuracy } = position.coords;
+    const nearest = findNearestStation(latitude, longitude, ALL_LOCATIONS);
+    if (isRoughLocation(accuracy)) setRoughGuess({ station: nearest, withinKm: accuracy / 1000 });
+    else onSelect(nearest);
+  }
 
   function handleClick() {
     setError('');
+    setRoughGuess(null);
     setLocating(true);
     navigator.geolocation.getCurrentPosition(
-      position => {
-        setLocating(false);
-        const { latitude, longitude } = position.coords;
-        onSelect(findNearestStation(latitude, longitude, ALL_LOCATIONS));
-      },
+      handlePosition,
       () => {
         setLocating(false);
         setError('Location access is needed to find your nearest station.');
-      }
+      },
+      LOCATION_OPTIONS
     );
   }
 
@@ -189,6 +201,23 @@ function NearestStationButton({ onSelect }) {
         {locating ? 'Finding your location…' : 'Use my location'}
       </button>
       {error && <p className="sidebar__error">{error}</p>}
+      {roughGuess && <RoughLocationGuess guess={roughGuess} onSelect={onSelect} />}
+    </div>
+  );
+}
+
+// "Your device could only place you within about 40 km, near White Rock."
+function RoughLocationGuess({ guess, onSelect }) {
+  const { station, withinKm } = guess;
+  return (
+    <div className="sidebar__note" role="status">
+      <p>
+        Your device could only place you within about {Math.round(withinKm)} km, near {station.name}
+        . If that&apos;s wrong, pick your station below.
+      </p>
+      <button type="button" className="button button--wide" onClick={() => onSelect(station)}>
+        Use {station.name}
+      </button>
     </div>
   );
 }

@@ -2,7 +2,7 @@ import { getJson, getText } from './http.js';
 import { getCache, setCache } from './cache.js';
 import { distanceKm } from '../units.js';
 import { OBSERVATION_SITES } from '../observationSites.js';
-import { readLighthouseFeature, parseNdbcText } from '../observationReaders.js';
+import { readLighthouseFeature, parseNdbcText, parseNdbcRows } from '../observationReaders.js';
 
 const NEARBY_RADIUS_KM = 100;
 const SITES_TO_SHOW = 3;
@@ -74,4 +74,44 @@ async function fetchLighthouseReading(site) {
 
 async function fetchBuoyReading(site) {
   return parseNdbcText(await getText(currentBuildBuoyUrl(site.sourceId)));
+}
+
+const HISTORY_HOURS = 12;
+
+// Find a lighthouse or buoy by its id (the slug used in links, e.g. 'race-rocks')
+export function findObservationSite(id, sites = OBSERVATION_SITES) {
+  return sites.find(site => site.id === id);
+}
+
+// The last 12 hourly readings for one site, newest first, cached for 10 minutes
+export async function fetchSiteHistory(site) {
+  const cacheKey = `siteHistory_${site.sourceId}`;
+  const cached = getCache(cacheKey);
+  if (cached) return cached;
+
+  const history =
+    site.type === 'buoy' ? await fetchBuoyHistory(site) : await fetchLighthouseHistory(site);
+  setCache(cacheKey, history, OBSERVATIONS_TTL_MS);
+  return history;
+}
+
+// EC keeps per-minute readings for some stations; ask for the hourly ones only
+async function fetchLighthouseHistory(site) {
+  const url = 'https://api.weather.gc.ca/collections/swob-realtime/items';
+  const params = {
+    f: 'json',
+    'msc_id-value': site.sourceId,
+    '_is-minutely_obs-value': false,
+    sortby: '-obs_date_tm',
+    limit: HISTORY_HOURS,
+  };
+  const data = await getJson(url, { params });
+  return (data.features ?? [])
+    .map(feature => readLighthouseFeature(feature.properties))
+    .filter(Boolean);
+}
+
+// NOAA's file already holds weeks of hourly rows; take the newest 12
+async function fetchBuoyHistory(site) {
+  return parseNdbcRows(await getText(currentBuildBuoyUrl(site.sourceId)), HISTORY_HOURS);
 }

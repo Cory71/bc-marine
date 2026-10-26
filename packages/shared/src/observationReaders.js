@@ -36,14 +36,27 @@ export function readLighthouseFeature(properties) {
 
 // Read the newest row of a NOAA NDBC realtime2 text file (wind in m/s, waves in m)
 export function parseNdbcText(text) {
+  return parseNdbcRows(text, 1)[0] ?? null;
+}
+
+// Read up to `limit` rows, newest first (NOAA lists them newest first, one per hour),
+// skipping any row whose time can't be read
+export function parseNdbcRows(text, limit) {
   const lines = String(text ?? '').split('\n');
   const header = lines.find(line => line.startsWith('#'));
-  const row = lines.find(line => line.trim() && !line.startsWith('#'));
-  if (!header || !row) return null;
+  if (!header) return [];
 
   // Look columns up by name, so a changed column order can't shift values
   const columns = header.replace('#', '').trim().split(/\s+/);
-  const values = row.trim().split(/\s+/);
+  return lines
+    .filter(line => line.trim() && !line.startsWith('#'))
+    .map(line => readNdbcRow(columns, line.trim().split(/\s+/)))
+    .filter(Boolean)
+    .slice(0, limit);
+}
+
+// One NOAA row → a reading, or null if its time is incomplete
+function readNdbcRow(columns, values) {
   const value = name => numberOrNull(values[columns.indexOf(name)]);
   const waveHeightM = value('WVHT');
 
@@ -51,10 +64,9 @@ export function parseNdbcText(text) {
   // otherwise quietly become 1900)
   const [year, month, day, hour, minute] = ['YY', 'MM', 'DD', 'hh', 'mm'].map(value);
   if ([year, month, day, hour, minute].some(part => part == null)) return null;
-  const observedAt = new Date(Date.UTC(year, month - 1, day, hour, minute));
 
   return {
-    observedAt,
+    observedAt: new Date(Date.UTC(year, month - 1, day, hour, minute)),
     windKts: msToKnots(value('WSPD')),
     windDirDeg: value('WDIR'),
     gustKts: msToKnots(value('GST')),

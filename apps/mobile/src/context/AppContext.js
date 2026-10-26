@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState, useEffect, useRef } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { ALL_LOCATIONS, BC_STATIONS, loadStationData, normalizeUnits, DEFAULT_UNITS } from '@bc-marine/shared';
+import { ALL_LOCATIONS, BC_STATIONS, loadStationData, normalizeUnits, DEFAULT_UNITS, findStationBySlug, toStationSlug } from '@bc-marine/shared';
 
 const AppContext = createContext(null);
 
@@ -19,6 +19,9 @@ export function AppProvider({ children }) {
   const [error, setError] = useState(null);
   const [lastUpdated, setLastUpdated] = useState(null);
   const [units, setUnits] = useState(DEFAULT_UNITS);
+  const [openingStation, setOpeningStationState] = useState(defaultStation);
+  // Data waits until the saved opening station is read, so Victoria isn't fetched for nothing
+  const [startupDone, setStartupDone] = useState(false);
   // Counts requests so a slow, older response can't overwrite a newer station's data
   const latestRequestId = useRef(0);
 
@@ -46,6 +49,26 @@ export function AppProvider({ children }) {
     AsyncStorage.setItem('units', JSON.stringify(updated));
   }
 
+  // Open with the station chosen in Settings (Victoria until one is chosen)
+  useEffect(() => {
+    AsyncStorage.getItem('openingStation')
+      .then(slug => {
+        const station = slug && findStationBySlug(slug);
+        if (station) {
+          setOpeningStationState(station);
+          setActiveStation(station);
+        }
+      })
+      .catch(() => {})
+      .finally(() => setStartupDone(true));
+  }, []);
+
+  // Remember which station the app opens with on this phone
+  function setOpeningStation(station) {
+    setOpeningStationState(station);
+    AsyncStorage.setItem('openingStation', toStationSlug(station.name));
+  }
+
   // Load saved stations from device storage on app start
   useEffect(() => {
     AsyncStorage.getItem('savedStations').then(json => {
@@ -61,8 +84,8 @@ export function AppProvider({ children }) {
 
   // Fetch all data whenever the active station changes
   useEffect(() => {
-    loadData();
-  }, [activeStation]);
+    if (startupDone) loadData();
+  }, [activeStation, startupDone]);
 
   async function loadData(forceRefresh = false) {
     const requestId = ++latestRequestId.current;
@@ -134,6 +157,7 @@ export function AppProvider({ children }) {
       tides, tideEvents, weeklyTides, weather, marineForecast, observations, observationsLoading,
       loading, error, lastUpdated,
       units, setUnit,
+      openingStation, setOpeningStation,
       refresh: () => loadData(true),
     }}>
       {children}

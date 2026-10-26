@@ -1,8 +1,9 @@
 import { useEffect, useRef, useState } from 'react';
+import { useApp } from '../context/AppContext.jsx';
 import Icon from './Icon.jsx';
 import UnitsPicker from './UnitsPicker.jsx';
 
-// Settings button in the header that drops down a small panel (units for now)
+// Settings button in the header that drops down a small panel
 export default function SettingsMenu() {
   const [open, setOpen] = useState(false);
   const menuRef = useRef(null);
@@ -22,12 +23,39 @@ export default function SettingsMenu() {
       </button>
       {open && (
         <section id="settings-panel" className="settings-menu__panel" aria-label="Settings">
-          <h2 className="sidebar__label">Units</h2>
+          <OpeningStationSetting />
+          <h2 className="sidebar__label settings-menu__heading">Units</h2>
           <UnitsPicker />
-          <p className="settings-menu__note">Saved on this device until you change it.</p>
+          <p className="settings-menu__note">
+            Settings are saved on this device until you change them.
+          </p>
         </section>
       )}
     </div>
+  );
+}
+
+// Which station the app opens with, and a button to switch it to the one being viewed
+function OpeningStationSetting() {
+  const { activeStation, openingStation, setOpeningStation } = useApp();
+  const isViewingOpeningStation = activeStation.name === openingStation.name;
+
+  return (
+    <>
+      <h2 className="sidebar__label">Opening station</h2>
+      <p className="settings-menu__opening">
+        Opens with <strong>{openingStation.name}</strong>
+      </p>
+      {!isViewingOpeningStation && (
+        <button
+          type="button"
+          className="button button--wide"
+          onClick={() => setOpeningStation(activeStation)}
+        >
+          Open with {activeStation.name}
+        </button>
+      )}
+    </>
   );
 }
 

@@ -14,6 +14,8 @@ export const BC_REGIONS = [
         name: 'Dixon Entrance East',
         stations: [
           { id: '5cebf1de3d0f4a073c4bba06', name: 'Prince Rupert', lat: 54.3167, lon: -130.3167 },
+          { id: '5cebf1de3d0f4a073c4bb9ff', name: 'Port Edward', lat: 54.2290, lon: -130.2960 },
+          { id: '5cebf1de3d0f4a073c4bb92f', name: 'Kitkatla', lat: 53.8030, lon: -130.3570 },
         ],
       },
       {
@@ -27,6 +29,7 @@ export const BC_REGIONS = [
         name: 'Hecate Strait',
         stations: [
           { id: '5dd3064de0fdc4b9b4be66d5', name: 'Sandspit', lat: 53.2500, lon: -131.8167, ecSubarea: 'northern half' },
+          { id: '5cebf1de3d0f4a073c4bba3e', name: 'Daajing Giids', lat: 53.2520, lon: -132.0720, ecSubarea: 'northern half' },
         ],
       },
       {
@@ -57,6 +60,7 @@ export const BC_REGIONS = [
         name: 'Milbanke Sound',
         stations: [
           { id: '5cebf1e23d0f4a073c4bc0c2', name: 'Bella Bella', lat: 52.1581, lon: -128.1439 },
+          { id: '5cebf1e23d0f4a073c4bc0b1', name: 'Namu', lat: 51.8615, lon: -127.8657 },
         ],
       },
       {
@@ -70,6 +74,7 @@ export const BC_REGIONS = [
       {
         name: 'Johnstone Strait',
         stations: [
+          { id: '5cebf1de3d0f4a073c4bb9a4', name: 'Kelsey Bay', lat: 50.3980, lon: -125.9610 },
           { id: '5cebf1de3d0f4a073c4bb9a6', name: 'Port Neville', lat: 50.5000, lon: -126.0833 },
         ],
       },
@@ -117,6 +122,7 @@ export const BC_REGIONS = [
       {
         name: 'Georgia Strait North',
         stations: [
+          { id: '5cebf1de3d0f4a073c4bb962', name: 'Lund', lat: 49.9833, lon: -124.7667 },
           { id: '5cebf1de3d0f4a073c4bb960', name: 'Powell River', lat: 49.8353, lon: -124.5247 },
           { id: '5cebf1de3d0f4a073c4bb979', name: 'Comox', lat: 49.6667, lon: -124.9500 },
           { id: '5cebf1de3d0f4a073c4bb996', name: 'Campbell River', lat: 50.0419, lon: -125.2442 },
@@ -183,7 +189,11 @@ export const BC_COMMUNITIES = [
   // West Coast Vancouver Island
   { id: '5cebf1e23d0f4a073c4bc062', name: 'Bamfield', lat: 48.8356, lon: -125.1350, region: 'Barkley Sound', coast: 'West Coast Vancouver Island' },
   { id: '5dd3064ee0fdc4b9b4be6906', name: 'Tahsis', lat: 49.9167, lon: -126.6667, region: 'Nootka Sound', coast: 'West Coast Vancouver Island' },
+  // North Vancouver Island and Johnstone Strait
+  { id: '5cebf1de3d0f4a073c4bb9ac', name: 'Sointula', lat: 50.6300, lon: -127.0180, region: 'Queen Charlotte Strait', coast: 'Central Coast' },
+  { id: '5cebf1de3d0f4a073c4bb9a4', name: 'Sayward', lat: 50.3833, lon: -125.9500, region: 'Johnstone Strait', coast: 'Central Coast' },
   // Central Coast
+  { id: '5cebf1e23d0f4a073c4bc0c2', name: 'Shearwater', lat: 52.1470, lon: -128.0880, region: 'Milbanke Sound', coast: 'Central Coast' },
   { id: '5cebf1e23d0f4a073c4bc0b7', name: 'Bella Coola', lat: 52.3667, lon: -126.7667, region: 'Milbanke Sound', coast: 'Central Coast' },
   { id: '5cebf1e23d0f4a073c4bc0bb', name: 'Ocean Falls', lat: 52.3500, lon: -127.6833, region: 'Milbanke Sound', coast: 'Central Coast' },
   { id: '5cebf1e23d0f4a073c4bc0cc', name: 'Klemtu', lat: 52.5833, lon: -128.5167, region: 'Milbanke Sound', coast: 'Central Coast' },

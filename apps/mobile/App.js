@@ -1,7 +1,9 @@
 import { NavigationContainer, DarkTheme, DefaultTheme } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createStackNavigator } from '@react-navigation/stack';
+import { useEffect } from 'react';
 import { Text, StatusBar } from 'react-native';
+import * as SystemUI from 'expo-system-ui';
 import { ThemeProvider, useColors } from './src/theme';
 import { AppProvider, useApp } from './src/context/AppContext';
 
@@ -66,6 +68,11 @@ function navigationTheme(COLORS) {
 
 function AppNavigator() {
   const COLORS = useColors();
+
+  // Paint the app's root background in the theme colour, so no wrong colour shows behind screens
+  useEffect(() => {
+    SystemUI.setBackgroundColorAsync(COLORS.background);
+  }, [COLORS]);
 
   return (
     <NavigationContainer theme={navigationTheme(COLORS)}>

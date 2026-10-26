@@ -60,6 +60,15 @@ test('each place gets the EC forecast area it sits in', () => {
     Kitimat: 'Douglas Channel',
     'Hartley Bay': 'Douglas Channel',
     Sidney: 'Haro Strait',
+    'Daajing Giids': 'Hecate Strait',
+    'Port Edward': 'Dixon Entrance East',
+    Kitkatla: 'Dixon Entrance East',
+    'Kelsey Bay': 'Johnstone Strait',
+    Sayward: 'Johnstone Strait',
+    Namu: 'Milbanke Sound',
+    Shearwater: 'Milbanke Sound',
+    Lund: 'Georgia Strait North',
+    Sointula: 'Queen Charlotte Strait',
   };
   for (const [name, region] of Object.entries(expected)) {
     expect(findStationBySlug(toStationSlug(name))?.region, name).toBe(region);
@@ -79,6 +88,7 @@ test('places on a split EC area get their own part of it', () => {
   expect(subareaOf('Port Renfrew')).toBe('west entrance');
   expect(subareaOf('Masset')).toBe('east of langara');
   expect(subareaOf('Sandspit')).toBe('northern half');
+  expect(subareaOf('Daajing Giids')).toBe('northern half');
   expect(subareaOf('Port Louis')).toBe('northern half');
   expect(subareaOf('Tasu Sound')).toBe('southern half');
   expect(subareaOf('Comox')).toBe('north of nanaimo');

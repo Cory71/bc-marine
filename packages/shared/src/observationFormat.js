@@ -1,46 +1,34 @@
 import { degreesToCompass } from './units.js';
+import { DEFAULT_UNITS, formatSpeed, formatHeight } from './unitPreferences.js';
 
-// Display text for lighthouse and buoy readings. Every unit shown to the user
-// comes from this file, so the future units preferences only change it here.
+// Display text for lighthouse and buoy readings. Units come from the person's
+// chosen units (unitPreferences.js); readings themselves stay in kts, ft and °C.
 
 const NO_VALUE = '--';
 const MINUTE_MS = 60 * 1000;
 const OLD_READING_MS = 3 * 60 * MINUTE_MS;
 
-// Add a unit to a number, or '--' when it's missing
-function withUnit(value, unit) {
-  return value == null ? NO_VALUE : `${value} ${unit}`;
-}
-
 // 'E 17 kts' — speed only if the direction is missing
-export function formatWind(reading) {
+export function formatWind(reading, units = DEFAULT_UNITS) {
   if (reading?.windKts == null) return NO_VALUE;
-  const speed = `${reading.windKts} kts`;
+  const speed = formatSpeed(reading.windKts, units);
   return reading.windDirDeg == null ? speed : `${degreesToCompass(reading.windDirDeg)} ${speed}`;
 }
 
-export function formatGust(reading) {
-  return withUnit(reading?.gustKts, 'kts');
+export function formatGust(reading, units = DEFAULT_UNITS) {
+  return formatSpeed(reading?.gustKts, units);
 }
 
-export function formatWaves(reading) {
-  return withUnit(reading?.waveHeightFt, 'ft');
+export function formatWaves(reading, units = DEFAULT_UNITS) {
+  return formatHeight(reading?.waveHeightFt, units);
 }
 
 export function formatWavePeriod(reading) {
-  return withUnit(reading?.wavePeriodS, 's');
+  return reading?.wavePeriodS == null ? NO_VALUE : `${reading.wavePeriodS} s`;
 }
 
 export function formatPressure(reading) {
-  return withUnit(reading?.pressureHpa, 'hPa');
-}
-
-export function formatTemp(celsius) {
-  return withUnit(celsius, '°C');
-}
-
-export function formatDistance(km) {
-  return withUnit(km == null ? null : Math.round(km), 'km');
+  return reading?.pressureHpa == null ? NO_VALUE : `${reading.pressureHpa} hPa`;
 }
 
 // 'just now', '40 min ago', '2 h ago', '3 d ago'
@@ -60,19 +48,16 @@ export function isOldReading(observedAt, now = new Date()) {
 }
 
 // Short line for the dashboard card: gusts for lighthouses, waves for buoys
-export function summarizeObservation({ site, reading }) {
+export function summarizeObservation({ site, reading }, units = DEFAULT_UNITS) {
   if (!reading) return 'No recent report';
-  const extra =
-    site.type === 'buoy'
-      ? reading.waveHeightFt != null && `waves ${formatWaves(reading)}`
-      : reading.gustKts != null && `gust ${reading.gustKts}`;
-  return extra ? `${formatWind(reading)}, ${extra}` : formatWind(reading);
+  const extra = observationDetail({ site, reading }, units);
+  return extra ? `${formatWind(reading, units)}, ${extra}` : formatWind(reading, units);
 }
 
 // The second value for a site, shown beside its wind: gust for lighthouses, waves for buoys
-export function observationDetail({ site, reading }) {
+export function observationDetail({ site, reading }, units = DEFAULT_UNITS) {
   if (!reading) return '';
   if (site.type === 'buoy')
-    return reading.waveHeightFt == null ? '' : `waves ${formatWaves(reading)}`;
-  return reading.gustKts == null ? '' : `gust ${formatGust(reading)}`;
+    return reading.waveHeightFt == null ? '' : `waves ${formatWaves(reading, units)}`;
+  return reading.gustKts == null ? '' : `gust ${formatGust(reading, units)}`;
 }

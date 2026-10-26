@@ -70,7 +70,7 @@ test('readings older than 3 hours count as old', () => {
 
 test('summarizeObservation gives the short dashboard line', () => {
   expect(summarizeObservation({ site: { type: 'lighthouse' }, reading: LIGHTHOUSE_READING })).toBe(
-    'E 17 kts, gust 25'
+    'E 17 kts, gust 25 kts'
   );
   expect(summarizeObservation({ site: { type: 'buoy' }, reading: BUOY_READING })).toBe(
     'W 8 kts, waves 1.3 ft'
@@ -92,4 +92,12 @@ test('observationDetail gives the second value for a site: gust or waves', () =>
     observationDetail({ site: { type: 'buoy' }, reading: { ...BUOY_READING, waveHeightFt: null } })
   ).toBe('');
   expect(observationDetail({ site: { type: 'buoy' }, reading: null })).toBe('');
+});
+
+test('observation text follows the chosen units', () => {
+  const metric = { speed: 'kmh', height: 'm', temperature: 'c', distance: 'km' };
+  expect(formatWind(LIGHTHOUSE_READING, metric)).toBe('E 31 km/h');
+  expect(observationDetail({ site: { type: 'buoy' }, reading: BUOY_READING }, metric)).toBe(
+    'waves 0.4 m'
+  );
 });

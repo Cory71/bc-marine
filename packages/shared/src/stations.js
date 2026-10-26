@@ -26,3 +26,10 @@ export function getDefaultStation() {
 export function getStationRegion(station) {
   return station.region ?? BC_STATIONS.find(s => s.id === station.id)?.region;
 }
+
+// What the tide card says when there are no tides to show
+export function noTidesMessage(station) {
+  return station?.offshore
+    ? 'No tide station out here: this is an offshore forecast area.'
+    : 'No tide data available for this station.';
+}

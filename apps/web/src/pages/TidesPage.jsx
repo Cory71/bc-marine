@@ -5,6 +5,7 @@ import {
   getRecentAndUpcomingEvents,
   formatTime,
   formatHeight,
+  noTidesMessage,
 } from '@bc-marine/shared';
 import { useApp } from '../context/AppContext.jsx';
 import DetailPage, { EmptyState, DetailPlaceholder } from '../components/DetailPage.jsx';
@@ -30,8 +31,8 @@ export default function TidesPage() {
 }
 
 function TidesContent() {
-  const { tides, tideEvents, units } = useApp();
-  if (tides.length === 0) return <EmptyState message="No tide data available for this station." />;
+  const { activeStation, tides, tideEvents, units } = useApp();
+  if (tides.length === 0) return <EmptyState message={noTidesMessage(activeStation)} />;
 
   const current = findClosestReading(tides);
   const trend = getTideTrend(tides);

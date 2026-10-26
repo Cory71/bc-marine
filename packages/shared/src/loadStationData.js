@@ -4,17 +4,26 @@ import { fetchMarineForecast } from './services/ecService.js';
 import { fetchNearbyObservations } from './services/observationService.js';
 import { clearCache } from './services/cache.js';
 import { getStationRegion } from './stations.js';
+import { getEcSubarea, ecCacheKey } from './services/ecFeeds.js';
 
 // Every data set the apps show for a station. To add a new data layer,
 // add an entry here: its key in the result, and how to load it.
 const DATA_SOURCES = [
-  { key: 'tides', load: station => fetchTides(station.id) },
-  { key: 'tideEvents', load: station => fetchTideEvents(station.id) },
-  { key: 'weeklyTides', load: station => fetchWeeklyTides(station.id) },
+  { key: 'tides', load: station => withTides(station, fetchTides) },
+  { key: 'tideEvents', load: station => withTides(station, fetchTideEvents) },
+  { key: 'weeklyTides', load: station => withTides(station, fetchWeeklyTides) },
   { key: 'weather', load: station => fetchWeather(station.lat, station.lon) },
-  { key: 'marineForecast', load: (station, region) => fetchMarineForecast(region) },
+  {
+    key: 'marineForecast',
+    load: (station, region) => fetchMarineForecast(region, getEcSubarea(station)),
+  },
   { key: 'observations', load: station => fetchNearbyObservations(station) },
 ];
+
+// Offshore areas have no tide station, so they get no tides instead of a DFO call
+function withTides(station, fetchTideData) {
+  return station.offshore ? Promise.resolve([]) : fetchTideData(station.id);
+}
 
 // Load every data set for a station. Never throws: a failed fetch gives null
 // for that key and its name in `failures`, so callers can keep the old data.
@@ -48,6 +57,6 @@ function clearStationCache(station, region) {
   clearCache(`tideEvents_${station.id}`);
   clearCache(`weekly_${station.id}`);
   clearCache(`weather_${station.lat}_${station.lon}`);
-  clearCache(`ec_${region}`);
+  clearCache(ecCacheKey(region, getEcSubarea(station)));
   clearCache(`observations_${station.lat}_${station.lon}`);
 }

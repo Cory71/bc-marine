@@ -5,6 +5,8 @@ import { OBSERVATION_SITES } from '../observationSites.js';
 import { readLighthouseFeature, parseNdbcText, parseNdbcRows } from '../observationReaders.js';
 
 const NEARBY_RADIUS_KM = 100;
+// Offshore areas are far from every site, so they look further out
+const OFFSHORE_RADIUS_KM = 300;
 const SITES_TO_SHOW = 3;
 // Lighthouses report every minute, so keep observations for 10 minutes, not 30
 const OBSERVATIONS_TTL_MS = 10 * 60 * 1000;
@@ -21,15 +23,16 @@ export function configureBuoyFeedUrl(buildUrl) {
   currentBuildBuoyUrl = buildUrl;
 }
 
-// The 3 nearest sites within 100 km that report for the station's coast group,
+// The 3 nearest sites within 100 km (300 km offshore) that report for the station's coast group,
 // nearest first. Sites from another group are skipped even when closer (straight-line
 // distance can cut across Vancouver Island), so a station may get fewer than 3.
 // If none of the 3 is a buoy but one qualifies, it replaces the third, so waves show when they can.
 export function selectNearbySites(station, sites = OBSERVATION_SITES) {
+  const radiusKm = station.offshore ? OFFSHORE_RADIUS_KM : NEARBY_RADIUS_KM;
   const nearby = sites
     .filter(site => site.coasts.includes(station.coast))
     .map(site => ({ site, distanceKm: distanceKm(station.lat, station.lon, site.lat, site.lon) }))
-    .filter(entry => entry.distanceKm <= NEARBY_RADIUS_KM)
+    .filter(entry => entry.distanceKm <= radiusKm)
     .sort((a, b) => a.distanceKm - b.distanceKm);
 
   const chosen = nearby.slice(0, SITES_TO_SHOW);

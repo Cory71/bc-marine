@@ -6,7 +6,6 @@
 }
 
 html {
-  color-scheme: dark;
   -webkit-text-size-adjust: 100%;
 }
 
@@ -92,8 +91,8 @@ ul {
 }
 
 .button:hover:not(:disabled) {
-  background: rgba(126, 206, 244, 0.16);
-  border-color: rgba(126, 206, 244, 0.45);
+  background: rgba(var(--accent-rgb), 0.16);
+  border-color: rgba(var(--accent-rgb), 0.45);
 }
 
 .button:disabled {

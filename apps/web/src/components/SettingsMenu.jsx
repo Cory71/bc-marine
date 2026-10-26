@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
+import { THEME_OPTIONS } from '@bc-marine/shared';
 import { useApp } from '../context/AppContext.jsx';
 import Icon from './Icon.jsx';
 import UnitsPicker from './UnitsPicker.jsx';
@@ -24,6 +25,7 @@ export default function SettingsMenu() {
       {open && (
         <section id="settings-panel" className="settings-menu__panel" aria-label="Settings">
           <OpeningStationSetting />
+          <ThemeSetting />
           <h2 className="sidebar__label settings-menu__heading">Units</h2>
           <UnitsPicker />
           <p className="settings-menu__note">
@@ -55,6 +57,31 @@ function OpeningStationSetting() {
           Open with {activeStation.name}
         </button>
       )}
+    </>
+  );
+}
+
+// Device / Light / Dark buttons, styled like the unit buttons
+function ThemeSetting() {
+  const { theme, setTheme } = useApp();
+
+  return (
+    <>
+      <h2 className="sidebar__label settings-menu__heading">Theme</h2>
+      <div role="group" aria-label="Theme" className="units-picker__options">
+        {THEME_OPTIONS.map(option => (
+          <button
+            key={option.value}
+            type="button"
+            className="units-picker__option settings-menu__theme-option"
+            aria-pressed={theme === option.value}
+            onClick={() => setTheme(option.value)}
+          >
+            {option.label}
+          </button>
+        ))}
+      </div>
+      <p className="settings-menu__note">Device follows your computer or phone.</p>
     </>
   );
 }

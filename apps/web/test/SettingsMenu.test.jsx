@@ -15,6 +15,8 @@ function mockApp(overrides = {}) {
     activeStation: VICTORIA,
     openingStation: VICTORIA,
     setOpeningStation: vi.fn(),
+    theme: 'device',
+    setTheme: vi.fn(),
     ...overrides,
   });
 }
@@ -84,4 +86,15 @@ test('can make the station being viewed the opening station', () => {
   openMenu();
   fireEvent.click(screen.getByRole('button', { name: 'Open with Tofino' }));
   expect(setOpeningStation).toHaveBeenCalledWith(TOFINO);
+});
+
+test('the theme can follow the device or be set to light or dark', () => {
+  const setTheme = vi.fn();
+  mockApp({ setTheme });
+  render(<SettingsMenu />);
+  openMenu();
+  const themeGroup = screen.getByRole('group', { name: 'Theme' });
+  expect(themeGroup.querySelector('[aria-pressed="true"]').textContent).toBe('Device');
+  fireEvent.click(screen.getByRole('button', { name: 'Dark' }));
+  expect(setTheme).toHaveBeenCalledWith('dark');
 });

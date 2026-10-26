@@ -9,6 +9,7 @@ import {
 import { readSavedSlugs, writeSavedSlugs } from './savedStationsStorage.js';
 import { readUnits, writeUnits } from './unitsStorage.js';
 import { readOpeningSlug, writeOpeningSlug } from './openingStationStorage.js';
+import { readTheme, writeTheme, applyTheme } from './themeStorage.js';
 
 const AppContext = createContext(null);
 
@@ -20,6 +21,7 @@ export function AppProvider({ children }) {
   const saved = useSavedStations();
   const data = useStationData(activeStation.station);
   const unitChoices = useUnitChoices();
+  const themeChoice = useThemeChoice();
 
   const value = {
     activeStation: activeStation.station,
@@ -28,6 +30,7 @@ export function AppProvider({ children }) {
     ...data,
     ...unitChoices,
     ...opening,
+    ...themeChoice,
   };
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;
 }
@@ -77,6 +80,21 @@ function useOpeningStation() {
   }
 
   return { openingStation, setOpeningStation };
+}
+
+// --- Light / dark theme ("device" follows the computer or phone), kept in localStorage ---
+function useThemeChoice() {
+  const [theme, setThemeState] = useState(() => readTheme());
+
+  // Show the theme on the page whenever it changes
+  useEffect(() => applyTheme(theme), [theme]);
+
+  function setTheme(newTheme) {
+    setThemeState(newTheme);
+    writeTheme(newTheme);
+  }
+
+  return { theme, setTheme };
 }
 
 // --- Display units (kts/km/h/mph, ft/m, °C/°F, km/nm), kept in localStorage ---

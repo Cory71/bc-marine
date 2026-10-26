@@ -1,7 +1,7 @@
-import { View, Text, ScrollView, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, Text, ScrollView, TouchableOpacity } from 'react-native';
 import { useApp } from '../context/AppContext';
 import SettingsButton from '../components/SettingsButton';
-import { COLORS } from '../theme';
+import { useColors, makeStyles } from '../theme';
 import { formatTime, formatSpeed, formatHeight, formatDistance } from '@bc-marine/shared';
 
 // 16-point compass for more precise wind/swell direction
@@ -12,6 +12,8 @@ function degreesToCompass(deg) {
 }
 
 export default function WeatherDetailScreen({ navigation }) {
+  const styles = useStyles();
+  const COLORS = useColors();
   const { activeStation, weather, units } = useApp();
 
   const now = new Date();
@@ -109,26 +111,26 @@ export default function WeatherDetailScreen({ navigation }) {
   );
 }
 
-const styles = StyleSheet.create({
+const useStyles = makeStyles(COLORS => ({
   container: { flex: 1, backgroundColor: COLORS.background },
   topRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingRight: 10 },
   back: { padding: 16, paddingBottom: 4 },
   backText: { color: COLORS.accent, fontSize: 13 },
   title: { color: COLORS.textPrimary, fontSize: 18, fontWeight: 'bold', paddingHorizontal: 16 },
   subtitle: { color: COLORS.textMuted, fontSize: 10, paddingHorizontal: 16, marginBottom: 12 },
-  card: { marginHorizontal: 16, marginBottom: 10, backgroundColor: 'rgba(126,206,244,0.06)', borderWidth: 1, borderColor: 'rgba(126,206,244,0.15)', borderRadius: 10, padding: 12 },
+  card: { marginHorizontal: 16, marginBottom: 10, backgroundColor: `rgba(${COLORS.accentRgb},0.06)`, borderWidth: 1, borderColor: `rgba(${COLORS.accentRgb},0.15)`, borderRadius: 10, padding: 12 },
   cardLabel: { color: COLORS.accent, fontSize: 10, textTransform: 'uppercase', letterSpacing: 1, marginBottom: 8 },
   row: { flexDirection: 'row', gap: 8 },
-  statBox: { flex: 1, backgroundColor: 'rgba(126,206,244,0.1)', borderRadius: 6, padding: 8, alignItems: 'center' },
+  statBox: { flex: 1, backgroundColor: `rgba(${COLORS.accentRgb},0.1)`, borderRadius: 6, padding: 8, alignItems: 'center' },
   statLabel: { color: COLORS.accent, fontSize: 9, textTransform: 'uppercase' },
   statValue: { color: COLORS.textPrimary, fontSize: 13, fontWeight: 'bold', marginTop: 2, textAlign: 'center' },
   statSub: { color: COLORS.textSecondary, fontSize: 10, textAlign: 'center' },
   tableHeader: { flexDirection: 'row', marginBottom: 4 },
   col: { flex: 1, color: COLORS.textMuted, fontSize: 9, textTransform: 'uppercase' },
-  tableRow: { flexDirection: 'row', paddingVertical: 5, borderBottomWidth: 1, borderBottomColor: 'rgba(126,206,244,0.08)' },
-  currentRow: { backgroundColor: 'rgba(77,204,136,0.05)', borderRadius: 4 },
+  tableRow: { flexDirection: 'row', paddingVertical: 5, borderBottomWidth: 1, borderBottomColor: `rgba(${COLORS.accentRgb},0.08)` },
+  currentRow: { backgroundColor: `rgba(${COLORS.safeRgb},0.05)`, borderRadius: 4 },
   colText: { flex: 1, color: COLORS.textSecondary, fontSize: 10 },
-  emptyCard: { marginHorizontal: 16, marginTop: 12, padding: 16, backgroundColor: 'rgba(126,206,244,0.06)', borderWidth: 1, borderColor: 'rgba(126,206,244,0.15)', borderRadius: 10, alignItems: 'center' },
+  emptyCard: { marginHorizontal: 16, marginTop: 12, padding: 16, backgroundColor: `rgba(${COLORS.accentRgb},0.06)`, borderWidth: 1, borderColor: `rgba(${COLORS.accentRgb},0.15)`, borderRadius: 10, alignItems: 'center' },
   emptyText: { color: COLORS.textSecondary, fontSize: 13, textAlign: 'center' },
   emptySub: { color: COLORS.textMuted, fontSize: 11, marginTop: 6, textAlign: 'center' },
-});
+}));

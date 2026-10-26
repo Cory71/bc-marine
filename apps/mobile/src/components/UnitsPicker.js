@@ -1,12 +1,13 @@
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, Text, TouchableOpacity } from 'react-native';
 import { UNIT_OPTIONS } from '@bc-marine/shared';
 import { useApp } from '../context/AppContext';
-import { COLORS } from '../theme';
+import { makeStyles } from '../theme';
 
 const KIND_LABELS = { speed: 'Speed', height: 'Height', temperature: 'Temperature', distance: 'Distance' };
 
 // A row of toggle buttons for each kind of unit; the choice is saved on this phone
 export default function UnitsPicker() {
+  const styles = useStyles();
   const { units, setUnit } = useApp();
 
   return (
@@ -36,12 +37,12 @@ export default function UnitsPicker() {
   );
 }
 
-const styles = StyleSheet.create({
+const useStyles = makeStyles(COLORS => ({
   row: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingVertical: 6 },
   label: { color: COLORS.textSecondary, fontSize: 13 },
   options: { flexDirection: 'row', borderWidth: 1, borderColor: COLORS.cardBorder, borderRadius: 8, overflow: 'hidden' },
   option: { paddingHorizontal: 12, paddingVertical: 6 },
-  selected: { backgroundColor: 'rgba(126,206,244,0.18)' },
+  selected: { backgroundColor: `rgba(${COLORS.accentRgb},0.18)` },
   optionText: { color: COLORS.textSecondary, fontSize: 13, fontWeight: '600' },
   selectedText: { color: COLORS.accent },
-});
+}));

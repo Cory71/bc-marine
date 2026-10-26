@@ -1,10 +1,11 @@
 import { View } from 'react-native';
 import Svg, { Path, Circle, Line, Text as SvgText } from 'react-native-svg';
-import { COLORS } from '../theme';
+import { useColors } from '../theme';
 import { formatTime } from '@bc-marine/shared';
 
 // Draws a smooth tide curve from an array of { time, heightFt } hourly points
 export default function TideCurve({ tides, width = 300, height = 80 }) {
+  const COLORS = useColors();
   if (!tides || tides.length < 2) return null;
 
   const maxFt = Math.max(...tides.map(t => t.heightFt));
@@ -37,10 +38,10 @@ export default function TideCurve({ tides, width = 300, height = 80 }) {
   return (
     <View>
       <Svg width={width} height={height}>
-        <Path d={fillD} fill="rgba(126,206,244,0.15)" />
+        <Path d={fillD} fill={`rgba(${COLORS.accentRgb},0.15)`} />
         <Path d={d} fill="none" stroke={COLORS.accent} strokeWidth={2} />
         <Circle cx={currentPoint.x} cy={currentPoint.y} r={4} fill={COLORS.safe} />
-        <Line x1={currentPoint.x} y1={0} x2={currentPoint.x} y2={height} stroke="rgba(77,204,136,0.4)" strokeWidth={1} strokeDasharray="3,3" />
+        <Line x1={currentPoint.x} y1={0} x2={currentPoint.x} y2={height} stroke={`rgba(${COLORS.safeRgb},0.4)`} strokeWidth={1} strokeDasharray="3,3" />
         <SvgText x={currentPoint.x + 4} y={currentPoint.y - 6} fill={COLORS.safe} fontSize={8}>Now</SvgText>
       </Svg>
     </View>

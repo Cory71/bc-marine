@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react';
-import { View, Text, ScrollView, TouchableOpacity, StyleSheet, ActivityIndicator } from 'react-native';
+import { View, Text, ScrollView, TouchableOpacity, ActivityIndicator } from 'react-native';
 import { useApp } from '../context/AppContext';
 import SettingsButton from '../components/SettingsButton';
-import { COLORS } from '../theme';
+import { useColors, makeStyles } from '../theme';
 import { ReadingStats } from './ObservationsDetailScreen';
 import {
   findObservationSite,
@@ -19,6 +19,7 @@ import {
 // One lighthouse or buoy: its latest reading and the last 12 hours, so you can
 // see whether the wind is building, easing or holding steady
 export default function SiteDetailScreen({ route, navigation }) {
+  const styles = useStyles();
   const { activeStation, units } = useApp();
   const site = findObservationSite(route.params?.siteId);
   const { status, history } = useSiteHistory(site);
@@ -52,6 +53,8 @@ export default function SiteDetailScreen({ route, navigation }) {
 }
 
 function SiteReadings({ status, history, showWaves, units }) {
+  const styles = useStyles();
+  const COLORS = useColors();
   if (status === 'loading') return <ActivityIndicator color={COLORS.accent} style={{ marginTop: 24 }} />;
   if (status === 'failed') return <Message text="Readings unavailable. Try again shortly." />;
   const latest = history[0];
@@ -104,6 +107,7 @@ function useSiteHistory(site) {
 }
 
 function Message({ text }) {
+  const styles = useStyles();
   return (
     <View style={styles.card}>
       <Text style={styles.message}>{text}</Text>
@@ -111,18 +115,18 @@ function Message({ text }) {
   );
 }
 
-const styles = StyleSheet.create({
+const useStyles = makeStyles(COLORS => ({
   container: { flex: 1, backgroundColor: COLORS.background },
   topRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingRight: 10 },
   back: { padding: 16, paddingBottom: 4 },
   backText: { color: COLORS.accent, fontSize: 13 },
   title: { color: COLORS.textPrimary, fontSize: 18, fontWeight: 'bold', paddingHorizontal: 16 },
   subtitle: { color: COLORS.textMuted, fontSize: 10, paddingHorizontal: 16, marginBottom: 12 },
-  card: { marginHorizontal: 16, marginBottom: 10, backgroundColor: 'rgba(126,206,244,0.06)', borderWidth: 1, borderColor: 'rgba(126,206,244,0.15)', borderRadius: 10, padding: 12 },
+  card: { marginHorizontal: 16, marginBottom: 10, backgroundColor: `rgba(${COLORS.accentRgb},0.06)`, borderWidth: 1, borderColor: `rgba(${COLORS.accentRgb},0.15)`, borderRadius: 10, padding: 12 },
   cardLabel: { color: COLORS.accent, fontSize: 10, textTransform: 'uppercase', letterSpacing: 1, marginBottom: 8 },
-  tableRow: { flexDirection: 'row', paddingVertical: 5, borderBottomWidth: 1, borderBottomColor: 'rgba(126,206,244,0.08)' },
+  tableRow: { flexDirection: 'row', paddingVertical: 5, borderBottomWidth: 1, borderBottomColor: `rgba(${COLORS.accentRgb},0.08)` },
   timeCol: { flex: 1.1 },
   col: { flex: 1, color: COLORS.textMuted, fontSize: 9, textTransform: 'uppercase' },
   colText: { flex: 1, color: COLORS.textSecondary, fontSize: 11 },
   message: { color: COLORS.textSecondary, fontSize: 13, textAlign: 'center' },
-});
+}));

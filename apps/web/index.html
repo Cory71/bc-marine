@@ -3,7 +3,17 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="theme-color" content="#0a1628" />
+    <meta name="theme-color" content="#0a1628" media="(prefers-color-scheme: dark)" />
+    <meta name="theme-color" content="#f3f7fb" media="(prefers-color-scheme: light)" />
+    <!-- Apply a saved Light/Dark choice before the page draws, so it doesn't flash -->
+    <script>
+      try {
+        var savedTheme = localStorage.getItem('theme');
+        if (savedTheme === 'light' || savedTheme === 'dark') {
+          document.documentElement.dataset.theme = savedTheme;
+        }
+      } catch (error) {}
+    </script>
     <title>BC Marine: Tides, Wind & Marine Forecasts for the BC Coast</title>
     <meta
       name="description"

@@ -1,5 +1,12 @@
 import { useState } from 'react';
-import { BC_REGIONS, ALL_LOCATIONS, findNearestStation, toStationSlug } from '@bc-marine/shared';
+import { Link, useLocation } from 'react-router';
+import {
+  BC_REGIONS,
+  ALL_LOCATIONS,
+  OBSERVATION_SITES,
+  findNearestStation,
+  toStationSlug,
+} from '@bc-marine/shared';
 import { useApp } from '../context/AppContext.jsx';
 import Icon from '../components/Icon.jsx';
 
@@ -7,6 +14,12 @@ import Icon from '../components/Icon.jsx';
 export default function Sidebar({ open, onClose, searchInputRef }) {
   const { setActiveStationBySlug, saveStation } = useApp();
   const [query, setQuery] = useState('');
+
+  // Clear the search and close the drawer (after picking a lighthouse or buoy)
+  function finishSearch() {
+    setQuery('');
+    onClose();
+  }
 
   // Selecting a station also saves it (same as the mobile app)
   function selectStation(station) {
@@ -17,7 +30,11 @@ export default function Sidebar({ open, onClose, searchInputRef }) {
   }
 
   return (
-    <aside id="station-sidebar" className={`sidebar ${open ? 'sidebar--open' : ''}`} aria-label="Stations">
+    <aside
+      id="station-sidebar"
+      className={`sidebar ${open ? 'sidebar--open' : ''}`}
+      aria-label="Stations"
+    >
       <div className="sidebar__top">
         <p className="sidebar__brand">BC Marine</p>
         <button type="button" className="icon-button sidebar__close" onClick={onClose}>
@@ -28,7 +45,7 @@ export default function Sidebar({ open, onClose, searchInputRef }) {
 
       <StationSearch query={query} onQueryChange={setQuery} inputRef={searchInputRef} />
       {query ? (
-        <SearchResults query={query} onSelect={selectStation} />
+        <SearchResults query={query} onSelect={selectStation} onPickSite={finishSearch} />
       ) : (
         <>
           <NearestStationButton onSelect={selectStation} />
@@ -57,7 +74,7 @@ function StationSearch({ query, onQueryChange, inputRef }) {
 }
 
 // Case-insensitive match on station name or weather area, like the mobile app
-function SearchResults({ query, onSelect }) {
+function SearchResults({ query, onSelect, onPickSite }) {
   const text = query.toLowerCase();
   const results = ALL_LOCATIONS.filter(
     location =>
@@ -69,7 +86,37 @@ function SearchResults({ query, onSelect }) {
       <h2 className="sidebar__label">Search results</h2>
       {results.length === 0 && <p className="sidebar__empty">No stations found.</p>}
       <StationList stations={results} onSelect={onSelect} showRegion />
+      <SiteResults text={text} onPick={onPickSite} />
     </section>
+  );
+}
+
+// Lighthouses and buoys matching the search, linking to their own pages
+function SiteResults({ text, onPick }) {
+  const { search } = useLocation();
+  const sites = OBSERVATION_SITES.filter(site => site.name.toLowerCase().includes(text));
+  if (sites.length === 0) return null;
+
+  return (
+    <>
+      <h2 className="sidebar__label sidebar__label--spaced">Lighthouses &amp; buoys</h2>
+      <ul className="station-list">
+        {sites.map(site => (
+          <li key={site.id}>
+            <Link
+              to={{ pathname: `/observations/${site.id}`, search }}
+              className="station-button"
+              onClick={onPick}
+            >
+              <span>{site.name}</span>
+              <span className={`obs-badge obs-badge--${site.type}`}>
+                {site.type === 'buoy' ? 'Buoy' : 'Lighthouse'}
+              </span>
+            </Link>
+          </li>
+        ))}
+      </ul>
+    </>
   );
 }
 
@@ -97,7 +144,12 @@ function NearestStationButton({ onSelect }) {
 
   return (
     <div className="sidebar__section">
-      <button type="button" className="button button--wide" onClick={handleClick} disabled={locating}>
+      <button
+        type="button"
+        className="button button--wide"
+        onClick={handleClick}
+        disabled={locating}
+      >
         <Icon name="location" />
         {locating ? 'Finding your location…' : 'Use my location'}
       </button>

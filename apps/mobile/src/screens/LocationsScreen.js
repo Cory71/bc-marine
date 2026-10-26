@@ -3,7 +3,7 @@ import { View, Text, TextInput, ScrollView, StyleSheet, TouchableOpacity, Alert 
 import * as Location from 'expo-location';
 import { useApp } from '../context/AppContext';
 import { COLORS } from '../theme';
-import { BC_REGIONS, BC_STATIONS, BC_COMMUNITIES, findNearestStation } from '@bc-marine/shared';
+import { BC_REGIONS, BC_STATIONS, BC_COMMUNITIES, OBSERVATION_SITES, findNearestStation } from '@bc-marine/shared';
 
 export default function LocationsScreen({ navigation }) {
   const { activeStation, setActiveStation, savedStations, saveStation } = useApp();
@@ -16,6 +16,9 @@ export default function LocationsScreen({ navigation }) {
         s.name.toLowerCase().includes(query.toLowerCase()) ||
         s.region.toLowerCase().includes(query.toLowerCase())
       )
+    : [];
+  const siteResults = query
+    ? OBSERVATION_SITES.filter(site => site.name.toLowerCase().includes(query.toLowerCase()))
     : [];
 
   function handleSelectStation(station) {
@@ -65,9 +68,23 @@ export default function LocationsScreen({ navigation }) {
       {query !== '' && (
         <View style={styles.section}>
           <Text style={styles.sectionLabel}>Search Results</Text>
-          {searchResults.length === 0 && (
+          {searchResults.length === 0 && siteResults.length === 0 && (
             <Text style={styles.emptyText}>No stations found.</Text>
           )}
+          {/* Lighthouses and buoys open their own screen on the Home tab */}
+          {siteResults.map(site => (
+            <TouchableOpacity
+              key={site.id}
+              style={styles.stationRow}
+              onPress={() => navigation.navigate('Home', { screen: 'SiteDetail', params: { siteId: site.id } })}
+            >
+              <View>
+                <Text style={styles.stationName}>{site.name}</Text>
+                <Text style={styles.stationArea}>{site.type === 'buoy' ? 'Buoy' : 'Lighthouse'}</Text>
+              </View>
+              <Text style={styles.arrow}>›</Text>
+            </TouchableOpacity>
+          ))}
           {searchResults.map((station, i) => (
             <TouchableOpacity key={`${station.id}_${i}`} style={styles.stationRow} onPress={() => handleSelectStation(station)}>
               <View>

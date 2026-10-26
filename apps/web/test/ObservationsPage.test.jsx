@@ -70,3 +70,9 @@ test('no nearby sites shows an empty state', () => {
   renderPage([]);
   expect(screen.getByText('No observation sites nearby.')).toBeTruthy();
 });
+
+test('each tile links to that site page, keeping the station', () => {
+  renderPage([RACE_ROCKS]);
+  const link = screen.getByRole('link', { name: /race rocks/i });
+  expect(link.getAttribute('href')).toBe('/observations/race-rocks?station=victoria');
+});

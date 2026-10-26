@@ -4,6 +4,8 @@ import {
   fetchNearbyObservations,
   configureBuoyFeedUrl,
   buildDirectBuoyFeedUrl,
+  fetchSiteHistory,
+  findObservationSite,
 } from '../src/services/observationService.js';
 
 const VICTORIA = {
@@ -121,4 +123,30 @@ test('only picks sites that report for the same coast group as the station', () 
   ]);
   const chosen = selectNearbySites(VICTORIA, [acrossTheIsland, LIGHT_10, sharedBoundary]);
   expect(chosen.map(entry => entry.site.name)).toEqual(['Light10', 'Shared']);
+});
+
+test('fetchSiteHistory asks EC for hourly lighthouse readings only', async () => {
+  const fetchMock = stubFetch();
+  const history = await fetchSiteHistory({ ...LIGHT_10, sourceId: 'HIST-L' });
+  const url = new URL(fetchMock.mock.calls[0][0]);
+  expect(url.searchParams.get('_is-minutely_obs-value')).toBe('false');
+  expect(url.searchParams.get('limit')).toBe('12');
+  expect(history[0].windKts).toBe(17);
+});
+
+test('fetchSiteHistory reads several hours from a NOAA buoy file', async () => {
+  const twoHours =
+    '#YY  MM DD hh mm WDIR WSPD GST  WVHT\n#yr  mo dy hr mn degT m/s  m/s     m\n' +
+    '2026 10 25 23 00 270  4.0  4.0   0.4\n2026 10 25 22 00 250  5.0  6.0   0.5\n';
+  vi.stubGlobal(
+    'fetch',
+    vi.fn(() => Promise.resolve(new Response(twoHours)))
+  );
+  const history = await fetchSiteHistory({ ...BUOY_60, sourceId: 'HIST-B' });
+  expect(history.map(r => r.waveHeightFt)).toEqual([1.3, 1.6]);
+});
+
+test('findObservationSite looks a site up by its id', () => {
+  expect(findObservationSite('race-rocks').name).toBe('Race Rocks');
+  expect(findObservationSite('atlantis')).toBeUndefined();
 });

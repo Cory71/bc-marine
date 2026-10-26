@@ -43,7 +43,7 @@ export default function ObservationTile({ site, distanceKm, reading }) {
 }
 
 // Label and value pairs, skipping anything the site didn't report
-function ReadingStats({ reading }) {
+export function ReadingStats({ reading }) {
   const stats = [
     ['Wind', reading.windKts, formatWind(reading)],
     ['Gust (1 h)', reading.gustKts, formatGust(reading)],

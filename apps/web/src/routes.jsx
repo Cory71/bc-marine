@@ -9,6 +9,7 @@ const TidesPage = lazy(() => import('./pages/TidesPage.jsx'));
 const WeatherPage = lazy(() => import('./pages/WeatherPage.jsx'));
 const CurrentsPage = lazy(() => import('./pages/CurrentsPage.jsx'));
 const ObservationsPage = lazy(() => import('./pages/ObservationsPage.jsx'));
+const SitePage = lazy(() => import('./pages/SitePage.jsx'));
 
 // Every view sits inside the shell, so the sidebar and header stay put
 export default function AppRoutes() {
@@ -20,6 +21,7 @@ export default function AppRoutes() {
         <Route path="weather" element={<LazyPage page={<WeatherPage />} />} />
         <Route path="currents" element={<LazyPage page={<CurrentsPage />} />} />
         <Route path="observations" element={<LazyPage page={<ObservationsPage />} />} />
+        <Route path="observations/:siteId" element={<LazyPage page={<SitePage />} />} />
         {/* Unknown paths show the dashboard rather than a blank page */}
         <Route path="*" element={<DashboardPage />} />
       </Route>

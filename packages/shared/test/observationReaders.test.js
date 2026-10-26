@@ -1,5 +1,5 @@
 import { test, expect } from 'vitest';
-import { readLighthouseFeature, parseNdbcText } from '../src/observationReaders.js';
+import { readLighthouseFeature, parseNdbcText, parseNdbcRows } from '../src/observationReaders.js';
 
 // Race Rocks, as returned by EC GeoMet swob-realtime (only the fields we use)
 const RACE_ROCKS = {
@@ -78,4 +78,20 @@ test('an unreadable observation time gives no reading, never "NaN"', () => {
     NDBC_HEADER +
     'MM MM 25 23 00 270  4.0  4.0   0.4     4    MM  MM 1014.5  10.0  11.1    MM   MM -0.2    MM\n';
   expect(parseNdbcText(badTime)).toBeNull();
+});
+
+test('parseNdbcRows returns the newest hourly rows first, up to a limit, skipping unreadable ones', () => {
+  const text =
+    NDBC_HEADER +
+    '2026 10 25 23 00 270  4.0  4.0   0.4     4    MM  MM 1014.5  10.0  11.1    MM   MM -0.2    MM\n' +
+    'MM   10 25 22 00 250  4.0  4.0   0.5     4    MM  MM 1014.6  10.1  11.1    MM   MM +0.1    MM\n' +
+    '2026 10 25 21 00 240  5.0  6.0   0.6     5    MM  MM 1014.8  10.2  11.1    MM   MM +0.1    MM\n' +
+    '2026 10 25 20 00 230  6.0  7.0   0.7     5    MM  MM 1015.0  10.3  11.1    MM   MM +0.1    MM\n';
+  const rows = parseNdbcRows(text, 2);
+  expect(rows.map(r => r.observedAt.toISOString())).toEqual([
+    '2026-10-25T23:00:00.000Z',
+    '2026-10-25T21:00:00.000Z',
+  ]);
+  expect(rows[1].windKts).toBe(10);
+  expect(parseNdbcRows(NDBC_HEADER, 12)).toEqual([]);
 });

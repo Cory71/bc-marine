@@ -33,7 +33,15 @@ export default function ObservationsDetailScreen({ navigation }) {
           <Text style={styles.emptySub}>There's no lighthouse weather station or buoy within 100 km.</Text>
         </View>
       ) : (
-        observations.map(observation => <ObservationTile key={observation.site.id} {...observation} />)
+        observations.map(observation => (
+          // Tap a tile to see that site's last 12 hours
+          <TouchableOpacity
+            key={observation.site.id}
+            onPress={() => navigation.navigate('SiteDetail', { siteId: observation.site.id })}
+          >
+            <ObservationTile {...observation} />
+          </TouchableOpacity>
+        ))
       )}
       <View style={{ height: 20 }} />
     </ScrollView>
@@ -64,7 +72,7 @@ function ObservationTile({ site, distanceKm, reading }) {
 }
 
 // Label/value pairs in two columns, skipping anything the site didn't report
-function ReadingStats({ reading }) {
+export function ReadingStats({ reading }) {
   const stats = [
     ['Wind', reading.windKts, formatWind(reading)],
     ['Gust (1 h)', reading.gustKts, formatGust(reading)],

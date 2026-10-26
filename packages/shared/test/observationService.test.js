@@ -150,3 +150,10 @@ test('findObservationSite looks a site up by its id', () => {
   expect(findObservationSite('race-rocks').name).toBe('Race Rocks');
   expect(findObservationSite('atlantis')).toBeUndefined();
 });
+
+test('an offshore area looks up to 300 km out, since no site is within 100 km', () => {
+  const offshore = { ...VICTORIA, offshore: true };
+  expect(selectNearbySites(offshore, [BUOY_150]).map(entry => entry.site.name)).toEqual([
+    'Buoy150',
+  ]);
+});

@@ -10,6 +10,7 @@ import {
   formatSpeed,
   formatHeight,
   formatDistance,
+  noTidesMessage,
 } from '@bc-marine/shared';
 import { useApp } from '../context/AppContext.jsx';
 import Card from '../components/Card.jsx';
@@ -24,7 +25,7 @@ const NO_VALUE = '--';
 // At-a-glance conditions for the active station. Each card fills in as soon as
 // its own data source arrives, instead of waiting for the slowest one.
 export default function DashboardPage() {
-  const { loading, lastUpdated } = useApp();
+  const { activeStation, loading, lastUpdated } = useApp();
   // Fade the old numbers slightly while a refresh is running
   const isRefreshing = loading && Boolean(lastUpdated);
 
@@ -73,15 +74,18 @@ export default function DashboardPage() {
       {/* What lighthouses and buoys are reporting right now */}
       <NearbyObservationsCard />
 
-      <Card title="Today's tide" to="/tides" className="card--wide">
-        <SourceContent
-          source="tides"
-          errorMessage="Tides unavailable"
-          placeholder={<Skeleton height={240} />}
-        >
-          <TodaysTideCurve />
-        </SourceContent>
-      </Card>
+      {/* Offshore areas have no tide station, so there's no chart to show */}
+      {!activeStation.offshore && (
+        <Card title="Today's tide" to="/tides" className="card--wide">
+          <SourceContent
+            source="tides"
+            errorMessage="Tides unavailable"
+            placeholder={<Skeleton height={240} />}
+          >
+            <TodaysTideCurve />
+          </SourceContent>
+        </Card>
+      )}
     </div>
   );
 }
@@ -116,7 +120,9 @@ function VisibilityReading() {
 }
 
 function TideNowReading() {
-  const { tides, tideEvents, units } = useApp();
+  const { activeStation, tides, tideEvents, units } = useApp();
+  if (activeStation.offshore) return <p className="card__note">{noTidesMessage(activeStation)}</p>;
+
   const current = findClosestReading(tides);
   const nextHigh = getNextTideEvent(tideEvents, 'HIGH');
   const nextLow = getNextTideEvent(tideEvents, 'LOW');

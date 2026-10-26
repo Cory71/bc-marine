@@ -2,7 +2,7 @@ import { View, Text, ScrollView, RefreshControl, ActivityIndicator } from 'react
 import { useApp } from '../context/AppContext';
 import SettingsButton from '../components/SettingsButton';
 import { useColors, makeStyles } from '../theme';
-import { timeSince, formatTime, getSunMoon, degreesToCardinal, tidyForecastText, formatWind, observationDetail, formatReadingAge, isOldReading, formatSpeed, formatHeight, formatDistance } from '@bc-marine/shared';
+import { timeSince, formatTime, getSunMoon, degreesToCardinal, tidyForecastText, formatWind, observationDetail, formatReadingAge, isOldReading, formatSpeed, formatHeight, formatDistance, noTidesMessage } from '@bc-marine/shared';
 import WarningBanner from '../components/WarningBanner';
 import CardWrapper from '../components/CardWrapper';
 
@@ -139,6 +139,10 @@ export default function DashboardScreen({ navigation }) {
 
       {/* Tides */}
       <CardWrapper label="🌊 Tides — DFO" linkText="Full Chart" onPress={() => navigation.navigate('TideDetail')}>
+        {/* Offshore areas have no tide station */}
+        {activeStation.offshore ? (
+          <Text style={styles.forecastText}>{noTidesMessage(activeStation)}</Text>
+        ) : (
         <View style={styles.row}>
           <View style={styles.statBox}>
             <Text style={styles.statLabel}>Next High</Text>
@@ -155,6 +159,7 @@ export default function DashboardScreen({ navigation }) {
             <Text style={styles.statValue}>{formatHeight(currentTide?.heightFt, units)}</Text>
           </View>
         </View>
+        )}
       </CardWrapper>
 
       {/* Tidal Currents */}

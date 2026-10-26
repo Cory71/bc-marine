@@ -19,7 +19,10 @@
       name="description"
       content="Live tides, wind, waves, currents and Environment Canada marine forecasts for 50+ locations on the British Columbia coast."
     />
-    <link rel="icon" type="image/png" href="/favicon.png" />
+    <!-- Lighthouse icon: SVG for modern browsers, PNG fallback, and a home-screen icon for iPhones -->
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="icon" type="image/png" sizes="48x48" href="/favicon.png" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
 
     <!-- Open connections to the data APIs while the app is still loading -->
     <link rel="preconnect" href="https://api-iwls.dfo-mpo.gc.ca" crossorigin />

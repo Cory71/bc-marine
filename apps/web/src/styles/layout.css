@@ -313,6 +313,18 @@
   }
 }
 
+/* Phones: tighter tabs spread across the row, so all five fit without swiping */
+@media (max-width: 599px) {
+  .main-nav {
+    justify-content: space-between;
+  }
+
+  .main-nav__link {
+    padding: 10px 3px;
+    font-size: 0.8125rem;
+  }
+}
+
 /* ---------- Large screens: fixed sidebar beside the content ---------- */
 @media (min-width: 1024px) {
   .app-shell {

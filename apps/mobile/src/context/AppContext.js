@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, useRef } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { ALL_LOCATIONS, BC_STATIONS, loadStationData } from '@bc-marine/shared';
 
@@ -13,9 +13,23 @@ export function AppProvider({ children }) {
   const [weeklyTides, setWeeklyTides] = useState([]);
   const [weather, setWeather] = useState([]);
   const [marineForecast, setMarineForecast] = useState({ warnings: [], forecast: '' });
+  const [observations, setObservations] = useState([]);
+  const [observationsLoading, setObservationsLoading] = useState(true);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [lastUpdated, setLastUpdated] = useState(null);
+  // Counts requests so a slow, older response can't overwrite a newer station's data
+  const latestRequestId = useRef(0);
+
+  // Where each data set from loadStationData goes
+  const SETTERS = {
+    tides: setTides,
+    tideEvents: setTideEvents,
+    weeklyTides: setWeeklyTides,
+    weather: setWeather,
+    marineForecast: setMarineForecast,
+    observations: setObservations,
+  };
 
   // Load saved stations from device storage on app start
   useEffect(() => {
@@ -36,28 +50,49 @@ export function AppProvider({ children }) {
   }, [activeStation]);
 
   async function loadData(forceRefresh = false) {
+    const requestId = ++latestRequestId.current;
+    const isLatestRequest = () => requestId === latestRequestId.current;
+    // A new station starts empty, so its cards never mix with the old station's numbers.
+    // A refresh keeps the current numbers on screen while the new ones load.
+    if (!forceRefresh) clearStationData();
     setLoading(true);
+    setObservationsLoading(true);
     setError(null);
+
+    // Show each data set as soon as it arrives, instead of waiting for the slowest one
+    function showData(key, value) {
+      if (!isLatestRequest()) return;
+      SETTERS[key](value);
+      setLoading(false);
+      if (key === 'observations') setObservationsLoading(false);
+    }
+
     try {
-      const result = await loadStationData(activeStation, { forceRefresh });
+      const result = await loadStationData(activeStation, { forceRefresh, onData: showData });
+      if (!isLatestRequest()) return;
 
       // Log any failures to the console so we can see which API is broken
       result.failures.forEach(label => console.warn(`[loadData] ${label} failed`));
-
-      // A null key means that fetch failed — keep the previous data on screen
-      if (result.tides) setTides(result.tides);
-      if (result.tideEvents) setTideEvents(result.tideEvents);
-      if (result.weeklyTides) setWeeklyTides(result.weeklyTides);
-      if (result.weather) setWeather(result.weather);
-      if (result.marineForecast) setMarineForecast(result.marineForecast);
-
       setLastUpdated(new Date());
     } catch (e) {
       console.error('[loadData] unexpected error:', e);
-      setError('Could not load data. Check your connection and try again.');
+      if (isLatestRequest()) setError('Could not load data. Check your connection and try again.');
     } finally {
-      setLoading(false);
+      if (isLatestRequest()) {
+        setLoading(false);
+        setObservationsLoading(false);
+      }
     }
+  }
+
+  // Empty every data set (used when switching to another station)
+  function clearStationData() {
+    setTides([]);
+    setTideEvents([]);
+    setWeeklyTides([]);
+    setWeather([]);
+    setMarineForecast({ warnings: [], forecast: '' });
+    setObservations([]);
   }
 
   // Match saved stations by name — a few nearby places share one DFO tide station id
@@ -81,7 +116,7 @@ export function AppProvider({ children }) {
     <AppContext.Provider value={{
       activeStation, setActiveStation,
       savedStations, saveStation, removeStation,
-      tides, tideEvents, weeklyTides, weather, marineForecast,
+      tides, tideEvents, weeklyTides, weather, marineForecast, observations, observationsLoading,
       loading, error, lastUpdated,
       refresh: () => loadData(true),
     }}>

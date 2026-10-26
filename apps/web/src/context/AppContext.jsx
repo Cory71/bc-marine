@@ -94,6 +94,7 @@ const EMPTY_DATA = {
   weeklyTides: [],
   weather: [],
   marineForecast: EMPTY_FORECAST,
+  observations: [],
 };
 
 // Which sources have arrived or failed, and for which station

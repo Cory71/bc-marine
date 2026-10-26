@@ -14,6 +14,7 @@ import Stat from '../components/Stat.jsx';
 import TideCurve from '../components/TideCurve.jsx';
 import Skeleton from '../components/Skeleton.jsx';
 import SourceContent from '../components/SourceContent.jsx';
+import NearbyObservationsCard from '../components/NearbyObservationsCard.jsx';
 
 const NO_VALUE = '--';
 
@@ -36,6 +37,9 @@ export default function DashboardPage() {
           <ForecastText />
         </SourceContent>
       </Card>
+
+      {/* What lighthouses and buoys are reporting right now, next to the forecast */}
+      <NearbyObservationsCard />
 
       <div className="card-grid">
         <Card title="Wind" to="/weather">

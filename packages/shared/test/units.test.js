@@ -4,6 +4,7 @@ import {
   degreesToCardinal,
   degreesToCompass,
   findNearestStation,
+  distanceKm,
   formatTime,
   timeSince,
   BC_STATIONS,
@@ -36,4 +37,11 @@ test('degreesToCompass gives 16 points and handles missing values', () => {
   expect(degreesToCompass(157.5)).toBe('SSE');
   expect(degreesToCompass(350)).toBe('N');
   expect(degreesToCompass(null)).toBe('--');
+});
+
+test('distanceKm measures real distance (Victoria to Race Rocks is about 18 km)', () => {
+  const km = distanceKm(48.4244, -123.3699, 48.2983, -123.5317);
+  expect(km).toBeGreaterThan(17);
+  expect(km).toBeLessThan(19);
+  expect(distanceKm(48.4, -123.4, 48.4, -123.4)).toBe(0);
 });

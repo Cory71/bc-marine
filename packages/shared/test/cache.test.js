@@ -20,3 +20,11 @@ test('clearCache removes the entry', () => {
   clearCache('k2');
   expect(getCache('k2')).toBeNull();
 });
+
+test('an entry can have its own, shorter lifetime', () => {
+  setCache('obs', 1, 10 * MINUTE_MS);
+  vi.advanceTimersByTime(9 * MINUTE_MS);
+  expect(getCache('obs')).toBe(1);
+  vi.advanceTimersByTime(2 * MINUTE_MS);
+  expect(getCache('obs')).toBeNull();
+});

@@ -2,12 +2,14 @@ import { test, expect, vi, beforeEach } from 'vitest';
 import { fetchTides, fetchTideEvents, fetchWeeklyTides } from '../src/services/dfoService.js';
 import { fetchWeather } from '../src/services/weatherService.js';
 import { fetchMarineForecast } from '../src/services/ecService.js';
+import { fetchNearbyObservations } from '../src/services/observationService.js';
 import * as cache from '../src/services/cache.js';
 import { loadStationData } from '../src/loadStationData.js';
 
 vi.mock('../src/services/dfoService.js');
 vi.mock('../src/services/weatherService.js');
 vi.mock('../src/services/ecService.js');
+vi.mock('../src/services/observationService.js');
 
 const victoria = {
   id: 'vic',
@@ -17,6 +19,7 @@ const victoria = {
   region: 'Juan de Fuca Strait',
 };
 const MOCK_TIDES = [{ time: new Date(), heightFt: 5 }];
+const MOCK_OBSERVATIONS = [{ site: { name: 'Race Rocks' }, distanceKm: 18, reading: null }];
 
 beforeEach(() => {
   vi.restoreAllMocks();
@@ -25,6 +28,7 @@ beforeEach(() => {
   fetchWeeklyTides.mockResolvedValue([]);
   fetchWeather.mockResolvedValue([]);
   fetchMarineForecast.mockRejectedValue(new Error('EC down'));
+  fetchNearbyObservations.mockResolvedValue(MOCK_OBSERVATIONS);
 });
 
 test('loadStationData returns data and lists failures without throwing', async () => {
@@ -32,9 +36,10 @@ test('loadStationData returns data and lists failures without throwing', async (
   expect(result.marineForecast).toBeNull();
   expect(result.failures).toEqual(['marineForecast']);
   expect(result.tides).toEqual(MOCK_TIDES);
+  expect(result.observations).toEqual(MOCK_OBSERVATIONS);
 });
 
-test('forceRefresh clears the five cache keys', async () => {
+test('forceRefresh clears the cache key of every source', async () => {
   const clearSpy = vi.spyOn(cache, 'clearCache');
   await loadStationData(victoria, { forceRefresh: true });
   expect(clearSpy.mock.calls.map(call => call[0])).toEqual([
@@ -43,6 +48,7 @@ test('forceRefresh clears the five cache keys', async () => {
     'weekly_vic',
     'weather_48.4_-123.4',
     'ec_Juan de Fuca Strait',
+    'observations_48.4_-123.4',
   ]);
 });
 
@@ -60,7 +66,7 @@ test('onData reports each source as soon as it arrives, without waiting for the 
 
   const loading = loadStationData(victoria, { onData: key => received.push(key) });
   await new Promise(resolve => setTimeout(resolve, 0));
-  expect(received).toEqual(['tides', 'tideEvents', 'weather']);
+  expect(received).toEqual(['tides', 'tideEvents', 'weather', 'observations']);
 
   finishWeekly([]);
   const result = await loading;

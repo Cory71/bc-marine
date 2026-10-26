@@ -48,6 +48,18 @@ export function degreesToCompass(deg) {
   return dirs[Math.round(deg / 22.5) % 16];
 }
 
+// Great-circle distance in km between two lat/lon points (haversine formula)
+export function distanceKm(lat1, lon1, lat2, lon2) {
+  const EARTH_RADIUS_KM = 6371;
+  const toRadians = degrees => (degrees * Math.PI) / 180;
+  const dLat = toRadians(lat2 - lat1);
+  const dLon = toRadians(lon2 - lon1);
+  const a =
+    Math.sin(dLat / 2) ** 2 +
+    Math.cos(toRadians(lat1)) * Math.cos(toRadians(lat2)) * Math.sin(dLon / 2) ** 2;
+  return 2 * EARTH_RADIUS_KM * Math.asin(Math.sqrt(a));
+}
+
 // Returns the nearest station to a given GPS coordinate
 export function findNearestStation(lat, lon, stations) {
   let nearest = null;

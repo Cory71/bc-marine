@@ -43,7 +43,7 @@ It also takes an optional `onData(key, value)` callback that fires as each sourc
 
 ### Adding a data layer
 
-Data sources are listed in one table, `DATA_SOURCES` in `loadStationData.js`. To add a layer (for example, water temperature or buoy observations):
+Data sources are listed in one table, `DATA_SOURCES` in `loadStationData.js`; the nearby observations (`observations`) were added this way. To add a layer:
 
 1. Write a fetch function in `packages/shared/src/services/` using `getJson` or `getText` from `http.js` (timeouts and HTTP errors are handled there), and cache it with `getCache`/`setCache`.
 2. Add `{ key, load }` to `DATA_SOURCES`. Both apps now receive it from `loadStationData`.
@@ -69,6 +69,22 @@ The mobile app isn't subject to CORS, so it fetches EC feeds directly. The web a
 **Half-written feeds.** EC rewrites a feed file when it issues a forecast, and a fetch during that write can return a truncated file. This happened on the 4:00 PM issue on Oct 25, 2026: the CDN cached the broken copy, and one area showed "Forecast unavailable" until it expired. The proxy now only returns, and allows caching of, a feed that ends with its closing `</feed>` or `</rss>` tag. Anything else gets an uncached `502`, so the next request retries EC.
 
 The handler (`server/ecFeedHandler.js`) is a pure function that takes a code and a `fetch` implementation and returns `{ status, headers, body }`. The Vercel function, the Vite dev server and `vite preview` all wrap that same function, so local development behaves like production, and the tests can exercise it without a network.
+
+## Nearby observations: lighthouses and buoys
+
+The dashboard shows what's actually happening on the water next to the forecast, from the 3 observation sites nearest the active station, and an Observations page shows everything each site reports.
+
+| Source                    | What                                                                                   | How often              | Browser access                                    |
+| ------------------------- | -------------------------------------------------------------------------------------- | ---------------------- | ------------------------------------------------- |
+| EC GeoMet `swob-realtime` | Wind, gusts, pressure and air temperature at about 25 lighthouse and headland stations | Every minute to hourly | Allowed (`Access-Control-Allow-Origin: *`)        |
+| NOAA NDBC `realtime2`     | Wind, gusts, wave height and period, water temperature and pressure at 15 EC buoys     | Hourly                 | Not allowed, so the web app uses `/api/buoy-feed` |
+
+- **Site list.** `observationSites.js` is a hard-coded list, checked against live data: every site in it was reporting when it was added. Sheltered harbour stations are left out because they make conditions look calmer than they are offshore.
+- **Choosing sites.** The 3 nearest sites within 100 km (great-circle distance). If none of the 3 is a buoy but one is within 100 km, it replaces the third, so a wave reading shows whenever one is reasonably close.
+- **Readings.** `observationReaders.js` turns EC's JSON and NOAA's text format into one reading shape, converting to knots and feet at the edge. NOAA columns are looked up by header name, and its `MM` (missing) values become `null`, never `NaN`.
+- **Freshness.** Observations are cached for 10 minutes (other data keeps 30). Each tile shows how long ago the site reported, and readings older than 3 hours are dimmed and labelled "Old reading".
+- **Buoy relay.** `/api/buoy-feed` follows the same rules as the EC proxy: only buoy IDs from the site list are accepted, an incomplete file (the newest row must have a value for every column) is never passed on or cached, and successful responses are CDN-cached for 10 minutes.
+- **Units in one place.** All observation text comes from `observationFormat.js`, so user-chosen units can later be applied by changing that one module.
 
 ## BC time
 

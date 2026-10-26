@@ -74,3 +74,24 @@ test('onData reports each source as soon as it arrives, without waiting for the 
   expect(received).not.toContain('marineForecast'); // failed sources aren't reported to onData
   expect(result.failures).toEqual(['marineForecast']);
 });
+
+test('an offshore area skips tides without asking DFO', async () => {
+  const bowie = {
+    id: 'offshore-bowie',
+    name: 'Bowie',
+    lat: 53,
+    lon: -135,
+    region: 'Bowie',
+    offshore: true,
+  };
+  const result = await loadStationData(bowie);
+  expect(fetchTides).not.toHaveBeenCalled();
+  expect(result.tides).toEqual([]);
+  expect(result.tideEvents).toEqual([]);
+  expect(result.weeklyTides).toEqual([]);
+});
+
+test("the forecast is loaded for the station's own part of a split area", async () => {
+  await loadStationData({ ...victoria, ecSubarea: 'east entrance' });
+  expect(fetchMarineForecast).toHaveBeenCalledWith('Juan de Fuca Strait', 'east entrance');
+});

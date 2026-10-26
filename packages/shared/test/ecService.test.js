@@ -70,6 +70,34 @@ test('parseMarineFeed keeps only the Georgia Strait south entries', async () =>
     'South text.'
   ));
 
+// Juan de Fuca's feed holds three parts of the strait
+const JUAN_DE_FUCA_FIXTURE = `<?xml version="1.0" encoding="UTF-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+  <entry><title>Forecast for Tonight. - Juan de Fuca Strait - east entrance</title><summary>East text.</summary></entry>
+  <entry><title>Forecast for Tonight. - Juan de Fuca Strait - central strait</title><summary>Central text.</summary></entry>
+  <entry><title>Forecast for Tonight. - Juan de Fuca Strait - west entrance</title><summary>West text.</summary></entry>
+</feed>`;
+
+// An offshore feed split into halves, with extended forecasts too
+const BOWIE_FIXTURE = `<?xml version="1.0" encoding="UTF-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+  <entry><title>GALE WARNING IN EFFECT, Bowie - northern half</title><summary>Gale.</summary></entry>
+  <entry><title>Forecast for Tonight and Monday. - Bowie - northern half</title><summary>North text.</summary></entry>
+  <entry><title>Extended Forecast - Bowie - northern half</title><summary>Later north.</summary></entry>
+  <entry><title>Forecast for Tonight and Monday. - Bowie - southern half</title><summary>South text.</summary></entry>
+</feed>`;
+
+test('parseMarineFeed can be given the part of the area to keep', async () =>
+  expect(
+    (await parseMarineFeed(JUAN_DE_FUCA_FIXTURE, 'Juan de Fuca Strait', 'west entrance')).forecast
+  ).toBe('West text.'));
+
+test('with no part chosen, a feed split into halves shows each half', async () => {
+  const { forecast, warnings } = await parseMarineFeed(BOWIE_FIXTURE, 'Bowie');
+  expect(forecast).toBe('Northern half: North text.\n\nSouthern half: South text.');
+  expect(warnings.map(w => w.title)).toEqual(['GALE WARNING IN EFFECT, Bowie - northern half']);
+});
+
 test('fetchMarineForecast uses the configured URL builder', async () => {
   configureEcFeedUrl(code => `/api/ec-feed?code=${code}`);
   const fetchMock = vi.fn(() => Promise.resolve(new Response(ATOM_FIXTURE)));
@@ -85,6 +113,11 @@ test('unknown region returns the existing fallback', async () => {
     forecast: 'No forecast available for this region.',
   });
 });
+
+test('tidyForecastText keeps the blank line between halves of an offshore forecast', () =>
+  expect(tidyForecastText('Northern half: Wind\nnorth 20.\nIssued 9 PM\n\nSouthern half: Calm.')).toBe(
+    'Northern half: Wind north 20.\nIssued 9 PM\n\nSouthern half: Calm.'
+  ));
 
 test('tidyForecastText joins mid-sentence breaks but keeps "Issued" on its own line', () =>
   expect(tidyForecastText('Wind light near noon and\nto southeast 20.\nIssued 10:30 AM PDT')).toBe(

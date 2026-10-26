@@ -1,31 +1,51 @@
 // Station shown when the user hasn't picked one yet
 export const DEFAULT_STATION_NAME = 'Victoria';
 
-// BC stations organized by official EC marine weather areas
-// id is the DFO IWLS station ID used for tide API calls. Each one is the station's own
-// DFO tide station (checked against DFO's station list on 2026-10-24, all within 4 km)
+// BC stations organized by Environment Canada marine forecast areas (checked against
+// EC's area shapes on 2026-10-26). id is the DFO IWLS station ID used for tide API calls.
+// Each one is the station's own DFO tide station (checked against DFO's station list).
+// ecSubarea picks the station's part of an EC area that's split into parts.
+// Offshore areas have no tide station; they show the forecast and weather only.
 export const BC_REGIONS = [
   {
     name: 'North Coast',
     areas: [
       {
-        name: 'Dixon Entrance',
+        name: 'Dixon Entrance East',
         stations: [
           { id: '5cebf1de3d0f4a073c4bba06', name: 'Prince Rupert', lat: 54.3167, lon: -130.3167 },
-          { id: '5cebf1de3d0f4a073c4bba44', name: 'Masset', lat: 54.0167, lon: -132.1500 },
+        ],
+      },
+      {
+        name: 'Dixon Entrance West',
+        stations: [
+          { id: '5cebf1de3d0f4a073c4bba44', name: 'Masset', lat: 54.0167, lon: -132.1500, ecSubarea: 'east of langara' },
+          { id: '5cebf1e23d0f4a073c4bc02e', name: 'Langara Island', lat: 54.1910, lon: -133.0020, ecSubarea: 'east of langara' },
         ],
       },
       {
         name: 'Hecate Strait',
         stations: [
-          { id: '5dd3064de0fdc4b9b4be66d5', name: 'Sandspit', lat: 53.2500, lon: -131.8167 },
+          { id: '5dd3064de0fdc4b9b4be66d5', name: 'Sandspit', lat: 53.2500, lon: -131.8167, ecSubarea: 'northern half' },
+        ],
+      },
+      {
+        name: 'West Coast Haida Gwaii',
+        stations: [
+          { id: '5dd30650e0fdc4b9b4be6b91', name: 'Port Louis', lat: 53.6850, lon: -132.9610, ecSubarea: 'northern half' },
+          { id: '5cebf1de3d0f4a073c4bba1e', name: 'Tasu Sound', lat: 52.7660, lon: -132.0470, ecSubarea: 'southern half' },
         ],
       },
       {
         name: 'Queen Charlotte Sound',
         stations: [
-          { id: '5cebf1de3d0f4a073c4bb9c7', name: 'Port Hardy', lat: 50.7197, lon: -127.4897 },
-          { id: '5cebf1e23d0f4a073c4bc097', name: 'Winter Harbour', lat: 50.5167, lon: -128.0333 },
+          { id: 'offshore-queen-charlotte-sound', name: 'Queen Charlotte Sound (offshore)', lat: 51.3790, lon: -130.2612, offshore: true },
+        ],
+      },
+      {
+        name: 'Bowie',
+        stations: [
+          { id: 'offshore-bowie', name: 'Bowie (offshore)', lat: 52.6624, lon: -135.7320, offshore: true },
         ],
       },
     ],
@@ -42,6 +62,7 @@ export const BC_REGIONS = [
       {
         name: 'Queen Charlotte Strait',
         stations: [
+          { id: '5cebf1de3d0f4a073c4bb9c7', name: 'Port Hardy', lat: 50.7197, lon: -127.4897 },
           { id: '5cebf1de3d0f4a073c4bb9ac', name: 'Alert Bay', lat: 50.5833, lon: -126.9167 },
           { id: '5cebf1de3d0f4a073c4bb9ae', name: 'Port McNeill', lat: 50.5833, lon: -127.0833 },
         ],
@@ -49,7 +70,6 @@ export const BC_REGIONS = [
       {
         name: 'Johnstone Strait',
         stations: [
-          { id: '5cebf1de3d0f4a073c4bb996', name: 'Campbell River', lat: 50.0419, lon: -125.2442 },
           { id: '5cebf1de3d0f4a073c4bb9a6', name: 'Port Neville', lat: 50.5000, lon: -126.0833 },
         ],
       },
@@ -58,6 +78,12 @@ export const BC_REGIONS = [
   {
     name: 'West Coast Vancouver Island',
     areas: [
+      {
+        name: 'Quatsino Sound',
+        stations: [
+          { id: '5cebf1e23d0f4a073c4bc097', name: 'Winter Harbour', lat: 50.5167, lon: -128.0333 },
+        ],
+      },
       {
         name: 'Nootka Sound',
         stations: [
@@ -77,6 +103,12 @@ export const BC_REGIONS = [
           { id: '5cebf1e23d0f4a073c4bc06f', name: 'Port Alberni', lat: 49.2333, lon: -124.8167 },
         ],
       },
+      {
+        name: 'Explorer',
+        stations: [
+          { id: 'offshore-explorer', name: 'Explorer (offshore)', lat: 48.8665, lon: -130.4924, offshore: true },
+        ],
+      },
     ],
   },
   {
@@ -87,6 +119,7 @@ export const BC_REGIONS = [
         stations: [
           { id: '5cebf1de3d0f4a073c4bb960', name: 'Powell River', lat: 49.8353, lon: -124.5247 },
           { id: '5cebf1de3d0f4a073c4bb979', name: 'Comox', lat: 49.6667, lon: -124.9500 },
+          { id: '5cebf1de3d0f4a073c4bb996', name: 'Campbell River', lat: 50.0419, lon: -125.2442 },
         ],
       },
       {
@@ -110,12 +143,12 @@ export const BC_REGIONS = [
       {
         name: 'Juan de Fuca Strait',
         stations: [
-          { id: '5cebf1df3d0f4a073c4bbd1e', name: 'Victoria', lat: 48.4244, lon: -123.3699 },
-          { id: '5cebf1e23d0f4a073c4bc060', name: 'Port Renfrew', lat: 48.5500, lon: -124.4167 },
+          { id: '5cebf1df3d0f4a073c4bbd1e', name: 'Victoria', lat: 48.4244, lon: -123.3699, ecSubarea: 'east entrance' },
+          { id: '5cebf1e23d0f4a073c4bc060', name: 'Port Renfrew', lat: 48.5500, lon: -124.4167, ecSubarea: 'west entrance' },
         ],
       },
       {
-        name: 'Saanich Inlet',
+        name: 'Haro Strait',
         stations: [
           { id: '5cebf1df3d0f4a073c4bbd26', name: 'Sidney', lat: 48.6500, lon: -123.4000 },
         ],
@@ -145,8 +178,8 @@ export const BC_COMMUNITIES = [
   { id: '5cebf1e03d0f4a073c4bbd47', name: 'Ladysmith', lat: 49.0006, lon: -123.8197, region: 'Georgia Strait South', coast: 'Strait of Georgia' },
   { id: '5cebf1e03d0f4a073c4bbd45', name: 'Chemainus', lat: 48.9267, lon: -123.7097, region: 'Georgia Strait South', coast: 'Strait of Georgia' },
   // South Vancouver Island
-  { id: '5cebf1df3d0f4a073c4bbd0f', name: 'Sooke', lat: 48.3769, lon: -123.7264, region: 'Juan de Fuca Strait', coast: 'Juan de Fuca & South Coast' },
-  { id: '5cebf1e03d0f4a073c4bbd3d', name: 'Ganges', lat: 48.8594, lon: -123.5028, region: 'Saanich Inlet', coast: 'Juan de Fuca & South Coast' },
+  { id: '5cebf1df3d0f4a073c4bbd0f', name: 'Sooke', lat: 48.3769, lon: -123.7264, region: 'Juan de Fuca Strait', ecSubarea: 'central strait', coast: 'Juan de Fuca & South Coast' },
+  { id: '5cebf1e03d0f4a073c4bbd3d', name: 'Ganges', lat: 48.8594, lon: -123.5028, region: 'Georgia Strait South', coast: 'Strait of Georgia' },
   // West Coast Vancouver Island
   { id: '5cebf1e23d0f4a073c4bc062', name: 'Bamfield', lat: 48.8356, lon: -125.1350, region: 'Barkley Sound', coast: 'West Coast Vancouver Island' },
   { id: '5dd3064ee0fdc4b9b4be6906', name: 'Tahsis', lat: 49.9167, lon: -126.6667, region: 'Nootka Sound', coast: 'West Coast Vancouver Island' },
@@ -154,8 +187,8 @@ export const BC_COMMUNITIES = [
   { id: '5cebf1e23d0f4a073c4bc0b7', name: 'Bella Coola', lat: 52.3667, lon: -126.7667, region: 'Milbanke Sound', coast: 'Central Coast' },
   { id: '5cebf1e23d0f4a073c4bc0bb', name: 'Ocean Falls', lat: 52.3500, lon: -127.6833, region: 'Milbanke Sound', coast: 'Central Coast' },
   { id: '5cebf1e23d0f4a073c4bc0cc', name: 'Klemtu', lat: 52.5833, lon: -128.5167, region: 'Milbanke Sound', coast: 'Central Coast' },
-  { id: '5cebf1de3d0f4a073c4bb91e', name: 'Hartley Bay', lat: 53.4242, lon: -129.2519, region: 'Milbanke Sound', coast: 'Central Coast' },
-  { id: '5cebf1de3d0f4a073c4bb925', name: 'Kitimat', lat: 53.9890, lon: -128.6960, region: 'Milbanke Sound', coast: 'Central Coast' },
+  { id: '5cebf1de3d0f4a073c4bb91e', name: 'Hartley Bay', lat: 53.4242, lon: -129.2519, region: 'Douglas Channel', coast: 'Central Coast' },
+  { id: '5cebf1de3d0f4a073c4bb925', name: 'Kitimat', lat: 53.9890, lon: -128.6960, region: 'Douglas Channel', coast: 'Central Coast' },
   // Metro Vancouver area
   { id: '5cebf1de3d0f4a073c4bb933', name: 'White Rock', lat: 49.0253, lon: -122.8028, region: 'Georgia Strait South', coast: 'Strait of Georgia' },
   { id: '5cebf1de3d0f4a073c4bb935', name: 'Tsawwassen', lat: 49.0133, lon: -123.1317, region: 'Georgia Strait South', coast: 'Strait of Georgia' },

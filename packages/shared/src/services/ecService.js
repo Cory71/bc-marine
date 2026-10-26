@@ -1,6 +1,6 @@
 import { setCache, getCache } from './cache.js';
 import { getText } from './http.js';
-import { EC_FEED_CODES, EC_SUBAREA, buildDirectEcFeedUrl } from './ecFeeds.js';
+import { EC_FEED_CODES, EC_SUBAREA, buildDirectEcFeedUrl, ecCacheKey } from './ecFeeds.js';
 
 // The XML parser is only loaded when a forecast is first parsed, so it stays
 // out of the web app's first download (about 60 KB)
@@ -19,9 +19,10 @@ export function configureEcFeedUrl(buildUrl) {
   currentBuildUrl = buildUrl;
 }
 
-// Fetch marine forecast and active warnings for a BC region name
-export async function fetchMarineForecast(regionName) {
-  const cacheKey = `ec_${regionName}`;
+// Fetch marine forecast and active warnings for a BC region name.
+// subArea picks one part of a split area, e.g. 'east entrance' of Juan de Fuca Strait.
+export async function fetchMarineForecast(regionName, subArea = EC_SUBAREA[regionName]) {
+  const cacheKey = ecCacheKey(regionName, subArea);
   const cached = getCache(cacheKey);
   if (cached) return cached;
 
@@ -30,13 +31,13 @@ export async function fetchMarineForecast(regionName) {
 
   // Download the feed and the XML parser at the same time, not one after the other
   const [xml] = await Promise.all([getText(currentBuildUrl(code)), getXmlParser()]);
-  const data = await parseMarineFeed(xml, regionName);
+  const data = await parseMarineFeed(xml, regionName, subArea);
   setCache(cacheKey, data);
   return data;
 }
 
-// Turn an EC feed's XML into { warnings, forecast } for one region
-export async function parseMarineFeed(xml, regionName) {
+// Turn an EC feed's XML into { warnings, forecast } for one region (or one part of it)
+export async function parseMarineFeed(xml, regionName, subArea = EC_SUBAREA[regionName]) {
   const parser = await getXmlParser();
   const parsed = parser.parse(xml);
 
@@ -48,7 +49,6 @@ export async function parseMarineFeed(xml, regionName) {
 
   // When the region shares a feed with other sub-areas, keep only entries
   // whose title mentions this region's sub-area
-  const subArea = EC_SUBAREA[regionName];
   const entries = subArea
     ? allEntries.filter(e =>
         String(e.title ?? '')
@@ -64,6 +64,21 @@ export async function parseMarineFeed(xml, regionName) {
     })
     .map(e => ({ title: e.title, summary: getEntryText(e) }));
 
+  return { warnings, forecast: pickForecastText(entries) };
+}
+
+// The forecast to show. A feed split into halves with no half chosen (offshore
+// areas) shows each half's forecast, labelled; otherwise the first forecast entry.
+function pickForecastText(entries) {
+  const regularForecasts = entries.filter(e =>
+    String(e.title ?? '')
+      .toLowerCase()
+      .startsWith('forecast for')
+  );
+  if (regularForecasts.length > 1) {
+    return regularForecasts.map(e => `${partLabel(e.title)}: ${getEntryText(e)}`).join('\n\n');
+  }
+
   // Use first entry that mentions forecast, or fall back to the first entry
   const forecastEntry =
     entries.find(e =>
@@ -71,9 +86,13 @@ export async function parseMarineFeed(xml, regionName) {
         .toLowerCase()
         .includes('forecast')
     ) ?? entries[0];
-  const forecast = forecastEntry ? getEntryText(forecastEntry) : 'No forecast available.';
+  return forecastEntry ? getEntryText(forecastEntry) : 'No forecast available.';
+}
 
-  return { warnings, forecast };
+// 'Forecast for Tonight. - Bowie - northern half' → 'Northern half'
+function partLabel(title) {
+  const part = String(title).split(' - ').pop().trim();
+  return part.charAt(0).toUpperCase() + part.slice(1);
 }
 
 // summary is used in Atom, description in RSS 2.0 — strip HTML tags and decode entities
@@ -88,7 +107,11 @@ function getEntryText(entry) {
     .trim();
 }
 
-// EC hard-wraps its text mid-sentence. Join those lines, but keep "Issued ..." on its own line.
+// EC hard-wraps its text mid-sentence. Join those lines, but keep "Issued ..." on its own line,
+// and keep blank lines (they separate the halves of an offshore forecast).
 export function tidyForecastText(text) {
-  return text.replace(/\s*\n(?!Issued)\s*/g, ' ');
+  return text
+    .split(/\n\s*\n/)
+    .map(paragraph => paragraph.trim().replace(/\s*\n(?!Issued)\s*/g, ' '))
+    .join('\n\n');
 }

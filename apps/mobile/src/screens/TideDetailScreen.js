@@ -2,7 +2,7 @@ import { View, Text, ScrollView, TouchableOpacity, useWindowDimensions } from 'r
 import { useApp } from '../context/AppContext';
 import SettingsButton from '../components/SettingsButton';
 import { useColors, makeStyles } from '../theme';
-import { formatTime, formatHeight } from '@bc-marine/shared';
+import { formatTime, formatHeight, noTidesMessage } from '@bc-marine/shared';
 import TideCurve from '../components/TideCurve';
 
 export default function TideDetailScreen({ navigation }) {
@@ -27,7 +27,7 @@ export default function TideDetailScreen({ navigation }) {
         <Text style={styles.title}>Tide Chart</Text>
         <Text style={styles.subtitle}>📍 {activeStation.name}, BC · DFO</Text>
         <View style={styles.emptyCard}>
-          <Text style={styles.emptyText}>No tide data available for this station.</Text>
+          <Text style={styles.emptyText}>{noTidesMessage(activeStation)}</Text>
           <Text style={styles.emptySub}>Pull down on the Dashboard to refresh.</Text>
         </View>
       </ScrollView>

@@ -10,11 +10,19 @@ Live tides, wind, waves, currents and Environment Canada marine forecasts for th
 
 ### Web (desktop)
 
-![BC Marine web dashboard for Tofino, showing wind, waves, tide, currents and today's tide curve](docs/screenshots/web-dashboard.png)
+![BC Marine web dashboard for Victoria with a strong wind warning, the marine forecast, wind, waves, visibility, tide, currents and nearby lighthouse readings](docs/screenshots/web-dashboard.png)
+
+The theme follows your device (light or dark), or can be set in Settings:
+
+![The same dashboard in the light theme](docs/screenshots/web-dashboard-light.png)
+
+Each lighthouse and buoy has its own page with 12-hour charts:
+
+![Halibut Bank buoy page with its latest readings and 12-hour charts of wind and gusts, wave height and pressure](docs/screenshots/web-buoy-charts.png)
 
 ### Web (phone browser)
 
-<img src="docs/screenshots/web-mobile.png" alt="BC Marine tides view on a phone-sized screen" width="320" />
+<img src="docs/screenshots/web-mobile.png" alt="BC Marine dashboard for Victoria on a phone-sized screen, with a strong wind warning and the marine forecast" width="320" />
 
 ### Mobile app (Expo)
 
@@ -84,12 +92,27 @@ Requires [Node.js](https://nodejs.org/) 20 or newer.
 git clone https://github.com/Cory71/bc-marine.git
 cd bc-marine
 npm install                              # installs every workspace
-
-npm run dev --workspace bc-marine-web    # web app at http://localhost:5173
-npm start --workspace bc-marine-mobile   # mobile app: scan the QR code with Expo Go
 ```
 
-See [apps/web/README.md](apps/web/README.md) and [apps/mobile/README.md](apps/mobile/README.md) for more.
+### Web app
+
+```bash
+npm run dev --workspace bc-marine-web    # opens at http://localhost:5173
+```
+
+### Mobile app (on your phone, with Expo Go)
+
+1. Install **Expo Go** from the App Store or Google Play, and make sure it's up to date (the app uses Expo SDK 58).
+2. Connect your phone to the same Wi-Fi as your computer.
+3. Start the app, then scan the QR code: on Android with Expo Go's **Scan QR code**, on iPhone with the **Camera** app.
+
+```bash
+npm start --workspace bc-marine-mobile
+npm start --workspace bc-marine-mobile -- --clear    # after pulling new changes
+npm start --workspace bc-marine-mobile -- --tunnel   # if the phone is on a different network
+```
+
+For **Use my location**, turn on **Precise location** for Expo Go. More tips are in [apps/mobile/README.md](apps/mobile/README.md); the web app's notes are in [apps/web/README.md](apps/web/README.md).
 
 ## Testing and CI
 

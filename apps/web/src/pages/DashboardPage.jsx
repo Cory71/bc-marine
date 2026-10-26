@@ -38,9 +38,6 @@ export default function DashboardPage() {
         </SourceContent>
       </Card>
 
-      {/* What lighthouses and buoys are reporting right now, next to the forecast */}
-      <NearbyObservationsCard />
-
       <div className="card-grid">
         <Card title="Wind" to="/weather">
           <SourceContent source="weather" errorMessage="Weather unavailable">
@@ -69,6 +66,9 @@ export default function DashboardPage() {
         </Card>
         <SunMoonCard />
       </div>
+
+      {/* What lighthouses and buoys are reporting right now */}
+      <NearbyObservationsCard />
 
       <Card title="Today's tide" to="/tides" className="card--wide">
         <SourceContent

@@ -2,6 +2,8 @@ import { useEffect, useState } from 'react';
 import { View, Text, ScrollView, TouchableOpacity, ActivityIndicator } from 'react-native';
 import { useApp } from '../context/AppContext';
 import SettingsButton from '../components/SettingsButton';
+import SiteCharts from '../components/SiteCharts';
+import { useSavedSites } from '../context/useSavedSites';
 import { useColors, makeStyles } from '../theme';
 import { ReadingStats } from './ObservationsDetailScreen';
 import {
@@ -37,9 +39,12 @@ export default function SiteDetailScreen({ route, navigation }) {
         <Message text="We couldn't find that lighthouse or buoy." />
       ) : (
         <>
-          <Text style={styles.title}>
-            {site.name} · {site.type === 'buoy' ? 'Buoy' : 'Lighthouse'}
-          </Text>
+          <View style={styles.titleRow}>
+            <Text style={styles.title}>
+              {site.name} · {site.type === 'buoy' ? 'Buoy' : 'Lighthouse'}
+            </Text>
+            <SaveSiteButton site={site} />
+          </View>
           <Text style={styles.subtitle}>
             {formatDistance(distanceKm(activeStation.lat, activeStation.lon, site.lat, site.lon), units)} from{' '}
             {activeStation.name} · {site.type === 'buoy' ? 'NOAA NDBC' : 'Environment Canada'}
@@ -67,6 +72,10 @@ function SiteReadings({ status, history, showWaves, units }) {
         <ReadingStats reading={latest} units={units} />
       </View>
       <View style={styles.card}>
+        <Text style={styles.cardLabel}>12-Hour Trend</Text>
+        <SiteCharts history={history} units={units} />
+      </View>
+      <View style={styles.card}>
         <Text style={styles.cardLabel}>Last 12 Hours</Text>
         <View style={styles.tableRow}>
           <Text style={[styles.col, styles.timeCol]}>TIME</Text>
@@ -84,6 +93,24 @@ function SiteReadings({ status, history, showWaves, units }) {
         ))}
       </View>
     </>
+  );
+}
+
+// Star toggle that saves the site to the Locations tab on this phone
+function SaveSiteButton({ site }) {
+  const styles = useStyles();
+  const { isSiteSaved, toggleSavedSite } = useSavedSites();
+  const isSaved = isSiteSaved(site.id);
+  return (
+    <TouchableOpacity
+      style={[styles.saveButton, isSaved && styles.saveButtonOn]}
+      onPress={() => toggleSavedSite(site.id)}
+      accessibilityRole="togglebutton"
+      accessibilityLabel={`Save ${site.name}`}
+      accessibilityState={{ checked: isSaved }}
+    >
+      <Text style={[styles.saveText, isSaved && styles.saveTextOn]}>{isSaved ? '★ Saved' : '☆ Save'}</Text>
+    </TouchableOpacity>
   );
 }
 
@@ -120,7 +147,12 @@ const useStyles = makeStyles(COLORS => ({
   topRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingRight: 10 },
   back: { padding: 16, paddingBottom: 4 },
   backText: { color: COLORS.accent, fontSize: 13 },
-  title: { color: COLORS.textPrimary, fontSize: 18, fontWeight: 'bold', paddingHorizontal: 16 },
+  titleRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingRight: 16 },
+  title: { flexShrink: 1, color: COLORS.textPrimary, fontSize: 18, fontWeight: 'bold', paddingHorizontal: 16 },
+  saveButton: { borderWidth: 1, borderColor: COLORS.cardBorder, borderRadius: 14, paddingVertical: 4, paddingHorizontal: 10 },
+  saveButtonOn: { borderColor: COLORS.warning },
+  saveText: { color: COLORS.textSecondary, fontSize: 12, fontWeight: 'bold' },
+  saveTextOn: { color: COLORS.warning },
   subtitle: { color: COLORS.textMuted, fontSize: 10, paddingHorizontal: 16, marginBottom: 12 },
   card: { marginHorizontal: 16, marginBottom: 10, backgroundColor: `rgba(${COLORS.accentRgb},0.06)`, borderWidth: 1, borderColor: `rgba(${COLORS.accentRgb},0.15)`, borderRadius: 10, padding: 12 },
   cardLabel: { color: COLORS.accent, fontSize: 10, textTransform: 'uppercase', letterSpacing: 1, marginBottom: 8 },

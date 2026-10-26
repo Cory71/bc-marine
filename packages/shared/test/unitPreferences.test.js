@@ -4,6 +4,7 @@ import {
   UNIT_OPTIONS,
   normalizeUnits,
   formatSpeed,
+  speedInUnits,
   formatHeight,
   heightInUnits,
   formatTemp,
@@ -37,6 +38,12 @@ test('formatSpeed converts knots', () => {
   expect(formatSpeed(0.64, DEFAULT_UNITS, 1)).toBe('0.6 kts');
   expect(formatSpeed(0.64, METRIC, 1)).toBe('1.2 km/h');
   expect(formatSpeed(null)).toBe('--');
+});
+
+test('speedInUnits gives a plain number for charts', () => {
+  expect(speedInUnits(10)).toBe(10);
+  expect(speedInUnits(10, METRIC)).toBeCloseTo(18.52, 5);
+  expect(speedInUnits(10, { ...DEFAULT_UNITS, speed: 'mph' })).toBeCloseTo(11.50779, 5);
 });
 
 test('formatHeight converts feet', () => {

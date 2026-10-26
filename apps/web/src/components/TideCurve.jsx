@@ -198,7 +198,8 @@ function getLabelAnchor(x, chartWidth) {
 
 // Track an element's width so the chart can redraw when the layout changes.
 // Returns a callback ref: the element may appear later (once tide data arrives).
-function useContainerWidth(fallbackWidth) {
+// Also used by the lighthouse and buoy charts.
+export function useContainerWidth(fallbackWidth) {
   const [element, setElement] = useState(null);
   const [width, setWidth] = useState(fallbackWidth);
 

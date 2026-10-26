@@ -43,7 +43,7 @@ export function normalizeUnits(saved) {
 }
 
 // The label for a unit value, e.g. 'kmh' → 'km/h'
-function unitLabel(kind, value) {
+export function unitLabel(kind, value) {
   return UNIT_OPTIONS[kind].find(option => option.value === value).label;
 }
 
@@ -52,11 +52,16 @@ function roundTo(value, decimals) {
   return Number(value.toFixed(decimals));
 }
 
+// A speed as a plain number in the chosen unit, for charts
+export function speedInUnits(knots, units = DEFAULT_UNITS) {
+  const factor = { kts: 1, kmh: KMH_PER_KNOT, mph: MPH_PER_KNOT }[units.speed];
+  return knots * factor;
+}
+
 // Wind, gust or current speed, from knots: '12 kts', '22 km/h', '14 mph'
 export function formatSpeed(knots, units = DEFAULT_UNITS, decimals = 0) {
   if (knots == null) return NO_VALUE;
-  const factor = { kts: 1, kmh: KMH_PER_KNOT, mph: MPH_PER_KNOT }[units.speed];
-  return `${roundTo(knots * factor, decimals)} ${unitLabel('speed', units.speed)}`;
+  return `${roundTo(speedInUnits(knots, units), decimals)} ${unitLabel('speed', units.speed)}`;
 }
 
 // A height (tides, waves, swell) as a plain number in the chosen unit, for charts

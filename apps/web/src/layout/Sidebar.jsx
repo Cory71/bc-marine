@@ -8,6 +8,7 @@ import {
   toStationSlug,
 } from '@bc-marine/shared';
 import { useApp } from '../context/AppContext.jsx';
+import { useSavedSites } from '../context/useSavedSites.js';
 import Icon from '../components/Icon.jsx';
 
 // Station picker: search, nearest station, saved stations and the full region list
@@ -50,6 +51,7 @@ export default function Sidebar({ open, onClose, searchInputRef }) {
         <>
           <NearestStationButton onSelect={selectStation} />
           <SavedStations onSelect={selectStation} />
+          <SavedSites onPick={onClose} />
           <RegionList onSelect={selectStation} />
         </>
       )}
@@ -103,20 +105,53 @@ function SiteResults({ text, onPick }) {
       <ul className="station-list">
         {sites.map(site => (
           <li key={site.id}>
-            <Link
-              to={{ pathname: `/observations/${site.id}`, search }}
-              className="station-button"
-              onClick={onPick}
-            >
-              <span>{site.name}</span>
-              <span className={`obs-badge obs-badge--${site.type}`}>
-                {site.type === 'buoy' ? 'Buoy' : 'Lighthouse'}
-              </span>
-            </Link>
+            <SiteLink site={site} search={search} onPick={onPick} />
           </li>
         ))}
       </ul>
     </>
+  );
+}
+
+// Lighthouses and buoys starred on their own pages, each with a remove button
+function SavedSites({ onPick }) {
+  const { search } = useLocation();
+  const { savedSites, removeSavedSite } = useSavedSites();
+  if (savedSites.length === 0) return null;
+
+  return (
+    <section className="sidebar__section" aria-labelledby="saved-sites-heading">
+      <h2 id="saved-sites-heading" className="sidebar__label">
+        Saved lighthouses &amp; buoys
+      </h2>
+      <ul className="station-list">
+        {savedSites.map(site => (
+          <li key={site.id} className="station-list__row">
+            <SiteLink site={site} search={search} onPick={onPick} />
+            <button type="button" className="icon-button" onClick={() => removeSavedSite(site.id)}>
+              <Icon name="close" size={14} />
+              <span className="visually-hidden">Remove {site.name}</span>
+            </button>
+          </li>
+        ))}
+      </ul>
+    </section>
+  );
+}
+
+// A link to one site's page, keeping ?station= so the active station stays put
+function SiteLink({ site, search, onPick }) {
+  return (
+    <Link
+      to={{ pathname: `/observations/${site.id}`, search }}
+      className="station-button"
+      onClick={onPick}
+    >
+      <span>{site.name}</span>
+      <span className={`obs-badge obs-badge--${site.type}`}>
+        {site.type === 'buoy' ? 'Buoy' : 'Lighthouse'}
+      </span>
+    </Link>
   );
 }
 

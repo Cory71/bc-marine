@@ -7,6 +7,7 @@ const ICON_PATHS = {
   menu: 'M4 7h16M4 12h16M4 17h16',
   chevron: 'm9 6 6 6-6 6',
   warning: 'M12 3 2 20h20L12 3zm0 6v5m0 3v.5',
+  settings: 'M4 6h9M17 6h3M15 4v4M4 12h3M11 12h9M9 10v4M4 18h11M19 18h1M17 16v4',
   star: 'm12 3 2.8 5.7 6.2.9-4.5 4.4 1 6.2L12 17.3 6.5 20.2l1-6.2L3 9.6l6.2-.9L12 3z',
 };
 

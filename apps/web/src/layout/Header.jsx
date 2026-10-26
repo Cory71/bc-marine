@@ -3,6 +3,7 @@ import { timeSince } from '@bc-marine/shared';
 import { useApp } from '../context/AppContext.jsx';
 import WarningBanner from '../components/WarningBanner.jsx';
 import Icon from '../components/Icon.jsx';
+import SettingsMenu from '../components/SettingsMenu.jsx';
 
 const NAV_ITEMS = [
   { label: 'Dashboard', path: '/' },
@@ -45,6 +46,7 @@ export default function Header({ onOpenDrawer, menuButtonRef, drawerOpen }) {
             <Icon name="refresh" />
             Refresh
           </button>
+          <SettingsMenu />
         </div>
       </div>
 

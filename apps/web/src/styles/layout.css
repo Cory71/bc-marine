@@ -364,7 +364,48 @@
   }
 }
 
-/* ---------- Units picker (sidebar) ---------- */
+/* ---------- Settings drop-down (header) ---------- */
+.settings-menu {
+  position: relative;
+}
+
+.settings-menu__panel {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  z-index: 20;
+  width: 290px;
+  padding: 14px 16px;
+  border: 1px solid var(--color-card-border);
+  border-radius: 12px;
+  background: var(--color-background);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.45);
+}
+
+.settings-menu__note {
+  margin-top: 10px;
+  color: var(--color-text-secondary);
+  font-size: 0.75rem;
+}
+
+/* Phones: the panel spans the screen under the header */
+@media (max-width: 599px) {
+  .settings-menu {
+    position: static;
+  }
+
+  .header {
+    position: relative;
+  }
+
+  .settings-menu__panel {
+    left: 16px;
+    right: 16px;
+    width: auto;
+  }
+}
+
+/* ---------- Units picker (inside settings) ---------- */
 .units-picker {
   display: flex;
   flex-direction: column;

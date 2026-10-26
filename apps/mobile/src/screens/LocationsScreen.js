@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { View, Text, TextInput, ScrollView, StyleSheet, TouchableOpacity, Alert } from 'react-native';
 import * as Location from 'expo-location';
 import { useApp } from '../context/AppContext';
-import UnitsPicker from '../components/UnitsPicker';
+import SettingsButton from '../components/SettingsButton';
 import { COLORS } from '../theme';
 import { BC_REGIONS, BC_STATIONS, BC_COMMUNITIES, OBSERVATION_SITES, findNearestStation } from '@bc-marine/shared';
 
@@ -45,7 +45,10 @@ export default function LocationsScreen({ navigation }) {
 
   return (
     <ScrollView style={styles.container}>
-      <Text style={styles.title}>BC Locations</Text>
+      <View style={styles.titleRow}>
+        <Text style={styles.title}>BC Locations</Text>
+        <SettingsButton />
+      </View>
       <Text style={styles.subtitle}>Tap a region to expand · Tap a station to load conditions</Text>
 
       {/* Search bar */}
@@ -162,18 +165,13 @@ export default function LocationsScreen({ navigation }) {
       )}
 
       <View style={{ height: 24 }} />
-      {/* Display units, remembered on this phone until changed */}
-      <View style={styles.section}>
-        <Text style={styles.sectionLabel}>Units</Text>
-        <UnitsPicker />
-      </View>
-
     </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: COLORS.background },
+  titleRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-end', paddingRight: 10 },
   title: { color: COLORS.textPrimary, fontSize: 18, fontWeight: 'bold', paddingHorizontal: 16, paddingTop: 16 },
   subtitle: { color: COLORS.textMuted, fontSize: 10, paddingHorizontal: 16, marginBottom: 12 },
   searchBar: { marginHorizontal: 16, marginBottom: 8, backgroundColor: 'rgba(126,206,244,0.08)', borderWidth: 1, borderColor: 'rgba(126,206,244,0.2)', borderRadius: 8, padding: 8, flexDirection: 'row', alignItems: 'center', gap: 8 },

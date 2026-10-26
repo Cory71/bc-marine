@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { View, Text, ScrollView, TouchableOpacity, StyleSheet, ActivityIndicator } from 'react-native';
 import { useApp } from '../context/AppContext';
+import SettingsButton from '../components/SettingsButton';
 import { COLORS } from '../theme';
 import { ReadingStats } from './ObservationsDetailScreen';
 import {
@@ -24,9 +25,12 @@ export default function SiteDetailScreen({ route, navigation }) {
 
   return (
     <ScrollView style={styles.container}>
-      <TouchableOpacity style={styles.back} onPress={() => navigation.goBack()}>
-        <Text style={styles.backText}>‹ Back</Text>
-      </TouchableOpacity>
+      <View style={styles.topRow}>
+        <TouchableOpacity style={styles.back} onPress={() => navigation.goBack()}>
+          <Text style={styles.backText}>‹ Back</Text>
+        </TouchableOpacity>
+        <SettingsButton />
+      </View>
 
       {!site ? (
         <Message text="We couldn't find that lighthouse or buoy." />
@@ -109,6 +113,7 @@ function Message({ text }) {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: COLORS.background },
+  topRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingRight: 10 },
   back: { padding: 16, paddingBottom: 4 },
   backText: { color: COLORS.accent, fontSize: 13 },
   title: { color: COLORS.textPrimary, fontSize: 18, fontWeight: 'bold', paddingHorizontal: 16 },

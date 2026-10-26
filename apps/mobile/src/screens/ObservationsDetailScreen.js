@@ -1,5 +1,6 @@
 import { View, Text, ScrollView, TouchableOpacity, StyleSheet } from 'react-native';
 import { useApp } from '../context/AppContext';
+import SettingsButton from '../components/SettingsButton';
 import { COLORS } from '../theme';
 import {
   formatWind,
@@ -21,9 +22,12 @@ export default function ObservationsDetailScreen({ navigation }) {
 
   return (
     <ScrollView style={styles.container}>
-      <TouchableOpacity style={styles.back} onPress={() => navigation.goBack()}>
-        <Text style={styles.backText}>‹ Dashboard</Text>
-      </TouchableOpacity>
+      <View style={styles.topRow}>
+        <TouchableOpacity style={styles.back} onPress={() => navigation.goBack()}>
+          <Text style={styles.backText}>‹ Dashboard</Text>
+        </TouchableOpacity>
+        <SettingsButton />
+      </View>
       <Text style={styles.title}>Nearby Observations</Text>
       <Text style={styles.subtitle}>📍 {activeStation.name}, BC · Environment Canada, NOAA NDBC</Text>
 
@@ -97,6 +101,7 @@ export function ReadingStats({ reading, units }) {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: COLORS.background },
+  topRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingRight: 10 },
   back: { padding: 16, paddingBottom: 4 },
   backText: { color: COLORS.accent, fontSize: 13 },
   title: { color: COLORS.textPrimary, fontSize: 18, fontWeight: 'bold', paddingHorizontal: 16 },

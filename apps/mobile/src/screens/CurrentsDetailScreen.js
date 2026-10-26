@@ -1,5 +1,6 @@
 import { View, Text, ScrollView, TouchableOpacity, StyleSheet } from 'react-native';
 import { useApp } from '../context/AppContext';
+import SettingsButton from '../components/SettingsButton';
 import { COLORS } from '../theme';
 import { formatTime, formatSpeed } from '@bc-marine/shared';
 
@@ -21,9 +22,12 @@ export default function CurrentsDetailScreen({ navigation }) {
   if (!hasCurrentsData) {
     return (
       <ScrollView style={styles.container}>
-        <TouchableOpacity style={styles.back} onPress={() => navigation.goBack()}>
-          <Text style={styles.backText}>‹ Dashboard</Text>
-        </TouchableOpacity>
+        <View style={styles.topRow}>
+          <TouchableOpacity style={styles.back} onPress={() => navigation.goBack()}>
+            <Text style={styles.backText}>‹ Dashboard</Text>
+          </TouchableOpacity>
+          <SettingsButton />
+        </View>
         <Text style={styles.title}>Tidal Currents</Text>
         <Text style={styles.subtitle}>📍 {activeStation.name}, BC · Open-Meteo</Text>
         <View style={styles.emptyCard}>
@@ -47,9 +51,12 @@ export default function CurrentsDetailScreen({ navigation }) {
 
   return (
     <ScrollView style={styles.container}>
-      <TouchableOpacity style={styles.back} onPress={() => navigation.goBack()}>
-        <Text style={styles.backText}>‹ Dashboard</Text>
-      </TouchableOpacity>
+      <View style={styles.topRow}>
+        <TouchableOpacity style={styles.back} onPress={() => navigation.goBack()}>
+          <Text style={styles.backText}>‹ Dashboard</Text>
+        </TouchableOpacity>
+        <SettingsButton />
+      </View>
       <Text style={styles.title}>Tidal Currents</Text>
       <Text style={styles.subtitle}>📍 {activeStation.name}, BC · Open-Meteo</Text>
 
@@ -97,6 +104,7 @@ export default function CurrentsDetailScreen({ navigation }) {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: COLORS.background },
+  topRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingRight: 10 },
   back: { padding: 16, paddingBottom: 4 },
   backText: { color: COLORS.accent, fontSize: 13 },
   title: { color: COLORS.textPrimary, fontSize: 18, fontWeight: 'bold', paddingHorizontal: 16 },

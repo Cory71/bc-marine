@@ -10,9 +10,11 @@ const WARNING_RANKS = [
 // Gale and above are shown in the stronger (red) warning style
 const SEVERE_RANK = 2;
 
-// Rank a warning by its title: 0 for other warnings (e.g. freezing spray), up to 4
+// Rank a warning by its title: 0 for other warnings (e.g. freezing spray), up to 4.
+// "Gale warning ended" ranks 0 too, so it isn't shown red or ahead of active warnings.
 export function getWarningRank(title) {
   const text = String(title ?? '').toLowerCase();
+  if (text.includes('ended')) return 0;
   return WARNING_RANKS.find(({ phrase }) => text.includes(phrase))?.rank ?? 0;
 }
 

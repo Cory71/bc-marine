@@ -3,7 +3,13 @@ import { render, screen, cleanup } from '@testing-library/react';
 import { MemoryRouter } from 'react-router';
 import { useApp } from '../src/context/AppContext.jsx';
 import NearbyObservationsCard from '../src/components/NearbyObservationsCard.jsx';
-import { RACE_ROCKS, HALIBUT_BANK, SILENT_SITE, VICTORIA } from './observations.fixtures.js';
+import {
+  RACE_ROCKS,
+  HALIBUT_BANK,
+  SILENT_SITE,
+  VICTORIA,
+  minutesAgo,
+} from './observations.fixtures.js';
 
 vi.mock('../src/context/AppContext.jsx', () => ({ useApp: vi.fn() }));
 afterEach(cleanup);
@@ -31,4 +37,16 @@ test('shows one short line per site and links to the Observations page', () => {
 test('says so when no site is nearby', () => {
   renderCard([]);
   expect(screen.getByText('No observation sites nearby.')).toBeTruthy();
+});
+
+test('an old reading is labelled on the card, not shown as if it were current', () => {
+  const stale = {
+    ...RACE_ROCKS,
+    reading: { ...RACE_ROCKS.reading, observedAt: minutesAgo(100 * 60) },
+  };
+  renderCard([stale]);
+  const row = screen.getByText('Race Rocks').closest('li');
+  expect(row.className).toContain('obs-lines__row--old');
+  expect(row.textContent).toContain('Old reading');
+  expect(row.textContent).toContain('4 d ago');
 });

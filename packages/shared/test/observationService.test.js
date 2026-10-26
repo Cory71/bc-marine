@@ -91,3 +91,15 @@ test('no nearby sites resolves to an empty list without fetching', async () => {
   );
   expect(fetchMock).not.toHaveBeenCalled();
 });
+
+test('a result with a failed site is not cached, so the next load tries again', async () => {
+  const station = { ...VICTORIA, lat: VICTORIA.lat + 0.0003 };
+  stubFetch({ failFor: 'L20' });
+  await fetchNearbyObservations(station, [LIGHT_10, LIGHT_20]);
+  vi.unstubAllGlobals();
+
+  // Network is back: Light20 should now load instead of staying "no report"
+  stubFetch();
+  const results = await fetchNearbyObservations(station, [LIGHT_10, LIGHT_20]);
+  expect(results.find(r => r.site.name === 'Light20').reading.windKts).toBe(17);
+});

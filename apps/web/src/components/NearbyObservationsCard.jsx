@@ -1,4 +1,4 @@
-import { summarizeObservation, formatReadingAge } from '@bc-marine/shared';
+import { summarizeObservation, formatReadingAge, isOldReading } from '@bc-marine/shared';
 import { useApp } from '../context/AppContext.jsx';
 import Card from './Card.jsx';
 import SourceContent from './SourceContent.jsx';
@@ -22,14 +22,28 @@ function ObservationLines() {
   return (
     <ul className="obs-lines">
       {observations.map(observation => (
-        <li key={observation.site.id} className="obs-lines__row">
-          <span className="obs-lines__name">{observation.site.name}</span>
-          <span className="numeric">{summarizeObservation(observation)}</span>
-          {observation.reading && (
-            <span className="card__note">{formatReadingAge(observation.reading.observedAt)}</span>
-          )}
-        </li>
+        <ObservationLine key={observation.site.id} observation={observation} />
       ))}
     </ul>
+  );
+}
+
+// One site's line. Readings older than 3 hours are faded and labelled, so they
+// never pass for current conditions.
+function ObservationLine({ observation }) {
+  const { site, reading } = observation;
+  const isOld = reading && isOldReading(reading.observedAt);
+
+  return (
+    <li className={`obs-lines__row ${isOld ? 'obs-lines__row--old' : ''}`}>
+      <span className="obs-lines__name">{site.name}</span>
+      <span className="numeric">{summarizeObservation(observation)}</span>
+      {reading && (
+        <span className="card__note">
+          {isOld && <span className="obs-tile__old">Old reading · </span>}
+          {formatReadingAge(reading.observedAt)}
+        </span>
+      )}
+    </li>
   );
 }

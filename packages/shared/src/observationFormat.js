@@ -43,12 +43,15 @@ export function formatDistance(km) {
   return withUnit(km == null ? null : Math.round(km), 'km');
 }
 
-// 'just now', '40 min ago', '2 h ago'
+// 'just now', '40 min ago', '2 h ago', '3 d ago'
 export function formatReadingAge(observedAt, now = new Date()) {
   const minutes = Math.floor((now - new Date(observedAt)) / MINUTE_MS);
   if (minutes < 1) return 'just now';
   if (minutes < 60) return `${minutes} min ago`;
-  return `${Math.floor(minutes / 60)} h ago`;
+  const hours = Math.floor(minutes / 60);
+  // A station that stopped reporting days ago should read as days, not '2400 h'
+  if (hours < 48) return `${hours} h ago`;
+  return `${Math.floor(hours / 24)} d ago`;
 }
 
 // Readings older than 3 hours are shown dimmed as "Old reading"

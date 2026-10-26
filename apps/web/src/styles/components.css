@@ -467,3 +467,8 @@
     grid-row: 2;
   }
 }
+
+/* Old readings on the dashboard card fade back like the page's tiles */
+.obs-lines__row--old > :nth-child(-n + 2) {
+  opacity: 0.6;
+}

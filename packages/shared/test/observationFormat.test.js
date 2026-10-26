@@ -76,3 +76,8 @@ test('summarizeObservation gives the short dashboard line', () => {
   );
   expect(summarizeObservation({ site: { type: 'buoy' }, reading: null })).toBe('No recent report');
 });
+
+test('readings 48 hours or older show their age in days', () => {
+  expect(formatReadingAge(new Date('2026-10-23T21:30:00Z'), NOW)).toBe('2 d ago');
+  expect(formatReadingAge(new Date('2026-10-24T00:30:00Z'), NOW)).toBe('47 h ago');
+});

@@ -1,12 +1,12 @@
 import { View, Text, ScrollView, RefreshControl, StyleSheet, ActivityIndicator } from 'react-native';
 import { useApp } from '../context/AppContext';
 import { COLORS } from '../theme';
-import { timeSince, formatTime, getSunMoon, degreesToCardinal, tidyForecastText, summarizeObservation, formatReadingAge } from '@bc-marine/shared';
+import { timeSince, formatTime, getSunMoon, degreesToCardinal, tidyForecastText, summarizeObservation, formatReadingAge, isOldReading } from '@bc-marine/shared';
 import WarningBanner from '../components/WarningBanner';
 import CardWrapper from '../components/CardWrapper';
 
 export default function DashboardScreen({ navigation }) {
-  const { activeStation, tides, weather, tideEvents, marineForecast, observations, loading, error, lastUpdated, refresh } = useApp();
+  const { activeStation, tides, weather, tideEvents, marineForecast, observations, observationsLoading, loading, error, lastUpdated, refresh } = useApp();
 
   const now = new Date();
   const sunMoon = getSunMoon(activeStation.lat, activeStation.lon);
@@ -72,16 +72,26 @@ export default function DashboardScreen({ navigation }) {
 
       {/* Nearby lighthouses and buoys: what's actually happening right now */}
       <CardWrapper label="🗼 Nearby Observations" linkText="All Readings" onPress={() => navigation.navigate('ObservationsDetail')}>
-        {observations.length === 0 ? (
+        {observationsLoading && observations.length === 0 ? (
+          <Text style={styles.sourceText}>Loading nearby observations…</Text>
+        ) : observations.length === 0 ? (
           <Text style={styles.sourceText}>No observation sites nearby.</Text>
         ) : (
-          observations.map(observation => (
-            <View key={observation.site.id} style={styles.obsRow}>
-              <Text style={styles.obsName}>{observation.site.name}</Text>
-              <Text style={styles.obsSummary}>{summarizeObservation(observation)}</Text>
-              {observation.reading && <Text style={styles.obsAge}>{formatReadingAge(observation.reading.observedAt)}</Text>}
-            </View>
-          ))
+          observations.map(observation => {
+            // Readings older than 3 hours are faded and labelled, never shown as current
+            const isOld = observation.reading && isOldReading(observation.reading.observedAt);
+            return (
+              <View key={observation.site.id} style={[styles.obsRow, isOld && styles.obsOld]}>
+                <Text style={styles.obsName}>{observation.site.name}</Text>
+                <Text style={styles.obsSummary}>{summarizeObservation(observation)}</Text>
+                {observation.reading && (
+                  <Text style={styles.obsAge}>
+                    {isOld ? 'Old · ' : ''}{formatReadingAge(observation.reading.observedAt)}
+                  </Text>
+                )}
+              </View>
+            );
+          })
         )}
       </CardWrapper>
 
@@ -166,6 +176,7 @@ const styles = StyleSheet.create({
   obsName: { color: COLORS.textPrimary, fontSize: 12, fontWeight: 'bold', flex: 1.1 },
   obsSummary: { color: COLORS.textSecondary, fontSize: 12, flex: 1.6 },
   obsAge: { color: COLORS.textMuted, fontSize: 10 },
+  obsOld: { opacity: 0.6 },
   forecastText: { color: COLORS.textSecondary, fontSize: 11, lineHeight: 18 },
   sourceText: { color: COLORS.textMuted, fontSize: 10, marginTop: 6 },
   loadingText: { color: COLORS.textSecondary, marginTop: 12 },

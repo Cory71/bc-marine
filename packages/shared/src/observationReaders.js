@@ -9,7 +9,8 @@ const KNOTS_PER_MS = 1.943844;
 
 // Read one EC GeoMet swob-realtime feature's properties (wind in km/h)
 export function readLighthouseFeature(properties) {
-  if (!properties?.obs_date_tm) return null;
+  const observedAt = new Date(properties?.obs_date_tm);
+  if (!properties?.obs_date_tm || !isValidDate(observedAt)) return null;
   // Prefer the 10-minute average; fall back to the 2-minute, then the hourly one
   const windKmh = firstNumber(properties, [
     'avg_wnd_spd_10m_pst10mts',
@@ -24,7 +25,7 @@ export function readLighthouseFeature(properties) {
 
   return {
     ...emptyReading(),
-    observedAt: new Date(properties.obs_date_tm),
+    observedAt,
     windKts: kmhToKnots(windKmh),
     windDirDeg: windDir,
     gustKts: kmhToKnots(numberOrNull(properties.max_wnd_spd_10m_pst1hr)),
@@ -46,10 +47,14 @@ export function parseNdbcText(text) {
   const value = name => numberOrNull(values[columns.indexOf(name)]);
   const waveHeightM = value('WVHT');
 
+  // A row without a complete time can't be shown honestly (a missing year would
+  // otherwise quietly become 1900)
+  const [year, month, day, hour, minute] = ['YY', 'MM', 'DD', 'hh', 'mm'].map(value);
+  if ([year, month, day, hour, minute].some(part => part == null)) return null;
+  const observedAt = new Date(Date.UTC(year, month - 1, day, hour, minute));
+
   return {
-    observedAt: new Date(
-      Date.UTC(value('YY'), value('MM') - 1, value('DD'), value('hh'), value('mm'))
-    ),
+    observedAt,
     windKts: msToKnots(value('WSPD')),
     windDirDeg: value('WDIR'),
     gustKts: msToKnots(value('GST')),
@@ -59,6 +64,10 @@ export function parseNdbcText(text) {
     airTempC: value('ATMP'),
     waterTempC: value('WTMP'),
   };
+}
+
+function isValidDate(date) {
+  return !Number.isNaN(date.getTime());
 }
 
 function emptyReading() {

@@ -52,7 +52,9 @@ export async function fetchNearbyObservations(station, sites = OBSERVATION_SITES
     reading: results[i].status === 'fulfilled' ? results[i].value : null,
   }));
 
-  setCache(cacheKey, observations, OBSERVATIONS_TTL_MS);
+  // Only cache a complete set: after a brief network blip, the next load tries again
+  const anyFailed = results.some(result => result.status === 'rejected');
+  if (!anyFailed) setCache(cacheKey, observations, OBSERVATIONS_TTL_MS);
   return observations;
 }
 

@@ -71,3 +71,11 @@ test('parseNdbcText turns MM (missing) values into null, never NaN', () => {
 
 test('parseNdbcText returns null when there are no data rows', () =>
   expect(parseNdbcText(NDBC_HEADER)).toBeNull());
+
+test('an unreadable observation time gives no reading, never "NaN"', () => {
+  expect(readLighthouseFeature({ ...RACE_ROCKS, obs_date_tm: 'not a date' })).toBeNull();
+  const badTime =
+    NDBC_HEADER +
+    'MM MM 25 23 00 270  4.0  4.0   0.4     4    MM  MM 1014.5  10.0  11.1    MM   MM -0.2    MM\n';
+  expect(parseNdbcText(badTime)).toBeNull();
+});

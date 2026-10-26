@@ -23,15 +23,23 @@ function renderCard(observations) {
   );
 }
 
-test('shows one short line per site and links to the Observations page', () => {
+test('shows each site with its type, a big wind value, gust or waves, and age', () => {
   renderCard([RACE_ROCKS, HALIBUT_BANK, SILENT_SITE]);
   const card = screen.getByRole('link');
   expect(card.getAttribute('href')).toBe('/observations?station=victoria');
-  expect(card.textContent).toContain('Race Rocks');
-  expect(card.textContent).toContain('E 17 kts, gust 25');
-  expect(card.textContent).toContain('1 min ago');
-  expect(card.textContent).toContain('W 8 kts, waves 1.3 ft');
-  expect(card.textContent).toContain('No recent report');
+
+  const raceRocks = screen.getByText('Race Rocks').closest('li');
+  expect(raceRocks.textContent).toContain('Lighthouse');
+  expect(raceRocks.querySelector('.obs-lines__wind').textContent).toBe('E 17 kts');
+  expect(raceRocks.textContent).toContain('gust 25 kts');
+  expect(raceRocks.textContent).toContain('1 min ago');
+
+  const halibutBank = screen.getByText('Halibut Bank').closest('li');
+  expect(halibutBank.textContent).toContain('Buoy');
+  expect(halibutBank.querySelector('.obs-lines__wind').textContent).toBe('W 8 kts');
+  expect(halibutBank.textContent).toContain('waves 1.3 ft');
+
+  expect(screen.getByText('Kelp Reefs').closest('li').textContent).toContain('No recent report');
 });
 
 test('says so when no site is nearby', () => {

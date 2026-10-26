@@ -1,7 +1,7 @@
 import { View, Text, ScrollView, RefreshControl, StyleSheet, ActivityIndicator } from 'react-native';
 import { useApp } from '../context/AppContext';
 import { COLORS } from '../theme';
-import { timeSince, formatTime, getSunMoon, degreesToCardinal, tidyForecastText, summarizeObservation, formatReadingAge, isOldReading } from '@bc-marine/shared';
+import { timeSince, formatTime, getSunMoon, degreesToCardinal, tidyForecastText, formatWind, observationDetail, formatReadingAge, isOldReading } from '@bc-marine/shared';
 import WarningBanner from '../components/WarningBanner';
 import CardWrapper from '../components/CardWrapper';
 
@@ -101,13 +101,29 @@ export default function DashboardScreen({ navigation }) {
             // Readings older than 3 hours are faded and labelled, never shown as current
             const isOld = observation.reading && isOldReading(observation.reading.observedAt);
             return (
-              <View key={observation.site.id} style={[styles.obsRow, isOld && styles.obsOld]}>
-                <Text style={styles.obsName}>{observation.site.name}</Text>
-                <Text style={styles.obsSummary}>{summarizeObservation(observation)}</Text>
-                {observation.reading && (
-                  <Text style={styles.obsAge}>
-                    {isOld ? 'Old · ' : ''}{formatReadingAge(observation.reading.observedAt)}
-                  </Text>
+              <View key={observation.site.id} style={styles.obsRow}>
+                {/* Line 1: name, type badge and how long ago */}
+                <View style={styles.obsLine}>
+                  <View style={styles.obsNameWrap}>
+                    <Text style={styles.obsName}>{observation.site.name}</Text>
+                    <Text style={[styles.obsBadge, observation.site.type === 'buoy' ? styles.obsBuoy : styles.obsLighthouse]}>
+                      {observation.site.type === 'buoy' ? 'BUOY' : 'LIGHTHOUSE'}
+                    </Text>
+                  </View>
+                  {observation.reading && (
+                    <Text style={styles.obsAge}>
+                      {isOld ? 'Old · ' : ''}{formatReadingAge(observation.reading.observedAt)}
+                    </Text>
+                  )}
+                </View>
+                {/* Line 2: the big wind reading, then gust (lighthouses) or waves (buoys) */}
+                {observation.reading ? (
+                  <View style={[styles.obsLine2, isOld && styles.obsOld]}>
+                    <Text style={styles.obsWind}>{formatWind(observation.reading)}</Text>
+                    <Text style={styles.obsDetail}>{observationDetail(observation)}</Text>
+                  </View>
+                ) : (
+                  <Text style={styles.obsDetail}>No recent report</Text>
                 )}
               </View>
             );
@@ -172,10 +188,17 @@ const styles = StyleSheet.create({
   statLabel: { color: COLORS.accent, fontSize: 9, textTransform: 'uppercase' },
   statValue: { color: COLORS.textPrimary, fontSize: 14, fontWeight: 'bold', marginTop: 2 },
   statSub: { color: COLORS.textSecondary, fontSize: 10, marginTop: 1 },
-  obsRow: { flexDirection: 'row', alignItems: 'baseline', paddingVertical: 5, borderBottomWidth: 1, borderBottomColor: 'rgba(126,206,244,0.08)', gap: 8 },
-  obsName: { color: COLORS.textPrimary, fontSize: 12, fontWeight: 'bold', flex: 1.1 },
-  obsSummary: { color: COLORS.textSecondary, fontSize: 12, flex: 1.6 },
+  obsRow: { paddingVertical: 7, borderBottomWidth: 1, borderBottomColor: 'rgba(126,206,244,0.08)' },
+  obsLine: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
+  obsNameWrap: { flexDirection: 'row', alignItems: 'center', gap: 6, flexShrink: 1 },
+  obsName: { color: COLORS.textPrimary, fontSize: 13, fontWeight: 'bold' },
+  obsBadge: { fontSize: 8, fontWeight: 'bold', letterSpacing: 0.5, paddingHorizontal: 5, paddingVertical: 1, borderRadius: 4, overflow: 'hidden' },
+  obsLighthouse: { color: COLORS.accent, backgroundColor: 'rgba(126,206,244,0.16)' },
+  obsBuoy: { color: COLORS.safe, backgroundColor: 'rgba(77,204,136,0.16)' },
   obsAge: { color: COLORS.textMuted, fontSize: 10 },
+  obsLine2: { flexDirection: 'row', alignItems: 'baseline', gap: 10, marginTop: 2 },
+  obsWind: { color: COLORS.textPrimary, fontSize: 17, fontWeight: 'bold' },
+  obsDetail: { color: COLORS.textSecondary, fontSize: 12 },
   obsOld: { opacity: 0.6 },
   forecastText: { color: COLORS.textSecondary, fontSize: 11, lineHeight: 18 },
   sourceText: { color: COLORS.textMuted, fontSize: 10, marginTop: 6 },

@@ -31,7 +31,8 @@ Live tides, wind, waves, currents and Environment Canada marine forecasts for th
 - **Wind & Weather**: 16-point compass headings, wave height and period, swell, visibility and an 8-hour breakdown
 - **Tidal Currents**: speed, direction and flooding/ebbing phase
 - **Locations**: search by name or weather area, browse by EC marine region, save favourites, or use your location to find the nearest station
-- **Marine warnings**: active EC gale and wind warnings shown at the top of every screen
+- **Nearby observations**: live wind, gusts, waves, pressure and temperatures from the 3 nearest lighthouse weather stations and ocean buoys, with how fresh each reading is
+- **Marine warnings**: active EC warnings shown at the top of every screen, most severe first, with gale and above in red
 - **Web extras**: shareable links (`/tides?station=tofino`), a desktop layout with a station sidebar, keyboard navigation and screen-reader labels
 
 ## Data Sources
@@ -41,8 +42,10 @@ Live tides, wind, waves, currents and Environment Canada marine forecasts for th
 | Fisheries and Oceans Canada (DFO IWLS API) | Tide heights, high/low events, 7-day forecast  |
 | Open-Meteo Marine and Forecast APIs        | Wind, waves, swell, tidal currents, visibility |
 | Environment Canada Atom feeds              | Marine warnings and text forecasts             |
+| Environment Canada GeoMet (SWOB)           | Live lighthouse and headland weather stations  |
+| NOAA National Data Buoy Center             | Live readings from EC's BC ocean buoys         |
 
-No API keys are required. All three services are free and open.
+No API keys are required. All of these services are free and open.
 
 ## Architecture
 

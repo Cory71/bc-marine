@@ -70,6 +70,26 @@ export default function DashboardScreen({ navigation }) {
         <Text style={styles.sourceText}>Source: Environment Canada · {activeStation.region}</Text>
       </CardWrapper>
 
+      {/* Wind & Weather */}
+      <CardWrapper label="💨 Wind & Weather" linkText="Hourly View" onPress={() => navigation.navigate('WeatherDetail')}>
+        <View style={styles.row}>
+          <View style={styles.statBox}>
+            <Text style={styles.statLabel}>Wind</Text>
+            <Text style={styles.statValue}>
+              {currentWeather?.windDirectionDeg != null ? degreesToCardinal(currentWeather.windDirectionDeg) + ' ' : ''}{currentWeather?.windSpeedKts?.toFixed(0) ?? '--'} kts
+            </Text>
+          </View>
+          <View style={styles.statBox}>
+            <Text style={styles.statLabel}>Waves</Text>
+            <Text style={styles.statValue}>{currentWeather?.waveHeightFt ?? '--'} ft</Text>
+          </View>
+          <View style={styles.statBox}>
+            <Text style={styles.statLabel}>Visibility</Text>
+            <Text style={styles.statValue}>{currentWeather?.visibilityKm?.toFixed(0) ?? '--'} km</Text>
+          </View>
+        </View>
+      </CardWrapper>
+
       {/* Nearby lighthouses and buoys: what's actually happening right now */}
       <CardWrapper label="🗼 Nearby Observations" linkText="All Readings" onPress={() => navigation.navigate('ObservationsDetail')}>
         {observationsLoading && observations.length === 0 ? (
@@ -93,26 +113,6 @@ export default function DashboardScreen({ navigation }) {
             );
           })
         )}
-      </CardWrapper>
-
-      {/* Wind & Weather */}
-      <CardWrapper label="💨 Wind & Weather" linkText="Hourly View" onPress={() => navigation.navigate('WeatherDetail')}>
-        <View style={styles.row}>
-          <View style={styles.statBox}>
-            <Text style={styles.statLabel}>Wind</Text>
-            <Text style={styles.statValue}>
-              {currentWeather?.windDirectionDeg != null ? degreesToCardinal(currentWeather.windDirectionDeg) + ' ' : ''}{currentWeather?.windSpeedKts?.toFixed(0) ?? '--'} kts
-            </Text>
-          </View>
-          <View style={styles.statBox}>
-            <Text style={styles.statLabel}>Waves</Text>
-            <Text style={styles.statValue}>{currentWeather?.waveHeightFt ?? '--'} ft</Text>
-          </View>
-          <View style={styles.statBox}>
-            <Text style={styles.statLabel}>Visibility</Text>
-            <Text style={styles.statValue}>{currentWeather?.visibilityKm?.toFixed(0) ?? '--'} km</Text>
-          </View>
-        </View>
       </CardWrapper>
 
       {/* Tides */}

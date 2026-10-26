@@ -6,10 +6,15 @@ import {
   buildDirectBuoyFeedUrl,
 } from '../src/services/observationService.js';
 
-const VICTORIA = { name: 'Victoria', lat: 48.4244, lon: -123.3699 };
+const VICTORIA = {
+  name: 'Victoria',
+  lat: 48.4244,
+  lon: -123.3699,
+  coast: 'Juan de Fuca & South Coast',
+};
 
 // Sites due north of Victoria: 0.09° of latitude is about 10 km
-function site(name, type, kmNorth, sourceId) {
+function site(name, type, kmNorth, sourceId, coasts = [VICTORIA.coast]) {
   return {
     id: name.toLowerCase(),
     name,
@@ -17,6 +22,7 @@ function site(name, type, kmNorth, sourceId) {
     lat: VICTORIA.lat + kmNorth * 0.009,
     lon: VICTORIA.lon,
     sourceId,
+    coasts,
   };
 }
 const LIGHT_10 = site('Light10', 'lighthouse', 10, 'L10');
@@ -62,7 +68,7 @@ test('keeps the 3 nearest lighthouses when the only buoy is beyond 100 km', () =
 });
 
 test('returns nothing when no site is within 100 km', () => {
-  const farStation = { name: 'Far', lat: 52, lon: -123.37 };
+  const farStation = { name: 'Far', lat: 52, lon: -123.37, coast: VICTORIA.coast };
   expect(selectNearbySites(farStation, [LIGHT_10, BUOY_60])).toEqual([]);
 });
 
@@ -86,9 +92,11 @@ test('buoy requests use the configured URL builder', async () => {
 
 test('no nearby sites resolves to an empty list without fetching', async () => {
   const fetchMock = stubFetch();
-  expect(await fetchNearbyObservations({ name: 'Far', lat: 52, lon: -123.37 }, [LIGHT_10])).toEqual(
-    []
-  );
+  expect(
+    await fetchNearbyObservations({ name: 'Far', lat: 52, lon: -123.37, coast: VICTORIA.coast }, [
+      LIGHT_10,
+    ])
+  ).toEqual([]);
   expect(fetchMock).not.toHaveBeenCalled();
 });
 
@@ -102,4 +110,15 @@ test('a result with a failed site is not cached, so the next load tries again', 
   stubFetch();
   const results = await fetchNearbyObservations(station, [LIGHT_10, LIGHT_20]);
   expect(results.find(r => r.site.name === 'Light20').reading.windKts).toBe(17);
+});
+
+test('only picks sites that report for the same coast group as the station', () => {
+  // Nearer, but on the other side of Vancouver Island
+  const acrossTheIsland = site('Across', 'lighthouse', 5, 'X5', ['Strait of Georgia']);
+  const sharedBoundary = site('Shared', 'lighthouse', 40, 'S40', [
+    'Strait of Georgia',
+    VICTORIA.coast,
+  ]);
+  const chosen = selectNearbySites(VICTORIA, [acrossTheIsland, LIGHT_10, sharedBoundary]);
+  expect(chosen.map(entry => entry.site.name)).toEqual(['Light10', 'Shared']);
 });

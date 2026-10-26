@@ -21,10 +21,13 @@ export function configureBuoyFeedUrl(buildUrl) {
   currentBuildBuoyUrl = buildUrl;
 }
 
-// The 3 nearest sites within 100 km, nearest first. If none of those is a buoy
-// but one is within 100 km, it replaces the third, so waves show when they can.
+// The 3 nearest sites within 100 km that report for the station's coast group,
+// nearest first. Sites from another group are skipped even when closer (straight-line
+// distance can cut across Vancouver Island), so a station may get fewer than 3.
+// If none of the 3 is a buoy but one qualifies, it replaces the third, so waves show when they can.
 export function selectNearbySites(station, sites = OBSERVATION_SITES) {
   const nearby = sites
+    .filter(site => site.coasts.includes(station.coast))
     .map(site => ({ site, distanceKm: distanceKm(station.lat, station.lon, site.lat, site.lon) }))
     .filter(entry => entry.distanceKm <= NEARBY_RADIUS_KM)
     .sort((a, b) => a.distanceKm - b.distanceKm);

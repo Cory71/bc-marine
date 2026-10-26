@@ -1,5 +1,5 @@
 import { test, expect } from 'vitest';
-import { OBSERVATION_SITES } from '../src/index.js';
+import { OBSERVATION_SITES, BC_REGIONS } from '../src/index.js';
 
 test('every site has a valid type and sits in BC waters', () => {
   for (const site of OBSERVATION_SITES) {
@@ -22,4 +22,12 @@ test('the list has enough lighthouses and buoys to cover the coast', () => {
   const count = type => OBSERVATION_SITES.filter(site => site.type === type).length;
   expect(count('lighthouse')).toBeGreaterThanOrEqual(10);
   expect(count('buoy')).toBeGreaterThanOrEqual(8);
+});
+
+test('every site is tagged with the coast groups it reports for', () => {
+  const coastNames = BC_REGIONS.map(region => region.name);
+  for (const site of OBSERVATION_SITES) {
+    expect(site.coasts.length).toBeGreaterThan(0);
+    for (const coast of site.coasts) expect(coastNames).toContain(coast);
+  }
 });

@@ -1,5 +1,6 @@
 import { View, Text, ScrollView, TouchableOpacity, StyleSheet, useWindowDimensions } from 'react-native';
 import { useApp } from '../context/AppContext';
+import SettingsButton from '../components/SettingsButton';
 import { COLORS } from '../theme';
 import { formatTime, formatHeight } from '@bc-marine/shared';
 import TideCurve from '../components/TideCurve';
@@ -15,9 +16,12 @@ export default function TideDetailScreen({ navigation }) {
   if (!tides || tides.length === 0) {
     return (
       <ScrollView style={styles.container}>
-        <TouchableOpacity style={styles.back} onPress={() => navigation.goBack()}>
-          <Text style={styles.backText}>‹ Dashboard</Text>
-        </TouchableOpacity>
+        <View style={styles.topRow}>
+          <TouchableOpacity style={styles.back} onPress={() => navigation.goBack()}>
+            <Text style={styles.backText}>‹ Dashboard</Text>
+          </TouchableOpacity>
+          <SettingsButton />
+        </View>
         <Text style={styles.title}>Tide Chart</Text>
         <Text style={styles.subtitle}>📍 {activeStation.name}, BC · DFO</Text>
         <View style={styles.emptyCard}>
@@ -39,9 +43,12 @@ export default function TideDetailScreen({ navigation }) {
 
   return (
     <ScrollView style={styles.container}>
-      <TouchableOpacity style={styles.back} onPress={() => navigation.goBack()}>
-        <Text style={styles.backText}>‹ Dashboard</Text>
-      </TouchableOpacity>
+      <View style={styles.topRow}>
+        <TouchableOpacity style={styles.back} onPress={() => navigation.goBack()}>
+          <Text style={styles.backText}>‹ Dashboard</Text>
+        </TouchableOpacity>
+        <SettingsButton />
+      </View>
       <Text style={styles.title}>Tide Chart</Text>
       <Text style={styles.subtitle}>📍 {activeStation.name}, BC · DFO</Text>
 
@@ -108,6 +115,7 @@ export default function TideDetailScreen({ navigation }) {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: COLORS.background },
+  topRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingRight: 10 },
   back: { padding: 16, paddingBottom: 4 },
   backText: { color: COLORS.accent, fontSize: 13 },
   title: { color: COLORS.textPrimary, fontSize: 18, fontWeight: 'bold', paddingHorizontal: 16 },

@@ -1,0 +1,69 @@
+import { useState } from 'react';
+import { View, Text, TouchableOpacity, Pressable, Modal, StyleSheet } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import UnitsPicker from './UnitsPicker';
+import { COLORS } from '../theme';
+
+// Gear button for the top of each screen; opens a Settings panel that drops down from the top
+export default function SettingsButton() {
+  const [open, setOpen] = useState(false);
+
+  return (
+    <>
+      <TouchableOpacity
+        style={styles.gear}
+        onPress={() => setOpen(true)}
+        accessibilityRole="button"
+        accessibilityLabel="Settings"
+      >
+        <Text style={styles.gearText}>⚙️</Text>
+      </TouchableOpacity>
+      <SettingsPanel visible={open} onClose={() => setOpen(false)} />
+    </>
+  );
+}
+
+function SettingsPanel({ visible, onClose }) {
+  const insets = useSafeAreaInsets();
+
+  return (
+    <Modal visible={visible} transparent animationType="fade" statusBarTranslucent onRequestClose={onClose}>
+      {/* Tapping the dimmed area below the panel closes it */}
+      <Pressable style={styles.backdrop} onPress={onClose} accessibilityLabel="Close settings">
+        {/* An inner Pressable stops taps on the panel from closing it */}
+        <Pressable style={[styles.panel, { paddingTop: insets.top + 12 }]} onPress={() => {}}>
+          <View style={styles.titleRow}>
+            <Text style={styles.title}>Settings</Text>
+            <TouchableOpacity onPress={onClose} accessibilityRole="button">
+              <Text style={styles.done}>Done</Text>
+            </TouchableOpacity>
+          </View>
+          <Text style={styles.sectionLabel}>UNITS</Text>
+          <UnitsPicker />
+          <Text style={styles.note}>Saved on this phone until you change it.</Text>
+        </Pressable>
+      </Pressable>
+    </Modal>
+  );
+}
+
+const styles = StyleSheet.create({
+  gear: { padding: 6 },
+  gearText: { fontSize: 20 },
+  backdrop: { flex: 1, backgroundColor: 'rgba(0,0,0,0.55)' },
+  panel: {
+    backgroundColor: COLORS.background,
+    paddingHorizontal: 16,
+    paddingBottom: 16,
+    borderBottomLeftRadius: 16,
+    borderBottomRightRadius: 16,
+    borderWidth: 1,
+    borderTopWidth: 0,
+    borderColor: COLORS.cardBorder,
+  },
+  titleRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 },
+  title: { color: COLORS.textPrimary, fontSize: 18, fontWeight: 'bold' },
+  done: { color: COLORS.accent, fontSize: 15, fontWeight: '600' },
+  sectionLabel: { color: COLORS.textSecondary, fontSize: 11, fontWeight: '700', letterSpacing: 1, marginBottom: 4 },
+  note: { color: COLORS.textSecondary, fontSize: 12, marginTop: 10 },
+});

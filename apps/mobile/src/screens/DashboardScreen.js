@@ -1,5 +1,6 @@
 import { View, Text, ScrollView, RefreshControl, StyleSheet, ActivityIndicator } from 'react-native';
 import { useApp } from '../context/AppContext';
+import SettingsButton from '../components/SettingsButton';
 import { COLORS } from '../theme';
 import { timeSince, formatTime, getSunMoon, degreesToCardinal, tidyForecastText, formatWind, observationDetail, formatReadingAge, isOldReading, formatSpeed, formatHeight, formatDistance } from '@bc-marine/shared';
 import WarningBanner from '../components/WarningBanner';
@@ -50,7 +51,10 @@ export default function DashboardScreen({ navigation }) {
       {/* Location Header */}
       <View style={styles.header}>
         <View style={{ flex: 1 }}>
-          <Text style={styles.stationLabel}>📍 {activeStation.name.toUpperCase()}, BC</Text>
+          <View style={styles.labelRow}>
+            <Text style={styles.stationLabel}>📍 {activeStation.name.toUpperCase()}, BC</Text>
+            <SettingsButton />
+          </View>
           <Text style={styles.title}>Marine Dashboard</Text>
           <Text style={styles.updated}>{lastUpdated ? timeSince(lastUpdated) : ''} · Tap card for full detail</Text>
         </View>
@@ -180,6 +184,7 @@ const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: COLORS.background },
   centered: { flex: 1, backgroundColor: COLORS.background, justifyContent: 'center', alignItems: 'center' },
   header: { padding: 16, paddingBottom: 8 },
+  labelRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
   stationLabel: { color: COLORS.accent, fontSize: 10, letterSpacing: 2, textTransform: 'uppercase' },
   title: { color: COLORS.textPrimary, fontSize: 22, fontWeight: 'bold', marginTop: 2 },
   updated: { color: COLORS.textMuted, fontSize: 11, marginTop: 2 },

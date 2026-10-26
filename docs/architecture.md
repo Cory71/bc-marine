@@ -86,7 +86,7 @@ The dashboard shows what's actually happening on the water next to the forecast,
 - **Freshness.** Observations are cached for 10 minutes (other data keeps 30). Each tile shows how long ago the site reported, and readings older than 3 hours are dimmed and labelled "Old reading".
 - **Buoy relay.** `/api/buoy-feed` follows the same rules as the EC proxy: only buoy IDs from the site list are accepted, an incomplete file (the newest row must have a value for every column) is never passed on or cached, and successful responses are CDN-cached for 10 minutes.
 - **Site pages.** Each lighthouse and buoy has its own page (`/observations/<site>` on web, a detail screen on mobile) with its latest reading and the last 12 hourly readings, reachable from the Observations tiles and from search. EC stations that report every minute are queried with `_is-minutely_obs-value=false`, which returns one reading per hour; buoy history comes from the same NOAA file as the latest reading.
-- **Units in one place.** Data stays in knots, feet, °C and km. Only the display converts, through `unitPreferences.js`, using the units each person picks (web sidebar, mobile Locations tab). The choice is saved on the device until changed.
+- **Units in one place.** Data stays in knots, feet, °C and km. Only the display converts, through `unitPreferences.js`, using the units each person picks from the Settings drop-down at the top of every screen. The choice is saved on the device until changed.
 
 ## BC time
 

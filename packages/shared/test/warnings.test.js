@@ -29,3 +29,14 @@ test('sortWarningsBySeverity puts the most severe first without changing the inp
   ]);
   expect(warnings[0].title).toBe('STRONG WIND WARNING IN EFFECT');
 });
+
+test('an ended warning is no longer severe, so it shows amber', () => {
+  expect(getWarningRank('GALE WARNING ENDED, WEST COAST VANCOUVER ISLAND SOUTH')).toBe(0);
+  expect(isSevereWarning('GALE WARNING ENDED , WEST COAST VANCOUVER ISLAND SOUTH')).toBe(false);
+  expect(isSevereWarning('Storm warning ended')).toBe(false);
+});
+
+test('when a gale ends and a strong wind warning starts, the strong wind warning leads', () => {
+  const warnings = [{ title: 'GALE WARNING ENDED' }, { title: 'STRONG WIND WARNING IN EFFECT' }];
+  expect(sortWarningsBySeverity(warnings)[0].title).toBe('STRONG WIND WARNING IN EFFECT');
+});

@@ -4,6 +4,7 @@ import {
   degreesToCardinal,
   degreesToCompass,
   findNearestStation,
+  isRoughLocation,
   distanceKm,
   formatTime,
   timeSince,
@@ -44,4 +45,19 @@ test('distanceKm measures real distance (Victoria to Race Rocks is about 18 km)'
   expect(km).toBeGreaterThan(17);
   expect(km).toBeLessThan(19);
   expect(distanceKm(48.4, -123.4, 48.4, -123.4)).toBe(0);
+});
+
+test('findNearestStation measures real distance, not raw degrees', () => {
+  // East is 0.30° of longitude (about 22 km here); north is 0.25° of latitude (about 28 km)
+  const east = { name: 'East', lat: 49.0, lon: -122.7 };
+  const north = { name: 'North', lat: 49.25, lon: -123.0 };
+  expect(findNearestStation(49.0, -123.0, [north, east]).name).toBe('East');
+});
+
+test('isRoughLocation flags a device fix that is only known to 10 km or worse', () => {
+  expect(isRoughLocation(50)).toBe(false);
+  expect(isRoughLocation(9000)).toBe(false);
+  expect(isRoughLocation(10000)).toBe(true);
+  expect(isRoughLocation(45000)).toBe(true);
+  expect(isRoughLocation(undefined)).toBe(false);
 });

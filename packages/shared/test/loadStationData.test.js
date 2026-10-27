@@ -93,5 +93,7 @@ test('an offshore area skips tides without asking DFO', async () => {
 
 test("the forecast is loaded for the station's own part of a split area", async () => {
   await loadStationData({ ...victoria, ecSubarea: 'east entrance' });
-  expect(fetchMarineForecast).toHaveBeenCalledWith('Juan de Fuca Strait', 'east entrance');
+  expect(fetchMarineForecast).toHaveBeenCalledWith('Juan de Fuca Strait', 'east entrance', [
+    'east entrance',
+  ]);
 });

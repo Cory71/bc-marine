@@ -8,6 +8,7 @@ import {
   BC_STATIONS,
   EC_FEED_CODES,
   getEcSubarea,
+  getEcWarningSubareas,
   noTidesMessage,
 } from '../src/index.js';
 
@@ -69,6 +70,7 @@ test('each place gets the EC forecast area it sits in', () => {
     Shearwater: 'Milbanke Sound',
     Lund: 'Georgia Strait North',
     Sointula: 'Queen Charlotte Strait',
+    Parksville: 'Georgia Strait North',
   };
   for (const [name, region] of Object.entries(expected)) {
     expect(findStationBySlug(toStationSlug(name))?.region, name).toBe(region);
@@ -104,4 +106,15 @@ test('offshore forecast areas have no tide station and say so', () => {
   expect(noTidesMessage(findStationBySlug('victoria'))).toBe(
     'No tide data available for this station.'
   );
+});
+
+// Checked against the part shapes on EC's own marine maps (weather.gc.ca/marine) on 2026-10-26
+test('places on the line between two parts get warnings from both parts', () => {
+  const warningPartsOf = name => getEcWarningSubareas(findStationBySlug(toStationSlug(name)));
+  expect(warningPartsOf('Langara Island')).toEqual(['east of langara', 'west of langara']);
+  expect(warningPartsOf('Nanaimo')).toEqual(['south of nanaimo', 'north of nanaimo']);
+  expect(warningPartsOf('Gibsons')).toEqual(['north of nanaimo', 'south of nanaimo']);
+  expect(warningPartsOf('Port Renfrew')).toEqual(['west entrance', 'central strait']);
+  expect(warningPartsOf('Masset')).toEqual(['east of langara']);
+  expect(warningPartsOf('Tofino')).toEqual([]);
 });

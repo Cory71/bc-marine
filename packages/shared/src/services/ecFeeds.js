@@ -38,9 +38,18 @@ export function getEcSubarea(station) {
   return station.ecSubarea ?? EC_SUBAREA[getStationRegion(station)];
 }
 
-// Cache key for one area's forecast, or one part of it
-export function ecCacheKey(regionName, subArea) {
-  return subArea ? `ec_${regionName}_${subArea}` : `ec_${regionName}`;
+// The parts whose warnings a station shows: its own part, plus any part it sits on
+// the line with (ecAlsoWarnFor). An empty list means the area isn't split: show all.
+export function getEcWarningSubareas(station) {
+  const ownPart = getEcSubarea(station);
+  return ownPart ? [ownPart, ...(station.ecAlsoWarnFor ?? [])] : [];
+}
+
+// Cache key for one area's forecast, or one part of it (plus any extra warning parts)
+export function ecCacheKey(regionName, subArea, warningSubAreas = []) {
+  const extraParts = warningSubAreas.filter(part => part !== subArea);
+  const key = subArea ? `ec_${regionName}_${subArea}` : `ec_${regionName}`;
+  return extraParts.length ? `${key}+${extraParts.join('+')}` : key;
 }
 
 const KNOWN_CODES = new Set(Object.values(EC_FEED_CODES));

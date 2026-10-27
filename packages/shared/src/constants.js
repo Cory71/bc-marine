@@ -5,6 +5,7 @@ export const DEFAULT_STATION_NAME = 'Victoria';
 // EC's area shapes on 2026-10-26). id is the DFO IWLS station ID used for tide API calls.
 // Each one is the station's own DFO tide station (checked against DFO's station list).
 // ecSubarea picks the station's part of an EC area that's split into parts.
+// ecAlsoWarnFor lists the other parts a station sits on the line with, so it shows their warnings too.
 // Offshore areas have no tide station; they show the forecast and weather only.
 export const BC_REGIONS = [
   {
@@ -22,7 +23,7 @@ export const BC_REGIONS = [
         name: 'Dixon Entrance West',
         stations: [
           { id: '5cebf1de3d0f4a073c4bba44', name: 'Masset', lat: 54.0167, lon: -132.1500, ecSubarea: 'east of langara' },
-          { id: '5cebf1e23d0f4a073c4bc02e', name: 'Langara Island', lat: 54.1910, lon: -133.0020, ecSubarea: 'east of langara' },
+          { id: '5cebf1e23d0f4a073c4bc02e', name: 'Langara Island', lat: 54.1910, lon: -133.0020, ecSubarea: 'east of langara', ecAlsoWarnFor: ['west of langara'] },
         ],
       },
       {
@@ -131,7 +132,7 @@ export const BC_REGIONS = [
       {
         name: 'Georgia Strait South',
         stations: [
-          { id: '5cebf1de3d0f4a073c4bb96d', name: 'Nanaimo', lat: 49.1667, lon: -123.9333 },
+          { id: '5cebf1de3d0f4a073c4bb96d', name: 'Nanaimo', lat: 49.1667, lon: -123.9333, ecAlsoWarnFor: ['north of nanaimo'] },
           { id: '5cebf1de3d0f4a073c4bb943', name: 'Vancouver', lat: 49.2833, lon: -123.1167 },
         ],
       },
@@ -150,7 +151,7 @@ export const BC_REGIONS = [
         name: 'Juan de Fuca Strait',
         stations: [
           { id: '5cebf1df3d0f4a073c4bbd1e', name: 'Victoria', lat: 48.4244, lon: -123.3699, ecSubarea: 'east entrance' },
-          { id: '5cebf1e23d0f4a073c4bc060', name: 'Port Renfrew', lat: 48.5500, lon: -124.4167, ecSubarea: 'west entrance' },
+          { id: '5cebf1e23d0f4a073c4bc060', name: 'Port Renfrew', lat: 48.5500, lon: -124.4167, ecSubarea: 'west entrance', ecAlsoWarnFor: ['central strait'] },
         ],
       },
       {
@@ -174,13 +175,13 @@ export const BC_STATIONS = BC_REGIONS.flatMap(r =>
 // (within 6 km), so a few share one: Courtenay uses Comox's station
 export const BC_COMMUNITIES = [
   // Sunshine Coast
-  { id: '5cebf1de3d0f4a073c4bb950', name: 'Gibsons', lat: 49.3972, lon: -123.5069, region: 'Georgia Strait North', coast: 'Strait of Georgia' },
+  { id: '5cebf1de3d0f4a073c4bb950', name: 'Gibsons', lat: 49.3972, lon: -123.5069, region: 'Georgia Strait North', coast: 'Strait of Georgia', ecAlsoWarnFor: ['south of nanaimo'] },
   { id: '5cebf1de3d0f4a073c4bb958', name: 'Sechelt', lat: 49.4739, lon: -123.7572, region: 'Georgia Strait North', coast: 'Strait of Georgia' },
   { id: '5dd3064fe0fdc4b9b4be69da', name: 'Pender Harbour', lat: 49.6267, lon: -124.0261, region: 'Georgia Strait North', coast: 'Strait of Georgia' },
   { id: '5cebf1de3d0f4a073c4bb952', name: 'Halfmoon Bay', lat: 49.5106, lon: -123.9081, region: 'Georgia Strait North', coast: 'Strait of Georgia' },
   // East Vancouver Island
   { id: '5cebf1de3d0f4a073c4bb979', name: 'Courtenay', lat: 49.6858, lon: -124.9897, region: 'Georgia Strait North', coast: 'Strait of Georgia' },
-  { id: '5dd30650e0fdc4b9b4be6e1a', name: 'Parksville', lat: 49.3161, lon: -124.3122, region: 'Georgia Strait South', coast: 'Strait of Georgia' },
+  { id: '5dd30650e0fdc4b9b4be6e1a', name: 'Parksville', lat: 49.3161, lon: -124.3122, region: 'Georgia Strait North', coast: 'Strait of Georgia' },
   { id: '5cebf1e03d0f4a073c4bbd47', name: 'Ladysmith', lat: 49.0006, lon: -123.8197, region: 'Georgia Strait South', coast: 'Strait of Georgia' },
   { id: '5cebf1e03d0f4a073c4bbd45', name: 'Chemainus', lat: 48.9267, lon: -123.7097, region: 'Georgia Strait South', coast: 'Strait of Georgia' },
   // South Vancouver Island

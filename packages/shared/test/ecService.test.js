@@ -129,6 +129,33 @@ test('a place inside one part gets warnings for that part only', async () => {
   expect(warnings).toEqual([]);
 });
 
+// Some days EC issues one forecast (and warning) for the whole of a split area
+const WHOLE_HECATE_FIXTURE = `<?xml version="1.0" encoding="UTF-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+  <entry><title>STRONG WIND WARNING IN EFFECT, Hecate Strait</title><summary>Strong winds.</summary></entry>
+  <entry><title>Forecast for Today Tonight and Wednesday. - Hecate Strait</title><summary>Whole strait text.</summary></entry>
+  <entry><title>Extended Forecast - Hecate Strait</title><summary>Later.</summary></entry>
+</feed>`;
+
+test('when EC covers a split area as a whole, every part gets that forecast and warning', async () => {
+  const { forecast, warnings } = await parseMarineFeed(
+    WHOLE_HECATE_FIXTURE,
+    'Hecate Strait',
+    'northern half'
+  );
+  expect(forecast).toBe('Whole strait text.');
+  expect(warnings.map(w => w.title)).toEqual(['STRONG WIND WARNING IN EFFECT, Hecate Strait']);
+});
+
+test('a part still skips entries that name a different part', async () => {
+  const { forecast } = await parseMarineFeed(
+    JUAN_DE_FUCA_FIXTURE,
+    'Juan de Fuca Strait',
+    'east entrance'
+  );
+  expect(forecast).toBe('East text.');
+});
+
 test('fetchMarineForecast uses the configured URL builder', async () => {
   configureEcFeedUrl(code => `/api/ec-feed?code=${code}`);
   const fetchMock = vi.fn(() => Promise.resolve(new Response(ATOM_FIXTURE)));

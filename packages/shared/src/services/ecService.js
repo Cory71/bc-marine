@@ -1,6 +1,12 @@
 import { setCache, getCache } from './cache.js';
 import { getText } from './http.js';
-import { EC_FEED_CODES, EC_SUBAREA, buildDirectEcFeedUrl, ecCacheKey } from './ecFeeds.js';
+import {
+  EC_FEED_CODES,
+  EC_SUBAREA,
+  EC_PART_NAMES,
+  buildDirectEcFeedUrl,
+  ecCacheKey,
+} from './ecFeeds.js';
 
 // The XML parser is only loaded when a forecast is first parsed, so it stays
 // out of the web app's first download (about 60 KB)
@@ -75,11 +81,13 @@ export async function parseMarineFeed(
   return { warnings, forecast: pickForecastText(entries) };
 }
 
-// Entries whose title names one of these parts, e.g. '... - west of Langara'
+// Entries for these parts: ones naming a part ('... - west of Langara'), plus ones
+// naming no part at all, which cover the whole area
 function entriesForParts(entries, parts) {
   return entries.filter(e => {
     const title = String(e.title ?? '').toLowerCase();
-    return parts.some(part => title.includes(part));
+    const namesNoPart = !EC_PART_NAMES.some(part => title.includes(part));
+    return namesNoPart || parts.some(part => title.includes(part));
   });
 }
 

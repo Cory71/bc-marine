@@ -32,6 +32,24 @@ export const EC_SUBAREA = {
   'Georgia Strait South': 'south of nanaimo',
 };
 
+// Every part name EC uses when it splits a BC area. An entry naming none of these
+// covers the whole area (EC does this when conditions are the same across it).
+export const EC_PART_NAMES = [
+  'northern half',
+  'southern half',
+  'eastern half',
+  'western half',
+  'northwestern half',
+  'southeastern half',
+  'east of langara',
+  'west of langara',
+  'east entrance',
+  'central strait',
+  'west entrance',
+  'north of nanaimo',
+  'south of nanaimo',
+];
+
 // The part of a split EC area a station is in: its own ecSubarea, else its area's
 // (e.g. 'east entrance' of Juan de Fuca Strait). Undefined when the area isn't split.
 export function getEcSubarea(station) {

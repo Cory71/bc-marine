@@ -182,10 +182,13 @@ function NowMarker({ point, top, bottom, nearbyEvent }) {
   );
 }
 
-// The high/low event whose label could collide with the "Now" label, if any
+// The closest high/low whose label could collide with the "Now" label, if any.
+// Closest matters on narrow phone charts, where a high and a low can both be in range.
 function findNearbyEvent(events, nowPoint, scale) {
   const LABEL_ROOM_PX = 90;
-  return events.find(event => Math.abs(scale.xForTime(event.time) - nowPoint.x) < LABEL_ROOM_PX);
+  const distanceTo = event => Math.abs(scale.xForTime(event.time) - nowPoint.x);
+  const nearby = events.filter(event => distanceTo(event) < LABEL_ROOM_PX);
+  return nearby.sort((a, b) => distanceTo(a) - distanceTo(b))[0];
 }
 
 // Keep labels near the chart's edges from being cut off

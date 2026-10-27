@@ -98,6 +98,37 @@ test('with no part chosen, a feed split into halves shows each half', async () =
   expect(warnings.map(w => w.title)).toEqual(['GALE WARNING IN EFFECT, Bowie - northern half']);
 });
 
+// Dixon Entrance West, with a gale for the west-of-Langara part only
+const DIXON_WEST_FIXTURE = `<?xml version="1.0" encoding="UTF-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+  <entry><title>Forecast for Tonight. - Dixon Entrance West - east of Langara</title><summary>East text.</summary></entry>
+  <entry><title>GALE WARNING IN EFFECT, Dixon Entrance West - west of Langara</title><summary>Gale.</summary></entry>
+  <entry><title>Forecast for Tonight. - Dixon Entrance West - west of Langara</title><summary>West text.</summary></entry>
+</feed>`;
+
+test('a place on the line between two parts gets warnings from both, but its own forecast', async () => {
+  const parts = ['east of langara', 'west of langara'];
+  const { forecast, warnings } = await parseMarineFeed(
+    DIXON_WEST_FIXTURE,
+    'Dixon Entrance West',
+    'east of langara',
+    parts
+  );
+  expect(forecast).toBe('East text.');
+  expect(warnings.map(w => w.title)).toEqual([
+    'GALE WARNING IN EFFECT, Dixon Entrance West - west of Langara',
+  ]);
+});
+
+test('a place inside one part gets warnings for that part only', async () => {
+  const { warnings } = await parseMarineFeed(
+    DIXON_WEST_FIXTURE,
+    'Dixon Entrance West',
+    'east of langara'
+  );
+  expect(warnings).toEqual([]);
+});
+
 test('fetchMarineForecast uses the configured URL builder', async () => {
   configureEcFeedUrl(code => `/api/ec-feed?code=${code}`);
   const fetchMock = vi.fn(() => Promise.resolve(new Response(ATOM_FIXTURE)));
@@ -115,9 +146,9 @@ test('unknown region returns the existing fallback', async () => {
 });
 
 test('tidyForecastText keeps the blank line between halves of an offshore forecast', () =>
-  expect(tidyForecastText('Northern half: Wind\nnorth 20.\nIssued 9 PM\n\nSouthern half: Calm.')).toBe(
-    'Northern half: Wind north 20.\nIssued 9 PM\n\nSouthern half: Calm.'
-  ));
+  expect(
+    tidyForecastText('Northern half: Wind\nnorth 20.\nIssued 9 PM\n\nSouthern half: Calm.')
+  ).toBe('Northern half: Wind north 20.\nIssued 9 PM\n\nSouthern half: Calm.'));
 
 test('tidyForecastText joins mid-sentence breaks but keeps "Issued" on its own line', () =>
   expect(tidyForecastText('Wind light near noon and\nto southeast 20.\nIssued 10:30 AM PDT')).toBe(

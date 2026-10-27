@@ -21,8 +21,13 @@ export function configureEcFeedUrl(buildUrl) {
 
 // Fetch marine forecast and active warnings for a BC region name.
 // subArea picks one part of a split area, e.g. 'east entrance' of Juan de Fuca Strait.
-export async function fetchMarineForecast(regionName, subArea = EC_SUBAREA[regionName]) {
-  const cacheKey = ecCacheKey(regionName, subArea);
+// warningSubAreas lists the parts whose warnings to show (more than one on a boundary).
+export async function fetchMarineForecast(
+  regionName,
+  subArea = EC_SUBAREA[regionName],
+  warningSubAreas = subArea ? [subArea] : []
+) {
+  const cacheKey = ecCacheKey(regionName, subArea, warningSubAreas);
   const cached = getCache(cacheKey);
   if (cached) return cached;
 
@@ -31,13 +36,18 @@ export async function fetchMarineForecast(regionName, subArea = EC_SUBAREA[regio
 
   // Download the feed and the XML parser at the same time, not one after the other
   const [xml] = await Promise.all([getText(currentBuildUrl(code)), getXmlParser()]);
-  const data = await parseMarineFeed(xml, regionName, subArea);
+  const data = await parseMarineFeed(xml, regionName, subArea, warningSubAreas);
   setCache(cacheKey, data);
   return data;
 }
 
 // Turn an EC feed's XML into { warnings, forecast } for one region (or one part of it)
-export async function parseMarineFeed(xml, regionName, subArea = EC_SUBAREA[regionName]) {
+export async function parseMarineFeed(
+  xml,
+  regionName,
+  subArea = EC_SUBAREA[regionName],
+  warningSubAreas = subArea ? [subArea] : []
+) {
   const parser = await getXmlParser();
   const parsed = parser.parse(xml);
 
@@ -49,15 +59,13 @@ export async function parseMarineFeed(xml, regionName, subArea = EC_SUBAREA[regi
 
   // When the region shares a feed with other sub-areas, keep only entries
   // whose title mentions this region's sub-area
-  const entries = subArea
-    ? allEntries.filter(e =>
-        String(e.title ?? '')
-          .toLowerCase()
-          .includes(subArea)
-      )
-    : allEntries;
+  const entries = subArea ? entriesForParts(allEntries, [subArea]) : allEntries;
 
-  const warnings = entries
+  // Warnings can come from more than one part, for a place on the line between parts
+  const warningEntries = warningSubAreas.length
+    ? entriesForParts(allEntries, warningSubAreas)
+    : allEntries;
+  const warnings = warningEntries
     .filter(e => {
       const t = String(e.title ?? '').toLowerCase();
       return t.includes('warning') || t.includes('watch');
@@ -65,6 +73,14 @@ export async function parseMarineFeed(xml, regionName, subArea = EC_SUBAREA[regi
     .map(e => ({ title: e.title, summary: getEntryText(e) }));
 
   return { warnings, forecast: pickForecastText(entries) };
+}
+
+// Entries whose title names one of these parts, e.g. '... - west of Langara'
+function entriesForParts(entries, parts) {
+  return entries.filter(e => {
+    const title = String(e.title ?? '').toLowerCase();
+    return parts.some(part => title.includes(part));
+  });
 }
 
 // The forecast to show. A feed split into halves with no half chosen (offshore

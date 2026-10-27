@@ -4,7 +4,7 @@ import { fetchMarineForecast } from './services/ecService.js';
 import { fetchNearbyObservations } from './services/observationService.js';
 import { clearCache } from './services/cache.js';
 import { getStationRegion } from './stations.js';
-import { getEcSubarea, ecCacheKey } from './services/ecFeeds.js';
+import { getEcSubarea, getEcWarningSubareas, ecCacheKey } from './services/ecFeeds.js';
 
 // Every data set the apps show for a station. To add a new data layer,
 // add an entry here: its key in the result, and how to load it.
@@ -15,7 +15,8 @@ const DATA_SOURCES = [
   { key: 'weather', load: station => fetchWeather(station.lat, station.lon) },
   {
     key: 'marineForecast',
-    load: (station, region) => fetchMarineForecast(region, getEcSubarea(station)),
+    load: (station, region) =>
+      fetchMarineForecast(region, getEcSubarea(station), getEcWarningSubareas(station)),
   },
   { key: 'observations', load: station => fetchNearbyObservations(station) },
 ];
@@ -57,6 +58,6 @@ function clearStationCache(station, region) {
   clearCache(`tideEvents_${station.id}`);
   clearCache(`weekly_${station.id}`);
   clearCache(`weather_${station.lat}_${station.lon}`);
-  clearCache(ecCacheKey(region, getEcSubarea(station)));
+  clearCache(ecCacheKey(region, getEcSubarea(station), getEcWarningSubareas(station)));
   clearCache(`observations_${station.lat}_${station.lon}`);
 }

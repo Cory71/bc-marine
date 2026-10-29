@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link, useLocation } from 'react-router';
 import {
   BC_REGIONS,
@@ -6,6 +6,7 @@ import {
   OBSERVATION_SITES,
   findNearestStation,
   isRoughLocation,
+  searchPlaceNames,
   toStationSlug,
 } from '@bc-marine/shared';
 import { useApp } from '../context/AppContext.jsx';
@@ -64,11 +65,11 @@ function StationSearch({ query, onQueryChange, inputRef }) {
   return (
     <label className="search">
       <Icon name="search" />
-      <span className="visually-hidden">Search stations and weather areas</span>
+      <span className="visually-hidden">Search places, harbours and weather areas</span>
       <input
         ref={inputRef}
         type="search"
-        placeholder="Search stations & areas"
+        placeholder="Search places, harbours & areas"
         value={query}
         onChange={event => onQueryChange(event.target.value)}
       />
@@ -84,20 +85,79 @@ function SearchResults({ query, onSelect, onPickSite }) {
       location.name.toLowerCase().includes(text) || location.region.toLowerCase().includes(text)
   );
 
+  const sites = OBSERVATION_SITES.filter(site => site.name.toLowerCase().includes(text));
+  const places = usePlaceNameSearch(query.trim());
+  const nothingFound = results.length === 0 && sites.length === 0 && places.length === 0;
+
   return (
     <section className="sidebar__section" aria-label="Search results">
       <h2 className="sidebar__label">Search results</h2>
-      {results.length === 0 && <p className="sidebar__empty">No stations found.</p>}
+      {nothingFound && <p className="sidebar__empty">Nothing found.</p>}
       <StationList stations={results} onSelect={onSelect} showRegion />
-      <SiteResults text={text} onPick={onPickSite} />
+      <SiteResults sites={sites} onPick={onPickSite} />
+      <PlaceNameResults places={places} onSelect={onSelect} />
     </section>
   );
 }
 
+// Any other BC place name (Deep Bay, Fanny Bay…), from BC Geographical Names,
+// each leading to its nearest station
+function PlaceNameResults({ places, onSelect }) {
+  if (places.length === 0) return null;
+
+  return (
+    <>
+      <h2 className="sidebar__label sidebar__label--spaced">Other places</h2>
+      <ul className="station-list">
+        {places.map(place => (
+          <li key={`${place.name}|${place.station.name}`}>
+            <button
+              type="button"
+              className="station-button station-button--stacked"
+              onClick={() => onSelect(place.station)}
+            >
+              <span>
+                {place.name} · {place.kind}
+              </span>
+              <span className="station-button__region">
+                Nearest station: {place.station.name}, {Math.round(place.distanceKm)} km
+              </span>
+            </button>
+          </li>
+        ))}
+      </ul>
+    </>
+  );
+}
+
+// Look up place names once typing pauses; searches under 3 letters are too vague.
+// An older answer that arrives after a newer search is ignored.
+const MIN_PLACE_SEARCH_LENGTH = 3;
+const TYPING_PAUSE_MS = 300;
+
+function usePlaceNameSearch(query) {
+  const [results, setResults] = useState({ query: '', places: [] });
+
+  useEffect(() => {
+    if (query.length < MIN_PLACE_SEARCH_LENGTH) return undefined;
+    let isCurrent = true;
+    const timer = setTimeout(() => {
+      searchPlaceNames(query)
+        .then(places => isCurrent && setResults({ query, places }))
+        .catch(() => isCurrent && setResults({ query, places: [] })); // offline: stations still work
+    }, TYPING_PAUSE_MS);
+    return () => {
+      isCurrent = false;
+      clearTimeout(timer);
+    };
+  }, [query]);
+
+  return results.query === query ? results.places : [];
+}
+
 // Lighthouses and buoys matching the search, linking to their own pages
-function SiteResults({ text, onPick }) {
+function SiteResults({ sites, onPick }) {
   const { search } = useLocation();
-  const sites = OBSERVATION_SITES.filter(site => site.name.toLowerCase().includes(text));
   if (sites.length === 0) return null;
 
   return (

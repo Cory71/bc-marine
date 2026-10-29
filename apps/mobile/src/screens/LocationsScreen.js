@@ -4,6 +4,7 @@ import * as Location from 'expo-location';
 import { useApp } from '../context/AppContext';
 import SettingsButton from '../components/SettingsButton';
 import { useSavedSites } from '../context/useSavedSites';
+import { usePlaceNameSearch } from '../context/usePlaceNameSearch';
 import { useColors, makeStyles } from '../theme';
 import { BC_REGIONS, ALL_LOCATIONS, OBSERVATION_SITES, findNearestStation, isRoughLocation } from '@bc-marine/shared';
 
@@ -14,6 +15,7 @@ export default function LocationsScreen({ navigation }) {
   const [query, setQuery] = useState('');
   const [openRegions, setOpenRegions] = useState({});
   const { savedSites, removeSavedSite } = useSavedSites();
+  const placeResults = usePlaceNameSearch(query);
 
   // Every place, including the extra harbour tide stations that only show in search
   const allSearchable = ALL_LOCATIONS;
@@ -81,7 +83,7 @@ export default function LocationsScreen({ navigation }) {
         <Text style={styles.searchIcon}>🔍</Text>
         <TextInput
           style={styles.searchInput}
-          placeholder="Search stations & weather areas..."
+          placeholder="Search places, harbours & weather areas..."
           placeholderTextColor={COLORS.textMuted}
           value={query}
           onChangeText={setQuery}
@@ -97,8 +99,8 @@ export default function LocationsScreen({ navigation }) {
       {query !== '' && (
         <View style={styles.section}>
           <Text style={styles.sectionLabel}>Search Results</Text>
-          {searchResults.length === 0 && siteResults.length === 0 && (
-            <Text style={styles.emptyText}>No stations found.</Text>
+          {searchResults.length === 0 && siteResults.length === 0 && placeResults.length === 0 && (
+            <Text style={styles.emptyText}>Nothing found.</Text>
           )}
           {/* Lighthouses and buoys open their own screen on the Home tab */}
           {siteResults.map(site => (
@@ -119,6 +121,23 @@ export default function LocationsScreen({ navigation }) {
               <View>
                 <Text style={styles.stationName}>{station.name}</Text>
                 <Text style={styles.stationArea}>{station.region}</Text>
+              </View>
+              <Text style={styles.arrow}>›</Text>
+            </TouchableOpacity>
+          ))}
+          {/* Any other BC place name, leading to its nearest station */}
+          {placeResults.length > 0 && <Text style={[styles.sectionLabel, styles.otherPlacesLabel]}>Other Places</Text>}
+          {placeResults.map(place => (
+            <TouchableOpacity
+              key={`${place.name}|${place.station.name}`}
+              style={styles.stationRow}
+              onPress={() => handleSelectStation(place.station)}
+            >
+              <View style={styles.siteButton}>
+                <Text style={styles.stationName}>{place.name} · {place.kind}</Text>
+                <Text style={styles.stationArea}>
+                  Nearest station: {place.station.name}, {Math.round(place.distanceKm)} km
+                </Text>
               </View>
               <Text style={styles.arrow}>›</Text>
             </TouchableOpacity>
@@ -246,5 +265,6 @@ const useStyles = makeStyles(COLORS => ({
   stationArea: { color: COLORS.textMuted, fontSize: 10, marginTop: 1 },
   arrow: { color: COLORS.textMuted, fontSize: 16 },
   siteButton: { flex: 1 },
+  otherPlacesLabel: { marginTop: 12 },
   removeText: { color: COLORS.textMuted, fontSize: 14, paddingHorizontal: 4 },
 }));

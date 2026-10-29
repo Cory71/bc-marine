@@ -95,3 +95,31 @@ test('parseNdbcRows returns the newest hourly rows first, up to a limit, skippin
   expect(rows[1].windKts).toBe(10);
   expect(parseNdbcRows(NDBC_HEADER, 12)).toEqual([]);
 });
+
+// Ballenas Island, 28 Oct 9 PM: EC marked a 326 km/h (176 kt) gust as failing its quality check
+const BALLENAS_BAD_GUST = {
+  obs_date_tm: '2026-10-29T04:00:00.000Z',
+  avg_wnd_spd_10m_pst10mts: 11.2,
+  'avg_wnd_spd_10m_pst10mts-qa': 100,
+  avg_wnd_dir_10m_pst10mts: 126,
+  'avg_wnd_dir_10m_pst10mts-qa': 100,
+  max_wnd_spd_10m_pst1hr: 326.1,
+  'max_wnd_spd_10m_pst1hr-qa': 0,
+};
+
+test('a reading that failed EC quality control is treated as missing', () => {
+  const reading = readLighthouseFeature(BALLENAS_BAD_GUST);
+  expect(reading.gustKts).toBeNull();
+  expect(reading.windKts).toBe(6);
+});
+
+test('a failed wind average falls back to the next one that passed', () => {
+  const reading = readLighthouseFeature({
+    obs_date_tm: '2026-10-29T04:00:00.000Z',
+    avg_wnd_spd_10m_pst10mts: 300,
+    'avg_wnd_spd_10m_pst10mts-qa': 0,
+    avg_wnd_spd_10m_pst2mts: 37.04,
+    'avg_wnd_spd_10m_pst2mts-qa': 100,
+  });
+  expect(reading.windKts).toBe(20);
+});

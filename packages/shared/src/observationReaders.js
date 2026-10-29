@@ -28,9 +28,9 @@ export function readLighthouseFeature(properties) {
     observedAt,
     windKts: kmhToKnots(windKmh),
     windDirDeg: windDir,
-    gustKts: kmhToKnots(numberOrNull(properties.max_wnd_spd_10m_pst1hr)),
-    pressureHpa: numberOrNull(properties.stn_pres),
-    airTempC: numberOrNull(properties.air_temp),
+    gustKts: kmhToKnots(checkedNumber(properties, 'max_wnd_spd_10m_pst1hr')),
+    pressureHpa: checkedNumber(properties, 'stn_pres'),
+    airTempC: checkedNumber(properties, 'air_temp'),
   };
 }
 
@@ -103,10 +103,18 @@ function numberOrNull(raw) {
   return Number.isFinite(number) ? number : null;
 }
 
-// The first of several fields that has a number
+// An EC field's number, or null when missing or when it failed EC's quality check.
+// EC scores each field in '<name>-qa': 100 means it passed, 0 means it failed
+// (e.g. a 326 km/h gust from a faulty sensor at Ballenas Island).
+function checkedNumber(properties, name) {
+  if (properties[`${name}-qa`] === 0) return null;
+  return numberOrNull(properties[name]);
+}
+
+// The first of several EC fields that has a number that passed EC's quality check
 function firstNumber(properties, fieldNames) {
   for (const name of fieldNames) {
-    const number = numberOrNull(properties[name]);
+    const number = checkedNumber(properties, name);
     if (number != null) return number;
   }
   return null;

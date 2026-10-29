@@ -109,7 +109,7 @@ npm run dev --workspace bc-marine-web    # opens at http://localhost:5173
 ```bash
 npm start --workspace bc-marine-mobile
 npm start --workspace bc-marine-mobile -- --clear    # after pulling new changes
-npm start --workspace bc-marine-mobile -- --tunnel   # if the phone is on a different network
+npm start --workspace bc-marine-mobile -- --tunnel   # if the phone can't connect ("Failed to download remote update")
 ```
 
 For **Use my location**, turn on **Precise location** for Expo Go. More tips are in [apps/mobile/README.md](apps/mobile/README.md); the web app's notes are in [apps/web/README.md](apps/web/README.md).

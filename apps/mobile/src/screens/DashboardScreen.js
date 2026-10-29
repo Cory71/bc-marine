@@ -12,7 +12,7 @@ export default function DashboardScreen({ navigation }) {
   const { activeStation, tides, weather, tideEvents, marineForecast, observations, observationsLoading, loading, error, lastUpdated, refresh, units } = useApp();
 
   const now = new Date();
-  const sunMoon = getSunMoon(activeStation.lat, activeStation.lon);
+  const sunMoon = getSunMoon(activeStation.lat, activeStation.lon, units);
   const currentWeather = weather.reduce((closest, h) =>
     Math.abs(new Date(h.time) - now) < Math.abs(new Date(closest.time) - now) ? h : closest
   , weather[0] ?? {});
@@ -58,7 +58,7 @@ export default function DashboardScreen({ navigation }) {
             <SettingsButton />
           </View>
           <Text style={styles.title}>Marine Dashboard</Text>
-          <Text style={styles.updated}>{lastUpdated ? timeSince(lastUpdated) : ''} · Tap card for full detail</Text>
+          <Text style={styles.updated}>{lastUpdated ? timeSince(lastUpdated, units) : ''} · Tap card for full detail</Text>
         </View>
         <View style={{ alignItems: 'flex-end' }}>
           <Text style={styles.sunText}>🌅 {sunMoon.sunrise}</Text>
@@ -147,12 +147,12 @@ export default function DashboardScreen({ navigation }) {
           <View style={styles.statBox}>
             <Text style={styles.statLabel}>Next High</Text>
             <Text style={styles.statValue}>{nextHigh ? formatHeight(nextHigh.heightFt, units) : '--'}</Text>
-            <Text style={styles.statSub}>{nextHigh ? formatTime(nextHigh.time) : ''}</Text>
+            <Text style={styles.statSub}>{nextHigh ? formatTime(nextHigh.time, units) : ''}</Text>
           </View>
           <View style={styles.statBox}>
             <Text style={styles.statLabel}>Next Low</Text>
             <Text style={styles.statValue}>{nextLow ? formatHeight(nextLow.heightFt, units) : '--'}</Text>
-            <Text style={styles.statSub}>{nextLow ? formatTime(nextLow.time) : ''}</Text>
+            <Text style={styles.statSub}>{nextLow ? formatTime(nextLow.time, units) : ''}</Text>
           </View>
           <View style={styles.statBox}>
             <Text style={styles.statLabel}>Now</Text>

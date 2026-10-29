@@ -6,18 +6,24 @@ export function metresToFeet(metres) {
   return (metres * 3.28084).toFixed(1);
 }
 
-// Format a JS Date to "9:15 AM" in BC time
-export function formatTime(date) {
-  return formatBcTime(date);
+// Format a JS Date in BC time: "9:15 AM", or "09:15" on the 24-hour clock
+export function formatTime(date, units) {
+  return formatBcTime(date, units?.time ?? '12h');
+}
+
+// A short label for an on-the-hour chart tick: '6 AM', or '06:00' on the 24-hour clock
+export function formatHourLabel(date, units) {
+  const time = formatTime(date, units);
+  return units?.time === '24h' ? time : time.replace(':00', '');
 }
 
 // Returns "Updated 9:15 AM PT" string from a timestamp
-export function timeSince(date) {
-  return `Updated ${formatTime(date)} PT`;
+export function timeSince(date, units) {
+  return `Updated ${formatTime(date, units)} PT`;
 }
 
 // Returns sunrise, sunset, and moon phase for a given lat/lon
-export function getSunMoon(lat, lon) {
+export function getSunMoon(lat, lon, units) {
   const now = new Date();
   const times = SunCalc.getTimes(now, lat, lon);
   const moonIllum = SunCalc.getMoonIllumination(now);
@@ -29,8 +35,8 @@ export function getSunMoon(lat, lon) {
   const phaseIndex = Math.round(moonIllum.phase * 8) % 8;
 
   return {
-    sunrise: formatTime(times.sunrise),
-    sunset: formatTime(times.sunset),
+    sunrise: formatTime(times.sunrise, units),
+    sunset: formatTime(times.sunset, units),
     moonPhase: phaseNames[phaseIndex],
   };
 }

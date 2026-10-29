@@ -14,7 +14,7 @@ const NAV_ITEMS = [
 ];
 
 export default function Header({ onOpenDrawer, menuButtonRef, drawerOpen }) {
-  const { activeStation, marineForecast, lastUpdated, loading, refresh } = useApp();
+  const { activeStation, marineForecast, lastUpdated, loading, refresh, units } = useApp();
 
   return (
     <header className="header">
@@ -40,7 +40,7 @@ export default function Header({ onOpenDrawer, menuButtonRef, drawerOpen }) {
 
         <div className="header__status">
           <span className="header__updated" aria-live="polite">
-            {loading ? 'Loading…' : lastUpdated && timeSince(lastUpdated)}
+            {loading ? 'Loading…' : lastUpdated && timeSince(lastUpdated, units)}
           </span>
           <button type="button" className="button" onClick={refresh} disabled={loading}>
             <Icon name="refresh" />

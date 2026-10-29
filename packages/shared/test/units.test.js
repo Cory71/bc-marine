@@ -7,6 +7,8 @@ import {
   isRoughLocation,
   distanceKm,
   formatTime,
+  formatHourLabel,
+  getSunMoon,
   timeSince,
   BC_STATIONS,
 } from '../src/index.js';
@@ -60,4 +62,17 @@ test('isRoughLocation flags a device fix that is only known to 10 km or worse', 
   expect(isRoughLocation(10000)).toBe(true);
   expect(isRoughLocation(45000)).toBe(true);
   expect(isRoughLocation(undefined)).toBe(false);
+});
+
+test('times follow the chosen clock', () => {
+  const clock24 = { time: '24h' };
+  expect(formatTime(new Date('2026-10-24T23:05:00Z'), clock24)).toBe('16:05');
+  expect(timeSince(new Date('2026-10-24T23:05:00Z'), clock24)).toBe('Updated 16:05 PT');
+  expect(getSunMoon(48.42, -123.37, clock24).sunrise).toMatch(/^\d{2}:\d{2}$/);
+});
+
+test('formatHourLabel gives short chart labels on either clock', () => {
+  const sixAm = new Date('2026-10-24T13:00:00Z');
+  expect(formatHourLabel(sixAm)).toBe('6 AM');
+  expect(formatHourLabel(sixAm, { time: '24h' })).toBe('06:00');
 });

@@ -103,3 +103,9 @@ test('the pressure chart follows the chosen unit, with axis labels that stay dis
   const labels = layoutChart(pressure, { width: 300, height: 150 }).yTicks.map(tick => tick.label);
   expect(new Set(labels).size).toBe(labels.length);
 });
+
+test('chart time labels follow the chosen clock', () => {
+  const chart = buildSiteCharts(LIGHTHOUSE_HISTORY, { ...DEFAULT_UNITS, time: '24h' })[0];
+  const labels = layoutChart(chart, { width: 300, height: 150 }).xTicks.map(tick => tick.label);
+  expect(labels.at(-1)).toBe('13:00');
+});

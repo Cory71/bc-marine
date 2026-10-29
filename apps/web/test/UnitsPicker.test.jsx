@@ -25,3 +25,10 @@ test('offers pressure units', () => {
   const pressureGroup = screen.getByRole('group', { name: 'Pressure' });
   expect(pressureGroup.querySelector('[aria-pressed="true"]').textContent).toBe('hPa (mb)');
 });
+
+test('offers 12-hour and 24-hour time', () => {
+  useApp.mockReturnValue({ units: DEFAULT_UNITS, setUnit: vi.fn() });
+  render(<UnitsPicker />);
+  const timeGroup = screen.getByRole('group', { name: 'Time' });
+  expect(timeGroup.querySelector('[aria-pressed="true"]').textContent).toBe('12-hour');
+});

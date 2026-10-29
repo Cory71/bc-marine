@@ -74,7 +74,7 @@ function HourlyCurrentsTable({ hours }) {
         <tbody>
           {hours.map((hour, i) => (
             <tr key={hour.time.toString()} className={i === 0 ? 'data-table__now' : ''}>
-              <th scope="row">{i === 0 ? 'Now' : formatTime(hour.time)}</th>
+              <th scope="row">{i === 0 ? 'Now' : formatTime(hour.time, units)}</th>
               <td>{formatSpeed(hour.currentSpeedKts, units, 1)}</td>
               <td>{degreesToCompass(hour.currentDirectionDeg)}</td>
             </tr>

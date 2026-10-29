@@ -85,7 +85,7 @@ function SiteReadings({ status, history, showWaves, units }) {
         </View>
         {history.map(reading => (
           <View key={reading.observedAt.toISOString()} style={styles.tableRow}>
-            <Text style={[styles.colText, styles.timeCol]}>{formatTime(reading.observedAt)}</Text>
+            <Text style={[styles.colText, styles.timeCol]}>{formatTime(reading.observedAt, units)}</Text>
             <Text style={styles.colText}>{formatWind(reading, units)}</Text>
             <Text style={styles.colText}>{formatGust(reading, units)}</Text>
             {showWaves && <Text style={styles.colText}>{formatWaves(reading, units)}</Text>}

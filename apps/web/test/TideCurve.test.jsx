@@ -1,5 +1,6 @@
 import { test, expect, afterEach } from 'vitest';
 import { render, screen, cleanup } from '@testing-library/react';
+import { DEFAULT_UNITS } from '@bc-marine/shared';
 import TideCurve from '../src/components/TideCurve.jsx';
 
 afterEach(cleanup);
@@ -64,4 +65,18 @@ test('on a narrow phone chart, the Now label avoids the closest high, not an ear
   const dotY = Number(nowGroup.querySelector('circle').getAttribute('cy'));
   const labelY = Number(nowGroup.querySelector('text').getAttribute('y'));
   expect(labelY).toBeGreaterThanOrEqual(dotY + 12);
+});
+
+test('the tide chart uses the 24-hour clock when chosen', () => {
+  render(
+    <TideCurve
+      tides={SIX_HOURLY_POINTS}
+      events={EVENTS}
+      now={NOW}
+      width={600}
+      units={{ ...DEFAULT_UNITS, time: '24h' }}
+    />
+  );
+  expect(screen.getByText(/10:30$/)).toBeTruthy();
+  expect(screen.queryByText(/AM|PM/)).toBeNull();
 });

@@ -131,8 +131,8 @@ function TideNowReading() {
     <>
       <Stat label="Now" value={formatHeight(current?.heightFt, units)} />
       <p className="card__note numeric">
-        High {nextHigh ? formatTime(nextHigh.time) : NO_VALUE} · Low{' '}
-        {nextLow ? formatTime(nextLow.time) : NO_VALUE}
+        High {nextHigh ? formatTime(nextHigh.time, units) : NO_VALUE} · Low{' '}
+        {nextLow ? formatTime(nextLow.time, units) : NO_VALUE}
       </p>
     </>
   );
@@ -158,8 +158,8 @@ function CurrentsReading() {
 
 // Calculated on the device from the station's position, so it never waits for an API
 function SunMoonCard() {
-  const { activeStation } = useApp();
-  const { sunrise, sunset, moonPhase } = getSunMoon(activeStation.lat, activeStation.lon);
+  const { activeStation, units } = useApp();
+  const { sunrise, sunset, moonPhase } = getSunMoon(activeStation.lat, activeStation.lon, units);
   return (
     <Card title="Sun & Moon">
       <div className="stat-row">

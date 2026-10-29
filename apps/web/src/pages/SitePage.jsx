@@ -139,7 +139,7 @@ function HourlyTable({ history, showWaves }) {
         <tbody>
           {history.map(reading => (
             <tr key={reading.observedAt.toISOString()}>
-              <th scope="row">{formatTime(reading.observedAt)}</th>
+              <th scope="row">{formatTime(reading.observedAt, units)}</th>
               <td>{formatWind(reading, units)}</td>
               <td>{formatGust(reading, units)}</td>
               {showWaves && <td>{formatWaves(reading, units)}</td>}

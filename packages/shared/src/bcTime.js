@@ -58,8 +58,13 @@ export function getBcDayRangeUtc(dateString) {
   return { from: toIsoSeconds(startMs), to: toIsoSeconds(nextStartMs - 1000) };
 }
 
-// Format a time as '9:15 AM' in BC time
-export function formatBcTime(date) {
+// Format a time in BC time: '9:15 AM', or '09:15' on the 24-hour clock
+export function formatBcTime(date, clock = '12h') {
+  if (clock === '24h') {
+    // hourCycle h23 counts 00-23, so midnight is 00:00 rather than 24:00
+    const { hour, minute } = getBcParts(date, { hour: '2-digit', minute: '2-digit', hourCycle: 'h23' });
+    return `${hour}:${minute}`;
+  }
   const { hour, minute, dayPeriod } = getBcParts(date, { hour: 'numeric', minute: '2-digit', hour12: true });
   // en-CA prints 'a.m.' — turn it into 'AM' to match the mobile app
   const period = dayPeriod.replace(/\./g, '').toUpperCase();

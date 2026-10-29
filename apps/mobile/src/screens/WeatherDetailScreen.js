@@ -93,7 +93,7 @@ export default function WeatherDetailScreen({ navigation }) {
         {upcoming.map((hour, i) => (
           <View key={i} style={[styles.tableRow, i === 0 && styles.currentRow]}>
             <Text style={[styles.colText, { width: 50, color: i === 0 ? COLORS.safe : COLORS.textMuted }]}>
-              {i === 0 ? 'Now' : formatTime(hour.time)}
+              {i === 0 ? 'Now' : formatTime(hour.time, units)}
             </Text>
             <Text style={[styles.colText, { fontWeight: i === 0 ? 'bold' : 'normal' }]}>
               {degreesToCompass(hour.windDirectionDeg)} {formatSpeed(hour.windSpeedKts, units)}

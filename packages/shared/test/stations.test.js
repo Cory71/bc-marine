@@ -118,3 +118,11 @@ test('places on the line between two parts get warnings from both parts', () => 
   expect(warningPartsOf('Masset')).toEqual(['east of langara']);
   expect(warningPartsOf('Tofino')).toEqual([]);
 });
+
+test('more DFO tide stations, like harbours, can be found by name', () => {
+  expect(findStationBySlug('french-creek').region).toBe('Georgia Strait North');
+  expect(findStationBySlug('crofton').region).toBe('Georgia Strait South');
+  expect(findStationBySlug('brentwood-bay').region).toBe('Haro Strait');
+  expect(findStationBySlug('coal-harbour').region).toBe('Quatsino Sound');
+  expect(ALL_LOCATIONS.length).toBeGreaterThan(300);
+});

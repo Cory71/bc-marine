@@ -1,16 +1,25 @@
 // The units people can choose, and the one place values are converted for display.
-// Data is always stored in knots, feet, °C and km; only the text shown changes.
+// Data is always stored in knots, feet, °C, km and hPa; only the text shown changes.
 
 const NO_VALUE = '--';
 const KMH_PER_KNOT = 1.852;
 const MPH_PER_KNOT = 1.150779;
 const METRES_PER_FOOT = 0.3048;
 const KM_PER_NAUTICAL_MILE = 1.852;
+const KPA_PER_HPA = 0.1;
+const INHG_PER_HPA = 0.02953;
 
 // The app's original units stay the defaults
-export const DEFAULT_UNITS = { speed: 'kts', height: 'ft', temperature: 'c', distance: 'km' };
+export const DEFAULT_UNITS = {
+  speed: 'kts',
+  height: 'ft',
+  temperature: 'c',
+  distance: 'km',
+  pressure: 'hpa',
+};
 
-// Choices for each kind of unit, in the order they're offered
+// Choices for each kind of unit, in the order they're offered.
+// label is the Settings button; unit (when different) is what readings show.
 export const UNIT_OPTIONS = {
   speed: [
     { value: 'kts', label: 'kts' },
@@ -29,6 +38,11 @@ export const UNIT_OPTIONS = {
     { value: 'km', label: 'km' },
     { value: 'nm', label: 'nm' },
   ],
+  pressure: [
+    { value: 'hpa', label: 'hPa (mb)', unit: 'hPa' }, // millibars are the same as hPa
+    { value: 'kpa', label: 'kPa' },
+    { value: 'inhg', label: 'inHg' },
+  ],
 };
 
 // Keep saved choices that are still valid; anything missing or unknown falls back to the default
@@ -42,9 +56,10 @@ export function normalizeUnits(saved) {
   return units;
 }
 
-// The label for a unit value, e.g. 'kmh' → 'km/h'
+// The unit shown after a reading, e.g. 'kmh' → 'km/h', 'hpa' → 'hPa'
 export function unitLabel(kind, value) {
-  return UNIT_OPTIONS[kind].find(option => option.value === value).label;
+  const option = UNIT_OPTIONS[kind].find(item => item.value === value);
+  return option.unit ?? option.label;
 }
 
 // Round to a number of decimals, dropping a trailing '.0' (8.0 → 8)
@@ -87,4 +102,27 @@ export function formatDistance(km, units = DEFAULT_UNITS) {
   if (km == null) return NO_VALUE;
   const value = units.distance === 'nm' ? km / KM_PER_NAUTICAL_MILE : km;
   return `${Math.round(value)} ${unitLabel('distance', units.distance)}`;
+}
+
+// The chosen pressure unit; settings saved before pressure was added default to hPa
+function pressureUnit(units) {
+  return units?.pressure ?? DEFAULT_UNITS.pressure;
+}
+
+// A pressure as a plain number in the chosen unit, for charts
+export function pressureInUnits(hpa, units = DEFAULT_UNITS) {
+  const factor = { hpa: 1, kpa: KPA_PER_HPA, inhg: INHG_PER_HPA }[pressureUnit(units)];
+  return hpa * factor;
+}
+
+// How many decimals a pressure shows: kPa and inHg move in hundredths
+export function pressureDecimals(units = DEFAULT_UNITS) {
+  return pressureUnit(units) === 'hpa' ? 1 : 2;
+}
+
+// A pressure, from hPa: '1015.6 hPa', '101.56 kPa' or '29.99 inHg'
+export function formatPressureHpa(hpa, units = DEFAULT_UNITS) {
+  if (hpa == null) return NO_VALUE;
+  const value = pressureInUnits(hpa, units).toFixed(pressureDecimals(units));
+  return `${value} ${unitLabel('pressure', pressureUnit(units))}`;
 }

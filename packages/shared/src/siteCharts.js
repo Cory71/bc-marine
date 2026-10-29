@@ -1,5 +1,12 @@
 import { formatTime } from './units.js';
-import { DEFAULT_UNITS, speedInUnits, heightInUnits, unitLabel } from './unitPreferences.js';
+import {
+  DEFAULT_UNITS,
+  speedInUnits,
+  heightInUnits,
+  pressureInUnits,
+  pressureDecimals,
+  unitLabel,
+} from './unitPreferences.js';
 
 // Chart data and drawing maths for a lighthouse or buoy's last 12 hours.
 // Web (SVG) and mobile (react-native-svg) both draw from these, so they match.
@@ -40,13 +47,13 @@ const CHART_TYPES = [
 function convertValue(kind, value, units) {
   if (kind === 'speed') return speedInUnits(value, units);
   if (kind === 'height') return heightInUnits(value, units);
-  return value;
+  return pressureInUnits(value, units);
 }
 
 function chartUnitLabel(kind, units) {
   if (kind === 'speed') return unitLabel('speed', units.speed);
   if (kind === 'height') return unitLabel('height', units.height);
-  return 'hPa';
+  return unitLabel('pressure', units.pressure ?? DEFAULT_UNITS.pressure);
 }
 
 // Charts for a site's history (newest first). A chart is only included when
@@ -59,7 +66,7 @@ export function buildSiteCharts(history, units = DEFAULT_UNITS) {
     id: type.id,
     title: type.title,
     unit: chartUnitLabel(type.kind, units),
-    decimals: type.decimals,
+    decimals: type.kind === 'pressure' ? pressureDecimals(units) : type.decimals,
     fromZero: type.fromZero,
     times,
     lines: type.lines.map(line => ({
@@ -131,8 +138,16 @@ export function layoutChart(chart, { width, height }) {
     plot,
     lines: chart.lines.map(line => layoutLine(line, xForTime, yForValue)),
     xTicks: buildTimeTicks(chart.times, xForTime),
-    yTicks: ticks.map(value => ({ y: yForValue(value), label: String(roundTo(value, 1)) })),
+    yTicks: ticks.map(value => ({ y: yForValue(value), label: tickLabel(value, ticks) })),
   };
+}
+
+// An axis label with just enough decimals to tell the ticks apart:
+// steps of 10 → '1010', steps of 0.5 → '2.5', steps of 0.02 → '29.98'
+function tickLabel(value, ticks) {
+  const step = ticks.length > 1 ? ticks[1] - ticks[0] : 1;
+  const decimals = Math.max(0, Math.ceil(-Math.log10(step) - 1e-9));
+  return String(roundTo(value, decimals));
 }
 
 // Earliest reading on the left edge, latest on the right

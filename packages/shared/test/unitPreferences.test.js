@@ -9,12 +9,21 @@ import {
   heightInUnits,
   formatTemp,
   formatDistance,
+  formatPressureHpa,
+  pressureInUnits,
+  unitLabel,
 } from '../src/index.js';
 
 const METRIC = { speed: 'kmh', height: 'm', temperature: 'f', distance: 'nm' };
 
 test('the defaults are the units the app has always used', () =>
-  expect(DEFAULT_UNITS).toEqual({ speed: 'kts', height: 'ft', temperature: 'c', distance: 'km' }));
+  expect(DEFAULT_UNITS).toEqual({
+    speed: 'kts',
+    height: 'ft',
+    temperature: 'c',
+    distance: 'km',
+    pressure: 'hpa',
+  }));
 
 test('every unit kind offers its default as an option', () => {
   for (const [kind, value] of Object.entries(DEFAULT_UNITS)) {
@@ -60,4 +69,19 @@ test('formatTemp and formatDistance convert too', () => {
   expect(formatDistance(17.6)).toBe('18 km');
   expect(formatDistance(18.52, METRIC)).toBe('10 nm');
   expect(formatDistance(null)).toBe('--');
+});
+
+test('pressure can be hPa (mb), kPa or inHg, with hPa the default', () => {
+  expect(UNIT_OPTIONS.pressure.map(option => option.label)).toEqual(['hPa (mb)', 'kPa', 'inHg']);
+  expect(unitLabel('pressure', 'hpa')).toBe('hPa');
+  expect(normalizeUnits({ speed: 'mph' }).pressure).toBe('hpa');
+  expect(normalizeUnits({ pressure: 'inhg' }).pressure).toBe('inhg');
+});
+
+test('formatPressureHpa converts hPa, with 2 decimals for kPa and inHg', () => {
+  expect(formatPressureHpa(1015.6)).toBe('1015.6 hPa');
+  expect(formatPressureHpa(1015.6, { ...DEFAULT_UNITS, pressure: 'kpa' })).toBe('101.56 kPa');
+  expect(formatPressureHpa(1015.6, { ...DEFAULT_UNITS, pressure: 'inhg' })).toBe('29.99 inHg');
+  expect(formatPressureHpa(null)).toBe('--');
+  expect(pressureInUnits(1013.25, { ...DEFAULT_UNITS, pressure: 'inhg' })).toBeCloseTo(29.921, 3);
 });

@@ -52,7 +52,7 @@ export function ReadingStats({ reading, units }) {
     ['Waves', reading.waveHeightFt, formatWaves(reading, units)],
     ['Period', reading.wavePeriodS, formatWavePeriod(reading)],
     ['Water', reading.waterTempC, formatTemp(reading.waterTempC, units)],
-    ['Pressure', reading.pressureHpa, formatPressure(reading)],
+    ['Pressure', reading.pressureHpa, formatPressure(reading, units)],
     ['Air', reading.airTempC, formatTemp(reading.airTempC, units)],
   ].filter(([, rawValue]) => rawValue != null);
 

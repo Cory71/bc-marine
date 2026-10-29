@@ -6,6 +6,7 @@ const KIND_LABELS = {
   height: 'Height',
   temperature: 'Temperature',
   distance: 'Distance',
+  pressure: 'Pressure',
 };
 
 // A row of toggle buttons for each kind of unit; the choice is saved on this device

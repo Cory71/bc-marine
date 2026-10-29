@@ -54,10 +54,12 @@ export function summarizeObservation({ site, reading }, units = DEFAULT_UNITS) {
   return extra ? `${formatWind(reading, units)}, ${extra}` : formatWind(reading, units);
 }
 
-// The second value for a site, shown beside its wind: gust for lighthouses, waves for buoys
-export function observationDetail({ site, reading }, units = DEFAULT_UNITS) {
+// What a site reports beside its wind: gust and waves, whichever it has.
+// Buoys report both; lighthouses report gusts (EC's lighthouse feed has no waves).
+export function observationDetail({ reading }, units = DEFAULT_UNITS) {
   if (!reading) return '';
-  if (site.type === 'buoy')
-    return reading.waveHeightFt == null ? '' : `waves ${formatWaves(reading, units)}`;
-  return reading.gustKts == null ? '' : `gust ${formatGust(reading, units)}`;
+  const parts = [];
+  if (reading.gustKts != null) parts.push(`gust ${formatGust(reading, units)}`);
+  if (reading.waveHeightFt != null) parts.push(`waves ${formatWaves(reading, units)}`);
+  return parts.join(' · ');
 }

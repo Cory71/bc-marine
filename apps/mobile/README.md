@@ -23,7 +23,7 @@ Expo / React Native app for iOS and Android. It shares its data layer with the w
   npm start --workspace bc-marine-mobile -- --clear
   ```
 
-- **Phone on a different network, or the QR code won't connect?** Use tunnel mode. The first time, Expo may ask to install a tunnel helper; say yes.
+- **Phone can't connect** (Expo Go spins, then shows "Failed to download remote update")? Use tunnel mode. It goes through the internet instead of your Wi-Fi, so it works even when the phone is on another network or the router keeps devices apart. The first time, Expo may ask to install a tunnel helper; say yes.
 
   ```bash
   npm start --workspace bc-marine-mobile -- --tunnel

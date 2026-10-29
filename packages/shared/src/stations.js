@@ -1,7 +1,9 @@
 import { BC_STATIONS, BC_COMMUNITIES, DEFAULT_STATION_NAME } from './constants.js';
+import { EXTRA_TIDE_STATIONS } from './extraTideStations.js';
 
-// Every place a user can pick: tide stations plus nearby communities
-export const ALL_LOCATIONS = [...BC_STATIONS, ...BC_COMMUNITIES];
+// Every place a user can pick: tide stations, nearby communities, and more DFO tide
+// stations (harbours and bays) that are found by search
+export const ALL_LOCATIONS = [...BC_STATIONS, ...BC_COMMUNITIES, ...EXTRA_TIDE_STATIONS];
 
 // Turn a station name into a URL-safe slug: 'Port McNeill' → 'port-mcneill'.
 // Station ids aren't unique, so names (and their slugs) identify stations.

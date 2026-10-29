@@ -22,6 +22,10 @@ export const EC_FEED_CODES = {
   Explorer: '04800',
   'Juan de Fuca Strait': '07000',
   'Haro Strait': '06100',
+  // EC's own area names, used for remote inlets far from any named place above
+  'Central Coast from McInnes Island to Pine Island': '02300',
+  'West Coast Vancouver Island North': '15300',
+  'West Coast Vancouver Island South': '16200',
 };
 
 // Sub-area filter for regions that share a single EC feed with other sub-areas.

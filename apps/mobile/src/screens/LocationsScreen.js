@@ -5,7 +5,7 @@ import { useApp } from '../context/AppContext';
 import SettingsButton from '../components/SettingsButton';
 import { useSavedSites } from '../context/useSavedSites';
 import { useColors, makeStyles } from '../theme';
-import { BC_REGIONS, BC_STATIONS, BC_COMMUNITIES, OBSERVATION_SITES, findNearestStation, isRoughLocation } from '@bc-marine/shared';
+import { BC_REGIONS, ALL_LOCATIONS, OBSERVATION_SITES, findNearestStation, isRoughLocation } from '@bc-marine/shared';
 
 export default function LocationsScreen({ navigation }) {
   const styles = useStyles();
@@ -15,7 +15,8 @@ export default function LocationsScreen({ navigation }) {
   const [openRegions, setOpenRegions] = useState({});
   const { savedSites, removeSavedSite } = useSavedSites();
 
-  const allSearchable = [...BC_STATIONS, ...BC_COMMUNITIES];
+  // Every place, including the extra harbour tide stations that only show in search
+  const allSearchable = ALL_LOCATIONS;
   const searchResults = query
     ? allSearchable.filter(s =>
         s.name.toLowerCase().includes(query.toLowerCase()) ||

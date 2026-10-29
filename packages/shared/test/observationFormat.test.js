@@ -73,7 +73,7 @@ test('summarizeObservation gives the short dashboard line', () => {
     'E 17 kts, gust 25 kts'
   );
   expect(summarizeObservation({ site: { type: 'buoy' }, reading: BUOY_READING })).toBe(
-    'W 8 kts, waves 1.3 ft'
+    'W 8 kts, gust 8 kts · waves 1.3 ft'
   );
   expect(summarizeObservation({ site: { type: 'buoy' }, reading: null })).toBe('No recent report');
 });
@@ -83,14 +83,15 @@ test('readings 48 hours or older show their age in days', () => {
   expect(formatReadingAge(new Date('2026-10-24T00:30:00Z'), NOW)).toBe('47 h ago');
 });
 
-test('observationDetail gives the second value for a site: gust or waves', () => {
+test('observationDetail gives gust for lighthouses, and gust and waves for buoys', () => {
+  const buoy = reading => observationDetail({ site: { type: 'buoy' }, reading });
   expect(observationDetail({ site: { type: 'lighthouse' }, reading: LIGHTHOUSE_READING })).toBe(
     'gust 25 kts'
   );
-  expect(observationDetail({ site: { type: 'buoy' }, reading: BUOY_READING })).toBe('waves 1.3 ft');
-  expect(
-    observationDetail({ site: { type: 'buoy' }, reading: { ...BUOY_READING, waveHeightFt: null } })
-  ).toBe('');
+  expect(buoy(BUOY_READING)).toBe('gust 8 kts · waves 1.3 ft');
+  expect(buoy({ ...BUOY_READING, waveHeightFt: null })).toBe('gust 8 kts');
+  expect(buoy({ ...BUOY_READING, gustKts: null })).toBe('waves 1.3 ft');
+  expect(buoy({ ...BUOY_READING, gustKts: null, waveHeightFt: null })).toBe('');
   expect(observationDetail({ site: { type: 'buoy' }, reading: null })).toBe('');
 });
 
@@ -98,6 +99,6 @@ test('observation text follows the chosen units', () => {
   const metric = { speed: 'kmh', height: 'm', temperature: 'c', distance: 'km' };
   expect(formatWind(LIGHTHOUSE_READING, metric)).toBe('E 31 km/h');
   expect(observationDetail({ site: { type: 'buoy' }, reading: BUOY_READING }, metric)).toBe(
-    'waves 0.4 m'
+    'gust 15 km/h · waves 0.4 m'
   );
 });

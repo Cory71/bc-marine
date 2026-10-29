@@ -38,6 +38,7 @@ test('shows each site with its type, a big wind value, gust or waves, and age', 
   expect(halibutBank.textContent).toContain('Buoy');
   expect(halibutBank.querySelector('.obs-lines__wind').textContent).toBe('W 8 kts');
   expect(halibutBank.textContent).toContain('waves 1.3 ft');
+  expect(halibutBank.textContent).toContain('gust');
 
   expect(screen.getByText('Kelp Reefs').closest('li').textContent).toContain('No recent report');
 });

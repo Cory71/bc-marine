@@ -132,6 +132,13 @@
   font-weight: 600;
 }
 
+/* Two lines: the place, then its nearest station (search's "Other places") */
+.station-button--stacked {
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+}
+
 .station-button__region {
   color: var(--color-text-secondary);
   font-size: 0.8125rem;

@@ -17,4 +17,5 @@ export * from './services/dfoService.js';
 export * from './services/weatherService.js';
 export * from './services/ecFeeds.js';
 export * from './services/ecService.js';
+export * from './services/placeNameService.js';
 export * from './services/observationService.js';

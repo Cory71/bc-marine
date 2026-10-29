@@ -3,7 +3,7 @@ import { UNIT_OPTIONS } from '@bc-marine/shared';
 import { useApp } from '../context/AppContext';
 import { makeStyles } from '../theme';
 
-const KIND_LABELS = { speed: 'Speed', height: 'Height', temperature: 'Temperature', distance: 'Distance' };
+const KIND_LABELS = { speed: 'Speed', height: 'Height', temperature: 'Temperature', distance: 'Distance', pressure: 'Pressure' };
 
 // A row of toggle buttons for each kind of unit; the choice is saved on this phone
 export default function UnitsPicker() {

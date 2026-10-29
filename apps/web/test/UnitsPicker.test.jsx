@@ -18,3 +18,10 @@ test('shows the current choice for each kind and changes it on click', () => {
   fireEvent.click(screen.getByRole('button', { name: 'm' }));
   expect(setUnit).toHaveBeenCalledWith('height', 'm');
 });
+
+test('offers pressure units', () => {
+  useApp.mockReturnValue({ units: DEFAULT_UNITS, setUnit: vi.fn() });
+  render(<UnitsPicker />);
+  const pressureGroup = screen.getByRole('group', { name: 'Pressure' });
+  expect(pressureGroup.querySelector('[aria-pressed="true"]').textContent).toBe('hPa (mb)');
+});

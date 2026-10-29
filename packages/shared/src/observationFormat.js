@@ -1,5 +1,5 @@
 import { degreesToCompass } from './units.js';
-import { DEFAULT_UNITS, formatSpeed, formatHeight } from './unitPreferences.js';
+import { DEFAULT_UNITS, formatSpeed, formatHeight, formatPressureHpa } from './unitPreferences.js';
 
 // Display text for lighthouse and buoy readings. Units come from the person's
 // chosen units (unitPreferences.js); readings themselves stay in kts, ft and °C.
@@ -27,8 +27,8 @@ export function formatWavePeriod(reading) {
   return reading?.wavePeriodS == null ? NO_VALUE : `${reading.wavePeriodS} s`;
 }
 
-export function formatPressure(reading) {
-  return reading?.pressureHpa == null ? NO_VALUE : `${reading.pressureHpa} hPa`;
+export function formatPressure(reading, units = DEFAULT_UNITS) {
+  return formatPressureHpa(reading?.pressureHpa, units);
 }
 
 // 'just now', '40 min ago', '2 h ago', '3 d ago'

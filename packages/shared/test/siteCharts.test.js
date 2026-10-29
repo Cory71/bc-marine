@@ -94,3 +94,12 @@ test('describeChart summarises each line for screen readers', () => {
     'Wind over the last 12 hours: wind 10 to 17 kts, gust 15 to 25 kts.'
   );
 });
+
+test('the pressure chart follows the chosen unit, with axis labels that stay distinct', () => {
+  const inHg = { ...DEFAULT_UNITS, pressure: 'inhg' };
+  const pressure = buildSiteCharts(LIGHTHOUSE_HISTORY, inHg).find(chart => chart.id === 'pressure');
+  expect(pressure.unit).toBe('inHg');
+  expect(pressure.lines[0].values.at(-1).value).toBeCloseTo(29.75, 2);
+  const labels = layoutChart(pressure, { width: 300, height: 150 }).yTicks.map(tick => tick.label);
+  expect(new Set(labels).size).toBe(labels.length);
+});

@@ -102,3 +102,8 @@ test('observation text follows the chosen units', () => {
     'gust 15 km/h · waves 0.4 m'
   );
 });
+
+test('formatPressure follows the chosen pressure unit', () => {
+  expect(formatPressure(LIGHTHOUSE_READING, { pressure: 'kpa' })).toBe('100.75 kPa');
+  expect(formatPressure({ pressureHpa: null }, { pressure: 'inhg' })).toBe('--');
+});

@@ -143,7 +143,7 @@ function HourlyTable({ history, showWaves }) {
               <td>{formatWind(reading, units)}</td>
               <td>{formatGust(reading, units)}</td>
               {showWaves && <td>{formatWaves(reading, units)}</td>}
-              <td>{formatPressure(reading)}</td>
+              <td>{formatPressure(reading, units)}</td>
             </tr>
           ))}
         </tbody>

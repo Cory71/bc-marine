@@ -68,6 +68,7 @@ export function buildSiteCharts(history, units = DEFAULT_UNITS) {
     unit: chartUnitLabel(type.kind, units),
     decimals: type.kind === 'pressure' ? pressureDecimals(units) : type.decimals,
     fromZero: type.fromZero,
+    clock: units.time ?? DEFAULT_UNITS.time,
     times,
     lines: type.lines.map(line => ({
       key: line.key,
@@ -137,7 +138,7 @@ export function layoutChart(chart, { width, height }) {
     height,
     plot,
     lines: chart.lines.map(line => layoutLine(line, xForTime, yForValue)),
-    xTicks: buildTimeTicks(chart.times, xForTime),
+    xTicks: buildTimeTicks(chart.times, xForTime, chart.clock),
     yTicks: ticks.map(value => ({ y: yForValue(value), label: tickLabel(value, ticks) })),
   };
 }
@@ -214,13 +215,13 @@ function layoutLine(line, xForTime, yForValue) {
 }
 
 // Time labels at the start, middle and end, in Pacific time
-function buildTimeTicks(times, xForTime) {
+function buildTimeTicks(times, xForTime, clock) {
   const indexes = [...new Set([0, Math.floor((times.length - 1) / 2), times.length - 1])];
   // Edge labels hang inwards so they aren't cut off
   const anchors = indexes.length === 3 ? ['start', 'middle', 'end'] : ['start', 'end'];
   return indexes.map((index, i) => ({
     x: xForTime(times[index]),
-    label: formatTime(times[index]),
+    label: formatTime(times[index], { time: clock }),
     anchor: anchors[i],
   }));
 }

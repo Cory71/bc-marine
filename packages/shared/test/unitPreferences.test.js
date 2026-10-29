@@ -23,6 +23,7 @@ test('the defaults are the units the app has always used', () =>
     temperature: 'c',
     distance: 'km',
     pressure: 'hpa',
+    time: '12h',
   }));
 
 test('every unit kind offers its default as an option', () => {
@@ -84,4 +85,10 @@ test('formatPressureHpa converts hPa, with 2 decimals for kPa and inHg', () => {
   expect(formatPressureHpa(1015.6, { ...DEFAULT_UNITS, pressure: 'inhg' })).toBe('29.99 inHg');
   expect(formatPressureHpa(null)).toBe('--');
   expect(pressureInUnits(1013.25, { ...DEFAULT_UNITS, pressure: 'inhg' })).toBeCloseTo(29.921, 3);
+});
+
+test('the clock can be 12-hour or 24-hour, with 12-hour the default', () => {
+  expect(UNIT_OPTIONS.time.map(option => option.label)).toEqual(['12-hour', '24-hour']);
+  expect(normalizeUnits({ speed: 'mph' }).time).toBe('12h');
+  expect(normalizeUnits({ time: '24h' }).time).toBe('24h');
 });

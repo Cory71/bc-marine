@@ -66,7 +66,7 @@ export default function TideDetailScreen({ navigation }) {
         <View style={{ alignItems: 'flex-end' }}>
           <Text style={styles.heroLabel}>Next Event</Text>
           <Text style={styles.heroValue}>{nextEvent ? `${nextEvent.type} ${formatHeight(nextEvent.heightFt, units)}` : '--'}</Text>
-          <Text style={styles.heroSub}>{nextEvent ? formatTime(nextEvent.time) : ''}</Text>
+          <Text style={styles.heroSub}>{nextEvent ? formatTime(nextEvent.time, units) : ''}</Text>
         </View>
       </View>
 
@@ -85,7 +85,7 @@ export default function TideDetailScreen({ navigation }) {
               {event.type === 'HIGH' ? '↑ HIGH' : '↓ LOW'}
             </Text>
             <Text style={styles.eventHeight}>{formatHeight(event.heightFt, units)}</Text>
-            <Text style={styles.eventTime}>{formatTime(event.time)}</Text>
+            <Text style={styles.eventTime}>{formatTime(event.time, units)}</Text>
           </View>
         ))}
       </View>

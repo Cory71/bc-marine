@@ -16,6 +16,7 @@ export const DEFAULT_UNITS = {
   temperature: 'c',
   distance: 'km',
   pressure: 'hpa',
+  time: '12h',
 };
 
 // Choices for each kind of unit, in the order they're offered.
@@ -42,6 +43,10 @@ export const UNIT_OPTIONS = {
     { value: 'hpa', label: 'hPa (mb)', unit: 'hPa' }, // millibars are the same as hPa
     { value: 'kpa', label: 'kPa' },
     { value: 'inhg', label: 'inHg' },
+  ],
+  time: [
+    { value: '12h', label: '12-hour' },
+    { value: '24h', label: '24-hour' },
   ],
 };
 

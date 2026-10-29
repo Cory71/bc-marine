@@ -86,7 +86,7 @@ function HourlyWeatherTable({ hours }) {
         <tbody>
           {hours.map((hour, i) => (
             <tr key={hour.time.toString()} className={i === 0 ? 'data-table__now' : ''}>
-              <th scope="row">{i === 0 ? 'Now' : formatTime(hour.time)}</th>
+              <th scope="row">{i === 0 ? 'Now' : formatTime(hour.time, units)}</th>
               <td>{formatWind(hour, units)}</td>
               <td>{formatHeight(hour.waveHeightFt, units)}</td>
               <td>

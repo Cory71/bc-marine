@@ -54,7 +54,7 @@ function TidesContent() {
                 ? `${capitalize(nextEvent.type)} ${formatHeight(nextEvent.heightFt, units)}`
                 : '--'
             }
-            detail={nextEvent && formatTime(nextEvent.time)}
+            detail={nextEvent && formatTime(nextEvent.time, units)}
           />
         </div>
       </Card>
@@ -110,7 +110,7 @@ function TideEventsTable({ events }) {
               {event.type === 'HIGH' ? '↑ High' : '↓ Low'}
             </th>
             <td>{formatHeight(event.heightFt, units)}</td>
-            <td>{formatTime(event.time)}</td>
+            <td>{formatTime(event.time, units)}</td>
           </tr>
         ))}
       </tbody>

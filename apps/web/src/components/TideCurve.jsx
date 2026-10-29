@@ -1,5 +1,11 @@
 import { useEffect, useState } from 'react';
-import { formatTime, getNextTideEvent, formatHeight, DEFAULT_UNITS } from '@bc-marine/shared';
+import {
+  formatTime,
+  formatHourLabel,
+  getNextTideEvent,
+  formatHeight,
+  DEFAULT_UNITS,
+} from '@bc-marine/shared';
 
 // Space around the curve for event labels (top/bottom) and the hour axis
 const PADDING = { top: 30, right: 16, bottom: 44, left: 16 };
@@ -38,7 +44,7 @@ export default function TideCurve({
         <path d={areaPath} fill="rgba(var(--accent-rgb), 0.12)" />
         <path d={curvePath} fill="none" stroke="var(--color-accent)" strokeWidth="2.5" />
 
-        <HourAxis points={points} y={height - 12} chartWidth={chartWidth} />
+        <HourAxis points={points} y={height - 12} chartWidth={chartWidth} units={units} />
         {visibleEvents.map(event => (
           <EventMarker
             key={event.time.toString()}
@@ -120,7 +126,7 @@ function describeTides(events, now, units) {
     .filter(([, event]) => event)
     .map(
       ([type, event]) =>
-        `next ${type} ${formatHeight(event.heightFt, units)} at ${formatTime(event.time)}`
+        `next ${type} ${formatHeight(event.heightFt, units)} at ${formatTime(event.time, units)}`
     );
 
   if (upcoming.length === 0) return 'Tide curve for today.';
@@ -128,8 +134,8 @@ function describeTides(events, now, units) {
   return `Tide curve for today. ${summary[0].toUpperCase()}${summary.slice(1)}.`;
 }
 
-// Hour labels every 6 readings: "12 AM", "6 AM", "12 PM", "6 PM"
-function HourAxis({ points, y, chartWidth }) {
+// Hour labels every 6 readings: "12 AM", "6 AM" (or "00:00", "06:00")
+function HourAxis({ points, y, chartWidth, units }) {
   return points
     .filter((_, i) => i % 6 === 0)
     .map(point => (
@@ -140,7 +146,7 @@ function HourAxis({ points, y, chartWidth }) {
         className="tide-curve__axis"
         textAnchor={getLabelAnchor(point.x, chartWidth)}
       >
-        {formatTime(point.time).replace(':00', '')}
+        {formatHourLabel(point.time, units)}
       </text>
     ));
 }
@@ -158,7 +164,7 @@ function EventMarker({ event, point, chartWidth, units }) {
         textAnchor={getLabelAnchor(point.x, chartWidth)}
         className="tide-curve__label"
       >
-        {formatHeight(event.heightFt, units)} · {formatTime(event.time)}
+        {formatHeight(event.heightFt, units)} · {formatTime(event.time, units)}
       </text>
     </g>
   );

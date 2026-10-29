@@ -41,29 +41,32 @@ export function useApp() {
 }
 
 // --- Active station lives in the URL (?station=tofino) so links can be shared ---
-// With no (or an unknown) ?station=, the opening station is shown instead
+// With no (or an unknown) ?station=, the opening station is shown instead. The opening
+// station keeps the address plain, so a bookmark made then follows the setting later.
 function useActiveStationFromUrl(openingStation) {
   const [searchParams, setSearchParams] = useSearchParams();
   const slug = searchParams.get('station');
   const matchedStation = slug ? findStationBySlug(slug) : undefined;
   const station = matchedStation ?? openingStation;
+  const openingSlug = toStationSlug(openingStation.name);
 
   const setBySlug = useCallback(
     newSlug =>
       setSearchParams(
         params => {
-          params.set('station', newSlug);
+          if (newSlug === openingSlug) params.delete('station');
+          else params.set('station', newSlug);
           return params;
         },
         { replace: true }
       ),
-    [setSearchParams]
+    [setSearchParams, openingSlug]
   );
 
-  // A missing or unknown slug shows the opening station — rewrite the URL to match
+  // An unknown slug shows the opening station, so take it out of the address
   useEffect(() => {
-    if (!matchedStation) setBySlug(toStationSlug(station.name));
-  }, [matchedStation, station, setBySlug]);
+    if (slug && !matchedStation) setBySlug(openingSlug);
+  }, [slug, matchedStation, openingSlug, setBySlug]);
 
   return { station, setBySlug };
 }

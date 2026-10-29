@@ -34,10 +34,10 @@ function renderApp(initialUrl = '/') {
   return renderHook(() => ({ app: useApp(), location: useLocation() }), { wrapper });
 }
 
-test('unknown ?station= falls back to Victoria', async () => {
+test('unknown ?station= falls back to Victoria and is removed from the address', async () => {
   const { result } = renderApp('/?station=atlantis');
   expect(result.current.app.activeStation.name).toBe('Victoria');
-  await waitFor(() => expect(result.current.location.search).toBe('?station=victoria'));
+  await waitFor(() => expect(result.current.location.search).toBe(''));
 });
 
 test('a known ?station= picks that station', async () => {
@@ -88,11 +88,21 @@ test('choosing a unit updates the app and is remembered on this device', async (
   expect(JSON.parse(window.localStorage.getItem('units')).height).toBe('m');
 });
 
-test('with no ?station=, the saved opening station opens', async () => {
+test('with no ?station=, the saved opening station opens and the address stays plain', async () => {
   window.localStorage.setItem('openingStation', 'tofino');
   const { result } = renderApp('/');
   expect(result.current.app.activeStation.name).toBe('Tofino');
-  await waitFor(() => expect(result.current.location.search).toBe('?station=tofino'));
+  // A bookmark made now saves the plain address, so it keeps following the setting
+  await new Promise(resolve => setTimeout(resolve, 50));
+  expect(result.current.location.search).toBe('');
+});
+
+test('picking the opening station from the list takes the station out of the address', async () => {
+  window.localStorage.setItem('openingStation', 'tofino');
+  const { result } = renderApp('/?station=sidney');
+  act(() => result.current.app.setActiveStationBySlug('tofino'));
+  await waitFor(() => expect(result.current.location.search).toBe(''));
+  expect(result.current.app.activeStation.name).toBe('Tofino');
 });
 
 test('a shared ?station= link still wins over the opening station', () => {

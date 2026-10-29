@@ -92,3 +92,9 @@ test('the clock can be 12-hour or 24-hour, with 12-hour the default', () => {
   expect(normalizeUnits({ speed: 'mph' }).time).toBe('12h');
   expect(normalizeUnits({ time: '24h' }).time).toBe('24h');
 });
+
+test('distance can be km, statute miles or nautical miles', () => {
+  expect(UNIT_OPTIONS.distance.map(option => option.label)).toEqual(['km', 'mi', 'nm']);
+  expect(formatDistance(16.09, { ...DEFAULT_UNITS, distance: 'mi' })).toBe('10 mi');
+  expect(normalizeUnits({ distance: 'mi' }).distance).toBe('mi');
+});

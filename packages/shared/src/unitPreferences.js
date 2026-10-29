@@ -6,6 +6,7 @@ const KMH_PER_KNOT = 1.852;
 const MPH_PER_KNOT = 1.150779;
 const METRES_PER_FOOT = 0.3048;
 const KM_PER_NAUTICAL_MILE = 1.852;
+const KM_PER_MILE = 1.609344;
 const KPA_PER_HPA = 0.1;
 const INHG_PER_HPA = 0.02953;
 
@@ -37,6 +38,7 @@ export const UNIT_OPTIONS = {
   ],
   distance: [
     { value: 'km', label: 'km' },
+    { value: 'mi', label: 'mi' }, // statute (land) miles
     { value: 'nm', label: 'nm' },
   ],
   pressure: [
@@ -102,10 +104,11 @@ export function formatTemp(celsius, units = DEFAULT_UNITS) {
   return `${roundTo(value, 1)} ${unitLabel('temperature', units.temperature)}`;
 }
 
-// A distance or visibility, from km: '18 km' or '10 nm'
+// A distance or visibility, from km: '18 km', '11 mi' or '10 nm'
 export function formatDistance(km, units = DEFAULT_UNITS) {
   if (km == null) return NO_VALUE;
-  const value = units.distance === 'nm' ? km / KM_PER_NAUTICAL_MILE : km;
+  const kmPerUnit = { km: 1, mi: KM_PER_MILE, nm: KM_PER_NAUTICAL_MILE }[units.distance] ?? 1;
+  const value = km / kmPerUnit;
   return `${Math.round(value)} ${unitLabel('distance', units.distance)}`;
 }
 

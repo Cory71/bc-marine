@@ -28,7 +28,7 @@ export function readLighthouseFeature(properties) {
     observedAt,
     windKts: kmhToKnots(windKmh),
     windDirDeg: windDir,
-    gustKts: kmhToKnots(checkedNumber(properties, 'max_wnd_spd_10m_pst1hr')),
+    gustKts: kmhToKnots(readGustKmh(properties)),
     pressureHpa: checkedNumber(properties, 'stn_pres'),
     airTempC: checkedNumber(properties, 'air_temp'),
   };
@@ -101,6 +101,27 @@ function numberOrNull(raw) {
   if (raw == null || raw === '' || raw === 'MM') return null;
   const number = Number(raw);
   return Number.isFinite(number) ? number : null;
+}
+
+// The past hour's top gust. Stations have two wind sensors (_1 and _2); when one spikes
+// and they disagree wildly (Entrance Island: 143 vs 12.8 km/h), the lower one is trusted,
+// unless it's below the hour's average wind, which means that sensor is broken (Estevan
+// Point: 0). The hourly average is used because a spike barely moves it.
+const SENSOR_SPIKE_RATIO = 2;
+const SENSOR_SPIKE_MIN_KMH = 20;
+
+function readGustKmh(properties) {
+  const averageWindKmh = checkedNumber(properties, 'avg_wnd_spd_10m_pst1hr');
+  const gust = checkedNumber(properties, 'max_wnd_spd_10m_pst1hr');
+  const sensor1 = numberOrNull(properties.max_wnd_spd_10m_pst1hr_1);
+  const sensor2 = numberOrNull(properties.max_wnd_spd_10m_pst1hr_2);
+  if (gust == null || sensor1 == null || sensor2 == null) return gust;
+
+  const high = Math.max(sensor1, sensor2);
+  const low = Math.min(sensor1, sensor2);
+  const sensorsDisagree = high > low * SENSOR_SPIKE_RATIO && high - low > SENSOR_SPIKE_MIN_KMH;
+  const lowSensorIsBroken = averageWindKmh != null && low < averageWindKmh;
+  return sensorsDisagree && !lowSensorIsBroken ? low : gust;
 }
 
 // An EC field's number, or null when missing or when it failed EC's quality check.

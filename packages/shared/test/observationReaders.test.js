@@ -123,3 +123,52 @@ test('a failed wind average falls back to the next one that passed', () => {
   });
   expect(reading.windKts).toBe(20);
 });
+
+// Entrance Island, 29 Oct 9 PM: one sensor spiked to 143 km/h (77 kts) and EC passed it,
+// while the station's second sensor saw 12.8 km/h (7 kts)
+const ENTRANCE_ISLAND_SPIKE = {
+  obs_date_tm: '2026-10-30T04:00:00.000Z',
+  avg_wnd_spd_10m_pst10mts: 6.5,
+  'avg_wnd_spd_10m_pst10mts-qa': 100,
+  max_wnd_spd_10m_pst1hr: 143.2,
+  'max_wnd_spd_10m_pst1hr-qa': 100,
+  max_wnd_spd_10m_pst1hr_1: 143.2,
+  max_wnd_spd_10m_pst1hr_2: 12.8,
+};
+
+test('when the two wind sensors disagree wildly, the gust uses the lower one', () =>
+  expect(readLighthouseFeature(ENTRANCE_ISLAND_SPIKE).gustKts).toBe(7));
+
+test('when the two sensors roughly agree, the main gust is kept', () => {
+  const agreeing = { ...ENTRANCE_ISLAND_SPIKE, max_wnd_spd_10m_pst1hr: 25.2 };
+  agreeing.max_wnd_spd_10m_pst1hr_1 = 25.2;
+  agreeing.max_wnd_spd_10m_pst1hr_2 = 24.9;
+  expect(readLighthouseFeature(agreeing).gustKts).toBe(14);
+});
+
+test('a backup sensor reading below the average wind is broken, so the main gust is kept', () => {
+  // Estevan Point, 29 Oct 7 PM: the second sensor read 0 while the wind averaged 15 km/h
+  const deadBackup = {
+    obs_date_tm: '2026-10-30T02:00:00.000Z',
+    avg_wnd_spd_10m_pst10mts: 15,
+    avg_wnd_spd_10m_pst1hr: 15,
+    max_wnd_spd_10m_pst1hr: 28.7,
+    max_wnd_spd_10m_pst1hr_1: 28.7,
+    max_wnd_spd_10m_pst1hr_2: 0,
+  };
+  expect(readLighthouseFeature(deadBackup).gustKts).toBe(15);
+});
+
+test('a spiking main sensor does not make a healthy backup look broken', () => {
+  // Ballenas Island, 29 Oct 8 PM: the main sensor spiked (99 km/h max, 46 km/h 10-minute
+  // average), while the backup saw 34.7 km/h, above the hour's 31.5 km/h average
+  const spiking = {
+    obs_date_tm: '2026-10-30T03:00:00.000Z',
+    avg_wnd_spd_10m_pst10mts: 46,
+    avg_wnd_spd_10m_pst1hr: 31.5,
+    max_wnd_spd_10m_pst1hr: 99.1,
+    max_wnd_spd_10m_pst1hr_1: 99.1,
+    max_wnd_spd_10m_pst1hr_2: 34.7,
+  };
+  expect(readLighthouseFeature(spiking).gustKts).toBe(19);
+});
